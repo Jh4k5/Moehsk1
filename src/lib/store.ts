@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap';
+type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat';
 
 interface QuizQuestion {
   wordId: number;
   question: string;
+  questionPinyin?: string;
   options: string[];
   correctIndex: number;
 }
@@ -16,6 +17,12 @@ interface MemoryCard {
   ar: string;
   pinyin: string;
   matched: boolean;
+  type: 'hanzi' | 'meaning';
+}
+
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
 }
 
 interface LearningStore {
@@ -48,11 +55,18 @@ interface LearningStore {
   memoryCards: MemoryCard[];
   memoryMoves: number;
   memoryPairs: number;
+  memoryLevel: number;
+  setMemoryLevel: (level: number) => void;
   startMemoryGame: (cards: MemoryCard[]) => void;
   flipMemoryCard: (id: number) => void;
   matchMemoryPair: (id1: number, id2: number) => void;
   incrementMemoryMoves: () => void;
   resetMemoryGame: () => void;
+  
+  // Chat
+  chatMessages: ChatMessage[];
+  addChatMessage: (msg: ChatMessage) => void;
+  clearChatMessages: () => void;
   
   // Streak
   dailyStreak: number;
@@ -110,6 +124,8 @@ export const useLearningStore = create<LearningStore>()(
       memoryCards: [],
       memoryMoves: 0,
       memoryPairs: 0,
+      memoryLevel: 1,
+      setMemoryLevel: (level) => set({ memoryLevel: level }),
       startMemoryGame: (cards) => set({
         memoryCards: cards,
         memoryMoves: 0,
@@ -136,6 +152,13 @@ export const useLearningStore = create<LearningStore>()(
         memoryMoves: 0,
         memoryPairs: 0,
       }),
+      
+      // Chat
+      chatMessages: [],
+      addChatMessage: (msg) => set((state) => ({
+        chatMessages: [...state.chatMessages, msg],
+      })),
+      clearChatMessages: () => set({ chatMessages: [] }),
       
       // Streak
       dailyStreak: 0,

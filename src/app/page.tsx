@@ -1044,7 +1044,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
   setToneRound: (r: number) => void
 }) {
   const store = useLearningStore()
-  const { memoryCards, memoryMoves, memoryPairs } = store
+  const { memoryCards, memoryMoves, memoryPairs, incrementStreak } = store
 
   const startToneGame = () => {
     setToneRound(0)

@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -90,15 +89,15 @@
 
 /* Chinese font classes */
 .font-chinese-serif {
-  font-family: 'Noto Serif SC', serif;
+  font-family: var(--font-noto-serif-sc), 'Noto Serif SC', serif;
 }
 
 .font-chinese-sans {
-  font-family: 'Noto Sans SC', sans-serif;
+  font-family: var(--font-noto-sans-sc), 'Noto Sans SC', sans-serif;
 }
 
 .font-arabic {
-  font-family: 'Tajawal', sans-serif;
+  font-family: var(--font-tajawal), 'Tajawal', sans-serif;
 }
 
 /* Flashcard flip animation */

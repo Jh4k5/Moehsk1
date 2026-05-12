@@ -189,7 +189,7 @@ export default function HanziSection() {
     if (!hanziWriterLoaded || !containerRef.current || !selectedChar) return
     const HW = (window as any).HanziWriter
     containerRef.current.innerHTML = ''
-    writerRef.current = HW(containerRef.current, selectedChar, {
+    writerRef.current = new HW(containerRef.current, selectedChar, {
       width: 250,
       height: 250,
       padding: 20,
@@ -212,7 +212,7 @@ export default function HanziSection() {
   const showNextStroke = useCallback(() => {
     if (!writerRef.current || !currentData) return
     if (revealedStrokes < currentData.strokes) {
-      writerRef.current.showStroke(revealedStrokes)
+      writerRef.current.animateStroke(revealedStrokes)
       setRevealedStrokes(prev => prev + 1)
     }
   }, [revealedStrokes, currentData])
@@ -222,7 +222,7 @@ export default function HanziSection() {
     if (!hanziWriterLoaded || !containerRef.current || !selectedChar) return
     const HW = (window as any).HanziWriter
     containerRef.current.innerHTML = ''
-    writerRef.current = HW(containerRef.current, selectedChar, {
+    writerRef.current = new HW(containerRef.current, selectedChar, {
       width: 250,
       height: 250,
       padding: 20,
@@ -270,7 +270,7 @@ export default function HanziSection() {
       if (!hanziWriterLoaded || !quizContainerRef.current || !randomChar) return
       const HW = (window as any).HanziWriter
       quizContainerRef.current.innerHTML = ''
-      const qWriter = HW(quizContainerRef.current, randomChar, {
+      const qWriter = new HW(quizContainerRef.current, randomChar, {
         width: 200,
         height: 200,
         padding: 15,
@@ -289,7 +289,7 @@ export default function HanziSection() {
     if (qWriter && quizChar) {
       const totalStrokes = characterData[quizChar]?.strokes || 0
       if (quizRevealed < totalStrokes) {
-        qWriter.showStroke(quizRevealed)
+        qWriter.animateStroke(quizRevealed)
         setQuizRevealed(prev => prev + 1)
       }
     }

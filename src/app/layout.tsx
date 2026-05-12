@@ -45,6 +45,14 @@ export default function RootLayout({
           src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"
           strategy="afterInteractive"
         />
+        <Script
+          src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+          strategy="afterInteractive"
+        />
+        <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"
+          strategy="afterInteractive"
+        />
         <Toaster />
       </body>
     </html>

@@ -23,7 +23,10 @@ type Section =
   | 'stories'
   | 'exam'
   | 'chat'
-  | 'roadmap';
+  | 'roadmap'
+  | 'pronunciation'
+  | 'visual-dict'
+  | 'achievements';
 
 // ── Existing interfaces ───────────────────────────────────────────────────
 interface QuizQuestion {

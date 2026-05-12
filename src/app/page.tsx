@@ -20,12 +20,17 @@ import HanziSection from '@/components/HanziSection'
 import LessonSystem from '@/components/LessonSystem'
 import ConversationsSection from '@/components/ConversationsSection'
 import QASection from '@/components/QASection'
+import ExamSimulator from '@/components/ExamSimulator'
+import PronunciationPractice from '@/components/PronunciationPractice'
+import VisualDictionary from '@/components/VisualDictionary'
+import AchievementsSection from '@/components/AchievementsSection'
 import {
   BookOpen, GraduationCap, Gamepad2, BookMarked, Map, LayoutDashboard,
   Volume2, ChevronLeft, ChevronRight, RotateCcw, Star, Check, X,
   Brain, Trophy, Target, Sparkles, Search, Filter, Eye, Heart,
   Clock, Flame, Languages, MessageCircle, ArrowLeftRight, Bot,
-  Send, MoreHorizontal, Lightbulb, Headphones, PenTool, HelpCircle
+  Send, MoreHorizontal, Lightbulb, Headphones, PenTool, HelpCircle,
+  Mic, Camera, Award
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -487,7 +492,7 @@ const allSentences = buildAllSentences()
 // ═══════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
-type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat' | 'pinyin' | 'hanzi' | 'lessons' | 'conversations' | 'qa'
+type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat' | 'pinyin' | 'hanzi' | 'lessons' | 'conversations' | 'qa' | 'exam' | 'pronunciation' | 'visual-dict' | 'achievements'
 
 export default function Home() {
   const store = useLearningStore()
@@ -555,6 +560,10 @@ export default function Home() {
     { id: 'lessons' as Section, label: 'الدروس', icon: BookOpen },
     { id: 'conversations' as Section, label: 'المحادثات', icon: MessageCircle },
     { id: 'qa' as Section, label: 'أسئلة وأجوبة', icon: HelpCircle },
+    { id: 'pronunciation' as Section, label: 'تقييم النطق', icon: Mic },
+    { id: 'exam' as Section, label: 'اختبار HSK', icon: Trophy },
+    { id: 'visual-dict' as Section, label: 'القاموس البصري', icon: Camera },
+    { id: 'achievements' as Section, label: 'الإنجازات', icon: Award },
     { id: 'sentences' as Section, label: 'الجمل', icon: MessageCircle },
     { id: 'stories' as Section, label: 'القصص', icon: BookMarked },
     { id: 'chat' as Section, label: 'المساعد', icon: Bot },
@@ -723,7 +732,7 @@ export default function Home() {
           ))}
           <button
             onClick={() => {
-              const moreSections: Section[] = ['sentences', 'stories', 'chat', 'games', 'roadmap', 'conversations', 'qa']
+              const moreSections: Section[] = ['pronunciation', 'exam', 'visual-dict', 'achievements', 'sentences', 'stories', 'chat', 'games', 'roadmap', 'conversations', 'qa']
               const currentIdx = moreSections.indexOf(store.currentSection as Section)
               const nextIdx = (currentIdx + 1) % moreSections.length
               setCurrentSection(moreSections[nextIdx])
@@ -803,6 +812,10 @@ export default function Home() {
               {currentSection === 'lessons' && <LessonSystem />}
               {currentSection === 'conversations' && <ConversationsSection />}
               {currentSection === 'qa' && <QASection />}
+              {currentSection === 'exam' && <ExamSimulator />}
+              {currentSection === 'pronunciation' && <PronunciationPractice />}
+              {currentSection === 'visual-dict' && <VisualDictionary />}
+              {currentSection === 'achievements' && <AchievementsSection />}
             </motion.div>
           </AnimatePresence>
         </main>

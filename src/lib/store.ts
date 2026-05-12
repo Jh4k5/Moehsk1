@@ -1,8 +1,31 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import {
+  type SRSCard,
+  type Quality,
+  createSRSCard,
+  calculateNextReview,
+  isDueForReview,
+  getWeakWords as getWeakWordsUtil,
+} from './srs';
 
-type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat';
+// ── Section type ──────────────────────────────────────────────────────────
+type Section =
+  | 'dashboard'
+  | 'vocabulary'
+  | 'pinyin'
+  | 'hanzi'
+  | 'lessons'
+  | 'grammar'
+  | 'conversations'
+  | 'practice'
+  | 'games'
+  | 'stories'
+  | 'exam'
+  | 'chat'
+  | 'roadmap';
 
+// ── Existing interfaces ───────────────────────────────────────────────────
 interface QuizQuestion {
   wordId: number;
   question: string;
@@ -25,22 +48,59 @@ interface ChatMessage {
   content: string;
 }
 
-interface LearningStore {
+// ── SRS State ─────────────────────────────────────────────────────────────
+interface SRSState {
+  srsCards: Record<number, SRSCard>;
+  rateWord: (wordId: number, quality: Quality) => void;
+  getSRSStats: () => { total: number; new: number; learning: number; review: number; mastered: number };
+  getDueCardIds: () => number[];
+  getWeakWordIds: (limit?: number) => number[];
+  getCardDifficulty: (wordId: number) => string;
+}
+
+// ── Game State ────────────────────────────────────────────────────────────
+interface GameState {
+  gameTimer: number;
+  setGameTimer: (t: number) => void;
+  gameDifficulty: 'easy' | 'medium' | 'hard';
+  setGameDifficulty: (d: 'easy' | 'medium' | 'hard') => void;
+  gameScore: number;
+  setGameScore: (s: number) => void;
+  gameStreak: number;
+  setGameStreak: (s: number) => void;
+}
+
+// ── Exam State ────────────────────────────────────────────────────────────
+interface ExamState {
+  examStarted: boolean;
+  examType: 'listening' | 'reading' | 'full' | null;
+  examAnswers: Record<number, number>;
+  examScore: number;
+  examTimeRemaining: number;
+  setExamState: (state: Partial<ExamState>) => void;
+  resetExam: () => void;
+}
+
+// ── Combined Store ────────────────────────────────────────────────────────
+interface LearningStore
+  extends SRSState,
+    GameState,
+    ExamState {
   // Navigation
   currentSection: Section;
   setCurrentSection: (section: Section) => void;
-  
+
   // Progress
   learnedWords: number[];
   toggleLearned: (id: number) => void;
   isLearned: (id: number) => boolean;
-  
+
   // Flashcard
   flashcardIndex: number;
   setFlashcardIndex: (index: number) => void;
   isFlipped: boolean;
   flip: () => void;
-  
+
   // Quiz
   quizScore: number;
   quizTotal: number;
@@ -50,7 +110,7 @@ interface LearningStore {
   answerQuiz: (correct: boolean) => void;
   resetQuiz: () => void;
   nextQuizQuestion: () => void;
-  
+
   // Memory Game
   memoryCards: MemoryCard[];
   memoryMoves: number;
@@ -62,105 +122,109 @@ interface LearningStore {
   matchMemoryPair: (id1: number, id2: number) => void;
   incrementMemoryMoves: () => void;
   resetMemoryGame: () => void;
-  
+
   // Chat
   chatMessages: ChatMessage[];
   addChatMessage: (msg: ChatMessage) => void;
   clearChatMessages: () => void;
-  
+
   // Streak
   dailyStreak: number;
   lastStudyDate: string;
   incrementStreak: () => void;
 }
 
+export type { Section, QuizQuestion, MemoryCard, ChatMessage };
+
 export const useLearningStore = create<LearningStore>()(
   persist(
     (set, get) => ({
-      // Navigation
+      // ── Navigation ────────────────────────────────────────────────────
       currentSection: 'dashboard',
       setCurrentSection: (section) => set({ currentSection: section }),
-      
-      // Progress
+
+      // ── Progress ──────────────────────────────────────────────────────
       learnedWords: [],
-      toggleLearned: (id) => set((state) => ({
-        learnedWords: state.learnedWords.includes(id)
-          ? state.learnedWords.filter((w) => w !== id)
-          : [...state.learnedWords, id],
-      })),
+      toggleLearned: (id) =>
+        set((state) => ({
+          learnedWords: state.learnedWords.includes(id)
+            ? state.learnedWords.filter((w) => w !== id)
+            : [...state.learnedWords, id],
+        })),
       isLearned: (id) => get().learnedWords.includes(id),
-      
-      // Flashcard
+
+      // ── Flashcard ─────────────────────────────────────────────────────
       flashcardIndex: 0,
       setFlashcardIndex: (index) => set({ flashcardIndex: index, isFlipped: false }),
       isFlipped: false,
       flip: () => set((state) => ({ isFlipped: !state.isFlipped })),
-      
-      // Quiz
+
+      // ── Quiz ──────────────────────────────────────────────────────────
       quizScore: 0,
       quizTotal: 0,
       currentQuizQuestion: 0,
       quizQuestions: [],
-      startQuiz: (questions) => set({
-        quizQuestions: questions,
-        quizScore: 0,
-        quizTotal: questions.length,
-        currentQuizQuestion: 0,
-      }),
-      answerQuiz: (correct) => set((state) => ({
-        quizScore: correct ? state.quizScore + 1 : state.quizScore,
-      })),
-      resetQuiz: () => set({
-        quizScore: 0,
-        quizTotal: 0,
-        currentQuizQuestion: 0,
-        quizQuestions: [],
-      }),
-      nextQuizQuestion: () => set((state) => ({
-        currentQuizQuestion: Math.min(state.currentQuizQuestion + 1, state.quizQuestions.length - 1),
-      })),
-      
-      // Memory Game
+      startQuiz: (questions) =>
+        set({
+          quizQuestions: questions,
+          quizScore: 0,
+          quizTotal: questions.length,
+          currentQuizQuestion: 0,
+        }),
+      answerQuiz: (correct) =>
+        set((state) => ({
+          quizScore: correct ? state.quizScore + 1 : state.quizScore,
+        })),
+      resetQuiz: () =>
+        set({
+          quizScore: 0,
+          quizTotal: 0,
+          currentQuizQuestion: 0,
+          quizQuestions: [],
+        }),
+      nextQuizQuestion: () =>
+        set((state) => ({
+          currentQuizQuestion: Math.min(
+            state.currentQuizQuestion + 1,
+            state.quizQuestions.length - 1,
+          ),
+        })),
+
+      // ── Memory Game ───────────────────────────────────────────────────
       memoryCards: [],
       memoryMoves: 0,
       memoryPairs: 0,
       memoryLevel: 1,
       setMemoryLevel: (level) => set({ memoryLevel: level }),
-      startMemoryGame: (cards) => set({
-        memoryCards: cards,
-        memoryMoves: 0,
-        memoryPairs: 0,
-      }),
-      flipMemoryCard: (id) => set((state) => ({
-        memoryCards: state.memoryCards.map((card) =>
-          card.id === id ? { ...card } : card
-        ),
-      })),
-      matchMemoryPair: (id1, id2) => set((state) => ({
-        memoryCards: state.memoryCards.map((card) =>
-          card.id === id1 || card.id === id2
-            ? { ...card, matched: true }
-            : card
-        ),
-        memoryPairs: state.memoryPairs + 1,
-      })),
-      incrementMemoryMoves: () => set((state) => ({
-        memoryMoves: state.memoryMoves + 1,
-      })),
-      resetMemoryGame: () => set({
-        memoryCards: [],
-        memoryMoves: 0,
-        memoryPairs: 0,
-      }),
-      
-      // Chat
+      startMemoryGame: (cards) =>
+        set({ memoryCards: cards, memoryMoves: 0, memoryPairs: 0 }),
+      flipMemoryCard: (id) =>
+        set((state) => ({
+          memoryCards: state.memoryCards.map((card) =>
+            card.id === id ? { ...card } : card,
+          ),
+        })),
+      matchMemoryPair: (id1, id2) =>
+        set((state) => ({
+          memoryCards: state.memoryCards.map((card) =>
+            card.id === id1 || card.id === id2
+              ? { ...card, matched: true }
+              : card,
+          ),
+          memoryPairs: state.memoryPairs + 1,
+        })),
+      incrementMemoryMoves: () =>
+        set((state) => ({ memoryMoves: state.memoryMoves + 1 })),
+      resetMemoryGame: () =>
+        set({ memoryCards: [], memoryMoves: 0, memoryPairs: 0 }),
+
+      // ── Chat ──────────────────────────────────────────────────────────
       chatMessages: [],
-      addChatMessage: (msg) => set((state) => ({
-        chatMessages: [...state.chatMessages, msg],
-      })),
+      addChatMessage: (msg) =>
+        set((state) => ({ chatMessages: [...state.chatMessages, msg] })),
       clearChatMessages: () => set({ chatMessages: [] }),
-      
-      // Streak
+
+      // ── Streak ────────────────────────────────────────────────────────
       dailyStreak: 0,
       lastStudyDate: '',
       incrementStreak: () => {
@@ -176,6 +240,82 @@ export const useLearningStore = create<LearningStore>()(
           }
         }
       },
+
+      // ── SRS (Spaced Repetition System) ────────────────────────────────
+      srsCards: {},
+
+      rateWord: (wordId: number, quality: Quality) => {
+        const { srsCards } = get();
+        const existing = srsCards[wordId] || createSRSCard(wordId);
+        const updated = calculateNextReview(existing, quality);
+        set({ srsCards: { ...srsCards, [wordId]: updated } });
+      },
+
+      getSRSStats: () => {
+        const { srsCards } = get();
+        const cards = Object.values(srsCards);
+        return {
+          total: cards.length,
+          new: cards.filter((c) => c.reviewCount === 0).length,
+          learning: cards.filter(
+            (c) => c.reviewCount > 0 && c.repetitions < 3,
+          ).length,
+          review: cards.filter(
+            (c) => c.repetitions >= 1 && isDueForReview(c),
+          ).length,
+          mastered: cards.filter(
+            (c) => c.repetitions >= 3 && c.easeFactor >= 2.0,
+          ).length,
+        };
+      },
+
+      getDueCardIds: () => {
+        const { srsCards } = get();
+        return Object.values(srsCards)
+          .filter(isDueForReview)
+          .map((c) => c.wordId);
+      },
+
+      getWeakWordIds: (limit = 20) => {
+        const { srsCards } = get();
+        return getWeakWordsUtil(Object.values(srsCards), limit);
+      },
+
+      getCardDifficulty: (wordId: number) => {
+        const { srsCards } = get();
+        const card = srsCards[wordId];
+        if (!card) return 'new';
+        if (card.easeFactor >= 2.0 && card.repetitions >= 3) return 'easy';
+        if (card.easeFactor >= 1.5) return 'medium';
+        return 'hard';
+      },
+
+      // ── Game ──────────────────────────────────────────────────────────
+      gameTimer: 0,
+      setGameTimer: (t: number) => set({ gameTimer: t }),
+      gameDifficulty: 'medium' as const,
+      setGameDifficulty: (d: 'easy' | 'medium' | 'hard') =>
+        set({ gameDifficulty: d }),
+      gameScore: 0,
+      setGameScore: (s: number) => set({ gameScore: s }),
+      gameStreak: 0,
+      setGameStreak: (s: number) => set({ gameStreak: s }),
+
+      // ── Exam ──────────────────────────────────────────────────────────
+      examStarted: false,
+      examType: null,
+      examAnswers: {},
+      examScore: 0,
+      examTimeRemaining: 0,
+      setExamState: (partial) => set(partial as Partial<LearningStore>),
+      resetExam: () =>
+        set({
+          examStarted: false,
+          examType: null,
+          examAnswers: {},
+          examScore: 0,
+          examTimeRemaining: 0,
+        }),
     }),
     {
       name: 'hsk-learning-storage',
@@ -183,7 +323,8 @@ export const useLearningStore = create<LearningStore>()(
         learnedWords: state.learnedWords,
         dailyStreak: state.dailyStreak,
         lastStudyDate: state.lastStudyDate,
+        srsCards: state.srsCards,
       }),
-    }
-  )
+    },
+  ),
 );

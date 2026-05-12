@@ -241,7 +241,7 @@ export default function HanziSection() {
       prevCharRef.current = selectedChar
       const HW = (window as any).HanziWriter
       containerRef.current.innerHTML = ''
-      writerRef.current = HW(containerRef.current, selectedChar, {
+      writerRef.current = new HW(containerRef.current, selectedChar, {
         width: 250,
         height: 250,
         padding: 20,

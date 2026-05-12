@@ -34,6 +34,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <script
+          src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body
         className={`${tajawal.variable} ${notoSansSC.variable} ${notoSerifSC.variable} antialiased bg-background text-foreground font-arabic`}
         style={{ fontFamily: "'Tajawal', sans-serif" }}

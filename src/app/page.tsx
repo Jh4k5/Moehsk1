@@ -15,12 +15,17 @@ import {
 } from '@/components/ui/accordion'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import PinyinHub from '@/components/PinyinHub'
+import HanziSection from '@/components/HanziSection'
+import LessonSystem from '@/components/LessonSystem'
+import ConversationsSection from '@/components/ConversationsSection'
+import QASection from '@/components/QASection'
 import {
   BookOpen, GraduationCap, Gamepad2, BookMarked, Map, LayoutDashboard,
   Volume2, ChevronLeft, ChevronRight, RotateCcw, Star, Check, X,
   Brain, Trophy, Target, Sparkles, Search, Filter, Eye, Heart,
   Clock, Flame, Languages, MessageCircle, ArrowLeftRight, Bot,
-  Send, MoreHorizontal, Lightbulb
+  Send, MoreHorizontal, Lightbulb, Headphones, PenTool, HelpCircle
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -482,7 +487,7 @@ const allSentences = buildAllSentences()
 // ═══════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
-type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat'
+type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat' | 'pinyin' | 'hanzi' | 'lessons' | 'conversations' | 'qa'
 
 export default function Home() {
   const store = useLearningStore()
@@ -545,6 +550,11 @@ export default function Home() {
     { id: 'grammar' as Section, label: 'القواعد', icon: GraduationCap },
     { id: 'practice' as Section, label: 'التمارين', icon: Target },
     { id: 'games' as Section, label: 'الألعاب', icon: Gamepad2 },
+    { id: 'pinyin' as Section, label: 'بينيين', icon: Headphones },
+    { id: 'hanzi' as Section, label: 'تعلم الرموز', icon: PenTool },
+    { id: 'lessons' as Section, label: 'الدروس', icon: BookOpen },
+    { id: 'conversations' as Section, label: 'المحادثات', icon: MessageCircle },
+    { id: 'qa' as Section, label: 'أسئلة وأجوبة', icon: HelpCircle },
     { id: 'sentences' as Section, label: 'الجمل', icon: MessageCircle },
     { id: 'stories' as Section, label: 'القصص', icon: BookMarked },
     { id: 'chat' as Section, label: 'المساعد', icon: Bot },
@@ -713,7 +723,7 @@ export default function Home() {
           ))}
           <button
             onClick={() => {
-              const moreSections: Section[] = ['sentences', 'stories', 'chat', 'games', 'roadmap']
+              const moreSections: Section[] = ['sentences', 'stories', 'chat', 'games', 'roadmap', 'conversations', 'qa']
               const currentIdx = moreSections.indexOf(store.currentSection as Section)
               const nextIdx = (currentIdx + 1) % moreSections.length
               setCurrentSection(moreSections[nextIdx])
@@ -788,6 +798,11 @@ export default function Home() {
               )}
               {currentSection === 'chat' && <ChatSection />}
               {currentSection === 'roadmap' && <RoadmapSection />}
+              {currentSection === 'pinyin' && <PinyinHub />}
+              {currentSection === 'hanzi' && <HanziSection />}
+              {currentSection === 'lessons' && <LessonSystem />}
+              {currentSection === 'conversations' && <ConversationsSection />}
+              {currentSection === 'qa' && <QASection />}
             </motion.div>
           </AnimatePresence>
         </main>

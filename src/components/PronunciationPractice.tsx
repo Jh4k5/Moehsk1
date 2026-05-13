@@ -24,76 +24,47 @@ const speak = (text: string, lang = 'zh-CN') => {
 
 // ─── Levenshtein Distance ───────────────────────────────────
 function levenshteinDistance(a: string, b: string): number {
-  const matrix: number[][] = []
-  for (let i = 0; i <= b.length; i++) matrix[i] = [i]
-  for (let j = 0; j <= a.length; j++) matrix[0][j] = j
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1]
+  const dp: number[][] = []
+  for (let i = 0; i <= a.length; i++) {
+    dp[i] = []
+    for (let j = 0; j <= b.length; j++) {
+      if (i === 0) { dp[i][j] = j }
+      else if (j === 0) { dp[i][j] = i }
+      else { dp[i][j] = 0 }
+    }
+  }
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1]
       } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
-        )
+        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
       }
     }
   }
-  return matrix[b.length][a.length]
+  return dp[a.length][b.length]
 }
 
-// ─── Similarity Score ───────────────────────────────────────
-function calculateSimilarity(spoken: string, expected: string): number {
-  if (!spoken || !expected) return 0
-  const cleanSpoken = spoken.trim().toLowerCase()
-  const cleanExpected = expected.trim().toLowerCase()
-  if (cleanSpoken === cleanExpected) return 100
-  const distance = levenshteinDistance(cleanSpoken, cleanExpected)
-  const maxLen = Math.max(cleanSpoken.length, cleanExpected.length)
-  if (maxLen === 0) return 100
-  return Math.round(((maxLen - distance) / maxLen) * 100)
+// ─── Pronunciation Engine (accurate) ─────────────────────────
+function cleanText(t: string): string {
+  return t.replace(/[\s，。！？、]/g, '').toLowerCase()
 }
 
-// ─── Pronunciation Scoring ──────────────────────────────────
-function scorePronunciation(spoken: string, expected: string, confidence: number): {
+function scorePronunciation(spoken: string, expected: string): {
   score: number
   color: string
-  feedback: string
   feedbackAr: string
 } {
-  const similarity = calculateSimilarity(spoken, expected)
-  const weightedScore = Math.round(similarity * 0.6 + confidence * 100 * 0.4)
-
-  if (weightedScore >= 85) {
-    return {
-      score: weightedScore,
-      color: '#22c55e',
-      feedback: 'Excellent pronunciation!',
-      feedbackAr: 'ممتاز! نطقك رائع! 🎉',
-    }
-  } else if (weightedScore >= 65) {
-    return {
-      score: weightedScore,
-      color: '#f97316',
-      feedback: 'Good, but keep practicing!',
-      feedbackAr: 'جيد! لكن استمر في التدريب 💪',
-    }
-  } else if (weightedScore >= 40) {
-    return {
-      score: weightedScore,
-      color: '#eab308',
-      feedback: 'Needs more practice.',
-      feedbackAr: 'يحتاج مزيد من التمرين 📝',
-    }
-  } else {
-    return {
-      score: weightedScore,
-      color: '#ef4444',
-      feedback: 'Try again, listen carefully.',
-      feedbackAr: 'حاول مرة أخرى، استمع جيداً 🎧',
-    }
-  }
+  const s = cleanText(spoken)
+  const e = cleanText(expected)
+  if (s === e) return { score: 100, color: '#27AE60', feedbackAr: 'ممتاز 🏆' }
+  const maxL = Math.max(s.length, e.length)
+  const simScore = maxL ? (maxL - levenshteinDistance(s, e)) / maxL : 0
+  const score = Math.round(simScore * 100)
+  if (score >= 85) return { score, color: '#27AE60', feedbackAr: 'ممتاز 🏆' }
+  if (score >= 65) return { score, color: '#F5A623', feedbackAr: 'جيد جداً ⭐' }
+  if (score >= 40) return { score, color: '#E67E22', feedbackAr: 'جيد 👍' }
+  return { score, color: '#E84C4C', feedbackAr: 'حاول مجدداً 💪' }
 }
 
 // ─── Practice Words ─────────────────────────────────────────
@@ -221,18 +192,26 @@ export default function PronunciationPractice() {
     const recognition = new SpeechRecognition()
     recognition.lang = 'zh-CN'
     recognition.interimResults = false
-    recognition.maxAlternatives = 3
+    recognition.maxAlternatives = 5
     recognition.continuous = false
 
     recognition.onresult = (event: any) => {
-      const results: SpeechRecognitionResultList = event.results
-      const spoken = results[0][0].transcript
-      const confidence = results[0][0].confidence
+      // Pick best score across all 5 alternatives
+      let bestSpoken = ''
+      let bestScore = 0
+      for (let i = 0; i < event.results[0].length; i++) {
+        const alt = event.results[0][i].transcript
+        const sc = scorePronunciation(alt, currentWord.zh)
+        if (sc.score > bestScore) {
+          bestScore = sc.score
+          bestSpoken = alt
+        }
+      }
 
-      const pronResult = scorePronunciation(spoken, currentWord.zh, confidence)
+      const pronResult = scorePronunciation(bestSpoken, currentWord.zh)
       setResult({
-        spoken,
-        confidence,
+        spoken: bestSpoken,
+        confidence: 0,
         score: pronResult.score,
         color: pronResult.color,
         feedbackAr: pronResult.feedbackAr,
@@ -264,7 +243,7 @@ export default function PronunciationPractice() {
           setError('لا يمكن الوصول إلى الميكروفون. تأكد من السماح بالوصول.')
           break
         case 'not-allowed':
-          setError('تم رفض إذن الميكروفون. يرجى السماح بالوصول.')
+          setError('يجب السماح للمايكروفون')
           break
         case 'network':
           setError('خطأ في الشبكة. تأكد من اتصالك بالإنترنت.')

@@ -34,6 +34,31 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+// ─── Learned Word Helpers (srs_data in localStorage) ───────
+function isWordLearned(wordId: number): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    const data = JSON.parse(localStorage.getItem('srs_data') || '{}')
+    return !!(data[wordId] && data[wordId].review_count >= 3)
+  } catch { return false }
+}
+
+function markWordLearned(wordId: number): void {
+  if (typeof window === 'undefined') return
+  try {
+    const data = JSON.parse(localStorage.getItem('srs_data') || '{}')
+    if (!data[wordId]) data[wordId] = { review_count: 0 }
+    data[wordId].review_count = (data[wordId].review_count || 0) + 1
+    data[wordId].last_seen = Date.now()
+    localStorage.setItem('srs_data', JSON.stringify(data))
+  } catch { /* ignore */ }
+}
+
+function resetLearnedProgress(): void {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem('srs_data')
+}
+
 // ─── TTS Helper ─────────────────────────────────────────────
 const speak = (text: string, lang = 'zh-CN') => {
   if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -932,7 +957,16 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
   setSelectedCategory: (c: string) => void
 }) {
   const store = useLearningStore()
-  const word = filteredVocab[store.flashcardIndex]
+  const [showLearned, setShowLearned] = useState(true)
+  const [learnedTick, setLearnedTick] = useState(0)
+
+  // Filter out learned words unless explicitly showing them
+  const displayVocab = useMemo(() => {
+    if (showLearned) return filteredVocab
+    return filteredVocab.filter(w => !isWordLearned(w.id))
+  }, [filteredVocab, showLearned, learnedTick])
+
+  const word = displayVocab[store.flashcardIndex]
 
   // Build sentence list for the word
   const wordSentences = useMemo(() => {
@@ -952,7 +986,25 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
           <BookOpen className="w-6 h-6 text-red-600" />
           المفردات
         </h2>
-        <Badge variant="secondary">{filteredVocab.length} كلمة</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">{displayVocab.length} كلمة</Badge>
+          <Button
+            variant={showLearned ? 'outline' : 'default'}
+            size="sm"
+            onClick={() => { setShowLearned(!showLearned); store.setFlashcardIndex(0) }}
+            className="text-xs"
+          >
+            {showLearned ? 'إخفاء المحفوظة' : 'عرض الكل'}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => { resetLearnedProgress(); setLearnedTick(t => t + 1); store.setFlashcardIndex(0) }}
+            className="text-xs text-red-600 hover:text-red-700"
+          >
+            إعادة تعيين
+          </Button>
+        </div>
       </div>
 
       {/* Search & Filter */}
@@ -1053,7 +1105,12 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
               <Button
                 size="sm"
                 variant={store.isLearned(word.id) ? 'default' : 'outline'}
-                onClick={() => { toggleLearned(word.id); incrementStreak() }}
+                onClick={() => {
+                  toggleLearned(word.id)
+                  markWordLearned(word.id)
+                  incrementStreak()
+                  setLearnedTick(t => t + 1)
+                }}
                 className={store.isLearned(word.id) ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
               >
                 {store.isLearned(word.id) ? <><Check className="w-4 h-4 ml-1" /> تم الحفظ</> : <><Star className="w-4 h-4 ml-1" /> حفظ</>}
@@ -1066,7 +1123,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
               variant="outline"
               size="sm"
               onClick={() => store.setFlashcardIndex(store.flashcardIndex + 1)}
-              disabled={store.flashcardIndex >= filteredVocab.length - 1}
+              disabled={store.flashcardIndex >= displayVocab.length - 1}
             >
               التالي
               <ChevronLeft className="w-4 h-4" />
@@ -1074,7 +1131,10 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
           </div>
 
           <div className="text-center text-sm text-gray-500">
-            {store.flashcardIndex + 1} / {filteredVocab.length}
+            {store.flashcardIndex + 1} / {displayVocab.length}
+            {!showLearned && (
+              <span className="text-xs text-gray-400 mr-2">(المحفوظة مخفية)</span>
+            )}
           </div>
         </div>
       )}
@@ -1084,22 +1144,23 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
         <Accordion type="single" collapsible>
           <AccordionItem value="list" className="border-0">
             <AccordionTrigger className="py-3 text-sm font-medium text-gray-700">
-              قائمة الكلمات ({filteredVocab.length})
+              قائمة الكلمات ({displayVocab.length})
             </AccordionTrigger>
             <AccordionContent>
               <div className="max-h-96 overflow-y-auto custom-scrollbar space-y-1">
-                {filteredVocab.map((w) => (
+                {displayVocab.map((w) => (
                   <button
                     key={w.id}
-                    onClick={() => store.setFlashcardIndex(filteredVocab.findIndex(v => v.id === w.id))}
+                    onClick={() => store.setFlashcardIndex(displayVocab.findIndex(v => v.id === w.id))}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-right transition-colors hover:bg-gray-50 ${
                       store.isLearned(w.id) ? 'bg-emerald-50/50' : ''
-                    }`}
+                    } ${isWordLearned(w.id) ? 'opacity-60' : ''}`}
                   >
                     <span className="font-chinese-serif text-lg w-20 text-gray-900">{w.zh}</span>
                     <span className="text-xs text-gray-500 font-chinese-sans w-28">{w.pinyin}</span>
                     <span className="text-sm text-gray-700 flex-1">{w.meaning}</span>
-                    {store.isLearned(w.id) && <Check className="w-4 h-4 text-emerald-600" />}
+                    {isWordLearned(w.id) && <Badge variant="outline" className="text-[10px] text-emerald-600">✓ محفوظة</Badge>}
+                    {!isWordLearned(w.id) && store.isLearned(w.id) && <Check className="w-4 h-4 text-emerald-600" />}
                   </button>
                 ))}
               </div>

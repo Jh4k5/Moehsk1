@@ -157,14 +157,14 @@ export default function HanziSection() {
   const containerRef = useRef<HTMLDivElement>(null)
   const quizContainerRef = useRef<HTMLDivElement>(null)
 
-  // Load hanzi-writer from CDN (only sets state in async callback)
+  // Detect hanzi-writer from CDN (loaded via layout.tsx <Script>)
   useEffect(() => {
-    if (typeof window === 'undefined' || hanziWriterLoaded) return
-    const script = document.createElement('script')
-    script.src = 'https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js'
-    script.onload = () => setHanziWriterLoaded(true)
-    document.head.appendChild(script)
-  }, [hanziWriterLoaded])
+    if (typeof window === 'undefined') return
+    const check = () => !!(window as any).HanziWriter
+    if (check()) { requestAnimationFrame(() => setHanziWriterLoaded(true)); return }
+    const iv = setInterval(() => { if (check()) { requestAnimationFrame(() => setHanziWriterLoaded(true)); clearInterval(iv) } }, 150)
+    return () => clearInterval(iv)
+  }, [])
 
   // Character list filtered
   const allChars = useMemo(() => {
@@ -190,15 +190,15 @@ export default function HanziSection() {
     const HW = (window as any).HanziWriter
     containerRef.current.innerHTML = ''
     writerRef.current = new HW(containerRef.current, selectedChar, {
-      width: 250,
-      height: 250,
-      padding: 20,
+      width: 200,
+      height: 200,
+      padding: 8,
       showOutline: true,
       strokeAnimationSpeed: 1,
-      delayBetweenStrokes: 200,
-      strokeColor: '#dc2626',
+      delayBetweenStrokes: 300,
+      strokeColor: '#E84C4C',
       outlineColor: '#fecaca',
-      drawingColor: '#dc2626',
+      drawingColor: '#E84C4C',
     })
     setRevealedStrokes(0)
     if (writerRef.current) {
@@ -223,37 +223,45 @@ export default function HanziSection() {
     const HW = (window as any).HanziWriter
     containerRef.current.innerHTML = ''
     writerRef.current = new HW(containerRef.current, selectedChar, {
-      width: 250,
-      height: 250,
-      padding: 20,
+      width: 200,
+      height: 200,
+      padding: 8,
       showOutline: true,
-      strokeColor: '#dc2626',
+      strokeColor: '#E84C4C',
       outlineColor: '#fecaca',
-      drawingColor: '#dc2626',
+      drawingColor: '#E84C4C',
     })
     setRevealedStrokes(0)
   }, [hanziWriterLoaded, selectedChar])
 
-  // Init character when selected changes
+  // Init character when selected changes using IntersectionObserver
   const prevCharRef = useRef<string>('')
   useEffect(() => {
-    if (hanziWriterLoaded && selectedChar && containerRef.current && prevCharRef.current !== selectedChar) {
-      prevCharRef.current = selectedChar
-      const HW = (window as any).HanziWriter
-      containerRef.current.innerHTML = ''
-      writerRef.current = new HW(containerRef.current, selectedChar, {
-        width: 250,
-        height: 250,
-        padding: 20,
-        showOutline: true,
-        strokeColor: '#dc2626',
-        outlineColor: '#fecaca',
-        drawingColor: '#dc2626',
-      })
-      revealedStrokesRef.current = 0
-      // Schedule state update asynchronously to satisfy lint
-      requestAnimationFrame(() => setRevealedStrokes(0))
-    }
+    if (!hanziWriterLoaded || !selectedChar || !containerRef.current) return
+    if (prevCharRef.current === selectedChar) return
+    prevCharRef.current = selectedChar
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        const HW = (window as any).HanziWriter
+        if (!HW || !containerRef.current) return
+        containerRef.current.innerHTML = ''
+        writerRef.current = new HW(containerRef.current, selectedChar, {
+          width: 200,
+          height: 200,
+          padding: 8,
+          showOutline: true,
+          strokeColor: '#E84C4C',
+          outlineColor: '#fecaca',
+          drawingColor: '#E84C4C',
+        })
+        revealedStrokesRef.current = 0
+        requestAnimationFrame(() => setRevealedStrokes(0))
+        observer.disconnect()
+      }
+    })
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
   }, [hanziWriterLoaded, selectedChar])
 
   // Quiz functions
@@ -273,11 +281,11 @@ export default function HanziSection() {
       const qWriter = new HW(quizContainerRef.current, randomChar, {
         width: 200,
         height: 200,
-        padding: 15,
+        padding: 8,
         showOutline: true,
-        strokeColor: '#dc2626',
+        strokeColor: '#E84C4C',
         outlineColor: '#fecaca',
-        drawingColor: '#dc2626',
+        drawingColor: '#E84C4C',
       })
       // Hide all strokes by showing outline only
       ;(quizContainerRef.current as any)._hw = qWriter
@@ -330,7 +338,7 @@ export default function HanziSection() {
               <CardContent className="p-6 flex flex-col items-center">
                 <div
                   ref={containerRef}
-                  className="w-[250px] h-[250px] bg-white rounded-xl border-2 border-red-100 flex items-center justify-center"
+                  className="w-[200px] h-[200px] bg-white rounded-xl border-2 border-red-100 flex items-center justify-center"
                 >
                   {!hanziWriterLoaded && (
                     <div className="text-gray-400 text-sm">جاري التحميل...</div>

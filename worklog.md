@@ -108,3 +108,19 @@ Stage Summary:
 - 5 features integrated: Pronunciation Scoring, HSK 1 Exam Simulator, Visual Dictionary, Smart Dashboard (analytics lib), Achievements System
 - All Phase 1 & 2 features preserved (no deletions)
 - New localStorage keys: pronunciation_scores, exam_history, daily_activity, streak_data, achievements, conv_completed
+
+---
+Task ID: 2
+Agent: Main Coordinator
+Task: Fix 3 critical bugs — HanziWriter, Pronunciation Scoring, Learned Vocabulary
+
+Work Log:
+- **Problem 1 (HanziWriter)**: Removed duplicate script loading from HanziSection.tsx (was loading via both layout.tsx CDN and manual `document.createElement`). Replaced with polling-based detection of CDN-loaded `window.HanziWriter`. Added IntersectionObserver for character container initialization. Standardized dimensions (200x200, padding 8) and stroke color (#E84C4C) per user spec.
+- **Problem 2 (Pronunciation)**: Replaced confidence-weighted scoring (`similarity * 0.6 + confidence * 0.4`) with pure Levenshtein distance scoring. Changed `maxAlternatives` from 3 to 5. Now iterates all 5 speech recognition alternatives and picks the one with highest Levenshtein similarity score. Color scheme updated: #27AE60 (85+), #F5A623 (65+), #E67E22 (40+), #E84C4C (<40).
+- **Problem 3 (Learned Vocabulary)**: Added `isWordLearned(wordId)` and `markWordLearned(wordId)` functions using `srs_data` localStorage key. Added "إخفاء المحفوظة/عرض الكل" toggle button and "إعادة تعيين" reset button to vocabulary section. Save button now calls `markWordLearned()` to track review_count. Words with review_count >= 3 are filtered out when toggle is off. Word list shows "✓ محفوظة" badge for fully learned words.
+
+Stage Summary:
+- 3 files modified: HanziSection.tsx, PronunciationPractice.tsx, page.tsx
+- 0 new lint errors (only pre-existing issues in scripts/ and upload/)
+- Dev server compiles and runs (GET / 200)
+- All Phase 1-3 features preserved

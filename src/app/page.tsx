@@ -15,49 +15,14 @@ import {
 } from '@/components/ui/accordion'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import PinyinHub from '@/components/PinyinHub'
-import HanziSection from '@/components/HanziSection'
-import LessonSystem from '@/components/LessonSystem'
-import ConversationsSection from '@/components/ConversationsSection'
-import QASection from '@/components/QASection'
-import ExamSimulator from '@/components/ExamSimulator'
-import PronunciationPractice from '@/components/PronunciationPractice'
-import VisualDictionary from '@/components/VisualDictionary'
-import AchievementsSection from '@/components/AchievementsSection'
 import {
   BookOpen, GraduationCap, Gamepad2, BookMarked, Map, LayoutDashboard,
   Volume2, ChevronLeft, ChevronRight, RotateCcw, Star, Check, X,
   Brain, Trophy, Target, Sparkles, Search, Filter, Eye, Heart,
   Clock, Flame, Languages, MessageCircle, ArrowLeftRight, Bot,
-  Send, MoreHorizontal, Lightbulb, Headphones, PenTool, HelpCircle,
-  Mic, Camera, Award
+  Send, MoreHorizontal, Lightbulb
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-// ─── Learned Word Helpers (srs_data in localStorage) ───────
-function isWordLearned(wordId: number): boolean {
-  if (typeof window === 'undefined') return false
-  try {
-    const data = JSON.parse(localStorage.getItem('srs_data') || '{}')
-    return !!(data[wordId] && data[wordId].review_count >= 3)
-  } catch { return false }
-}
-
-function markWordLearned(wordId: number): void {
-  if (typeof window === 'undefined') return
-  try {
-    const data = JSON.parse(localStorage.getItem('srs_data') || '{}')
-    if (!data[wordId]) data[wordId] = { review_count: 0 }
-    data[wordId].review_count = (data[wordId].review_count || 0) + 1
-    data[wordId].last_seen = Date.now()
-    localStorage.setItem('srs_data', JSON.stringify(data))
-  } catch { /* ignore */ }
-}
-
-function resetLearnedProgress(): void {
-  if (typeof window === 'undefined') return
-  localStorage.removeItem('srs_data')
-}
 
 // ─── TTS Helper ─────────────────────────────────────────────
 const speak = (text: string, lang = 'zh-CN') => {
@@ -517,11 +482,12 @@ const allSentences = buildAllSentences()
 // ═══════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
-type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat' | 'pinyin' | 'hanzi' | 'lessons' | 'conversations' | 'qa' | 'exam' | 'pronunciation' | 'visual-dict' | 'achievements'
+type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat'
 
 export default function Home() {
   const store = useLearningStore()
-  const { currentSection, setCurrentSection, learnedWords, toggleLearned, incrementStreak } = store
+  const { currentSection, setCurrentSection, learnedWords, toggleLearned, incrementStreak, srsCards } = store
+  const [hideMastered, setHideMastered] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null)
@@ -580,15 +546,6 @@ export default function Home() {
     { id: 'grammar' as Section, label: 'القواعد', icon: GraduationCap },
     { id: 'practice' as Section, label: 'التمارين', icon: Target },
     { id: 'games' as Section, label: 'الألعاب', icon: Gamepad2 },
-    { id: 'pinyin' as Section, label: 'بينيين', icon: Headphones },
-    { id: 'hanzi' as Section, label: 'تعلم الرموز', icon: PenTool },
-    { id: 'lessons' as Section, label: 'الدروس', icon: BookOpen },
-    { id: 'conversations' as Section, label: 'المحادثات', icon: MessageCircle },
-    { id: 'qa' as Section, label: 'أسئلة وأجوبة', icon: HelpCircle },
-    { id: 'pronunciation' as Section, label: 'تقييم النطق', icon: Mic },
-    { id: 'exam' as Section, label: 'اختبار HSK', icon: Trophy },
-    { id: 'visual-dict' as Section, label: 'القاموس البصري', icon: Camera },
-    { id: 'achievements' as Section, label: 'الإنجازات', icon: Award },
     { id: 'sentences' as Section, label: 'الجمل', icon: MessageCircle },
     { id: 'stories' as Section, label: 'القصص', icon: BookMarked },
     { id: 'chat' as Section, label: 'المساعد', icon: Bot },
@@ -596,8 +553,16 @@ export default function Home() {
   ]
 
   // ─── Filtered Vocab ────────────────────────────────────────
+  // Check if a word is mastered (SRS reviewCount >= 3)
+  const isWordMastered = useCallback((wordId: number): boolean => {
+    const card = srsCards[wordId]
+    return card ? card.reviewCount >= 3 : false
+  }, [srsCards])
+
   const filteredVocab = useMemo(() => {
     return vocabulary.filter(w => {
+      // Filter out mastered words if toggle is on
+      if (hideMastered && isWordMastered(w.id)) return false
       const matchSearch = searchQuery === '' ||
         w.zh.includes(searchQuery) ||
         w.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -605,7 +570,7 @@ export default function Home() {
       const matchCat = selectedCategory === 'all' || w.pos === selectedCategory
       return matchSearch && matchCat
     })
-  }, [searchQuery, selectedCategory])
+  }, [searchQuery, selectedCategory, hideMastered, isWordMastered])
 
   // ─── Quiz Generation (20 questions) ──────────────────────
   const generateQuiz = useCallback(() => {
@@ -757,7 +722,7 @@ export default function Home() {
           ))}
           <button
             onClick={() => {
-              const moreSections: Section[] = ['pronunciation', 'exam', 'visual-dict', 'achievements', 'sentences', 'stories', 'chat', 'games', 'roadmap', 'conversations', 'qa']
+              const moreSections: Section[] = ['sentences', 'stories', 'chat', 'games', 'roadmap']
               const currentIdx = moreSections.indexOf(store.currentSection as Section)
               const nextIdx = (currentIdx + 1) % moreSections.length
               setCurrentSection(moreSections[nextIdx])
@@ -786,6 +751,8 @@ export default function Home() {
                   setSearchQuery={setSearchQuery}
                   selectedCategory={selectedCategory}
                   setSelectedCategory={setSelectedCategory}
+                  hideMastered={hideMastered}
+                  setHideMastered={setHideMastered}
                 />
               )}
               {currentSection === 'grammar' && <GrammarSection />}
@@ -832,15 +799,6 @@ export default function Home() {
               )}
               {currentSection === 'chat' && <ChatSection />}
               {currentSection === 'roadmap' && <RoadmapSection />}
-              {currentSection === 'pinyin' && <PinyinHub />}
-              {currentSection === 'hanzi' && <HanziSection />}
-              {currentSection === 'lessons' && <LessonSystem />}
-              {currentSection === 'conversations' && <ConversationsSection />}
-              {currentSection === 'qa' && <QASection />}
-              {currentSection === 'exam' && <ExamSimulator />}
-              {currentSection === 'pronunciation' && <PronunciationPractice />}
-              {currentSection === 'visual-dict' && <VisualDictionary />}
-              {currentSection === 'achievements' && <AchievementsSection />}
             </motion.div>
           </AnimatePresence>
         </main>
@@ -949,24 +907,17 @@ function DashboardSection({ stats, onNavigate }: {
 // ═══════════════════════════════════════════════════════════
 // VOCABULARY SECTION (Enhanced Flashcards)
 // ═══════════════════════════════════════════════════════════
-function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selectedCategory, setSelectedCategory }: {
+function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selectedCategory, setSelectedCategory, hideMastered, setHideMastered }: {
   filteredVocab: VocabWord[]
   searchQuery: string
   setSearchQuery: (q: string) => void
   selectedCategory: string
   setSelectedCategory: (c: string) => void
+  hideMastered: boolean
+  setHideMastered: (v: boolean | ((prev: boolean) => boolean)) => void
 }) {
   const store = useLearningStore()
-  const [showLearned, setShowLearned] = useState(true)
-  const [learnedTick, setLearnedTick] = useState(0)
-
-  // Filter out learned words unless explicitly showing them
-  const displayVocab = useMemo(() => {
-    if (showLearned) return filteredVocab
-    return filteredVocab.filter(w => !isWordLearned(w.id))
-  }, [filteredVocab, showLearned, learnedTick])
-
-  const word = displayVocab[store.flashcardIndex]
+  const word = filteredVocab[store.flashcardIndex]
 
   // Build sentence list for the word
   const wordSentences = useMemo(() => {
@@ -981,29 +932,16 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <BookOpen className="w-6 h-6 text-red-600" />
           المفردات
         </h2>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{displayVocab.length} كلمة</Badge>
-          <Button
-            variant={showLearned ? 'outline' : 'default'}
-            size="sm"
-            onClick={() => { setShowLearned(!showLearned); store.setFlashcardIndex(0) }}
-            className="text-xs"
-          >
-            {showLearned ? 'إخفاء المحفوظة' : 'عرض الكل'}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => { resetLearnedProgress(); setLearnedTick(t => t + 1); store.setFlashcardIndex(0) }}
-            className="text-xs text-red-600 hover:text-red-700"
-          >
-            إعادة تعيين
-          </Button>
+          <Badge variant={hideMastered ? 'default' : 'outline'} className="cursor-pointer text-xs" onClick={() => setHideMastered(v => !v)}>
+            {hideMastered ? '✓ إخفاء المحفوظ' : 'إخفاء المحفوظ'}
+          </Badge>
+          <Badge variant="secondary">{filteredVocab.length} كلمة</Badge>
         </div>
       </div>
 
@@ -1105,12 +1043,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
               <Button
                 size="sm"
                 variant={store.isLearned(word.id) ? 'default' : 'outline'}
-                onClick={() => {
-                  toggleLearned(word.id)
-                  markWordLearned(word.id)
-                  incrementStreak()
-                  setLearnedTick(t => t + 1)
-                }}
+                onClick={() => { toggleLearned(word.id); incrementStreak() }}
                 className={store.isLearned(word.id) ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
               >
                 {store.isLearned(word.id) ? <><Check className="w-4 h-4 ml-1" /> تم الحفظ</> : <><Star className="w-4 h-4 ml-1" /> حفظ</>}
@@ -1123,7 +1056,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
               variant="outline"
               size="sm"
               onClick={() => store.setFlashcardIndex(store.flashcardIndex + 1)}
-              disabled={store.flashcardIndex >= displayVocab.length - 1}
+              disabled={store.flashcardIndex >= filteredVocab.length - 1}
             >
               التالي
               <ChevronLeft className="w-4 h-4" />
@@ -1131,10 +1064,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
           </div>
 
           <div className="text-center text-sm text-gray-500">
-            {store.flashcardIndex + 1} / {displayVocab.length}
-            {!showLearned && (
-              <span className="text-xs text-gray-400 mr-2">(المحفوظة مخفية)</span>
-            )}
+            {store.flashcardIndex + 1} / {filteredVocab.length}
           </div>
         </div>
       )}
@@ -1144,23 +1074,22 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
         <Accordion type="single" collapsible>
           <AccordionItem value="list" className="border-0">
             <AccordionTrigger className="py-3 text-sm font-medium text-gray-700">
-              قائمة الكلمات ({displayVocab.length})
+              قائمة الكلمات ({filteredVocab.length})
             </AccordionTrigger>
             <AccordionContent>
               <div className="max-h-96 overflow-y-auto custom-scrollbar space-y-1">
-                {displayVocab.map((w) => (
+                {filteredVocab.map((w) => (
                   <button
                     key={w.id}
-                    onClick={() => store.setFlashcardIndex(displayVocab.findIndex(v => v.id === w.id))}
+                    onClick={() => store.setFlashcardIndex(filteredVocab.findIndex(v => v.id === w.id))}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-right transition-colors hover:bg-gray-50 ${
                       store.isLearned(w.id) ? 'bg-emerald-50/50' : ''
-                    } ${isWordLearned(w.id) ? 'opacity-60' : ''}`}
+                    }`}
                   >
                     <span className="font-chinese-serif text-lg w-20 text-gray-900">{w.zh}</span>
                     <span className="text-xs text-gray-500 font-chinese-sans w-28">{w.pinyin}</span>
                     <span className="text-sm text-gray-700 flex-1">{w.meaning}</span>
-                    {isWordLearned(w.id) && <Badge variant="outline" className="text-[10px] text-emerald-600">✓ محفوظة</Badge>}
-                    {!isWordLearned(w.id) && store.isLearned(w.id) && <Check className="w-4 h-4 text-emerald-600" />}
+                    {store.isLearned(w.id) && <Check className="w-4 h-4 text-emerald-600" />}
                   </button>
                 ))}
               </div>

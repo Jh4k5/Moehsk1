@@ -4,11 +4,13 @@ import { useState, useCallback, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { VISUAL_DICT_CATEGORIES } from '@/data/visualDict'
 import type { VisualDictWord } from '@/data/visualDict'
+import { vocabulary } from '@/data/vocabulary'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
   Volume2, Mic, MicOff, RotateCcw, ChevronLeft, ChevronRight,
-  Gamepad2, Check, X, Star, Headphones, Languages
+  Gamepad2, Check, X, Star, Headphones, Languages, Trash2, Filter,
+  BookCheck, CheckCircle2
 } from 'lucide-react'
 import { useLearningStore } from '@/lib/store'
 
@@ -70,6 +72,34 @@ function similarity(spoken: string, expected: string): number {
   return Math.round(((Math.max(s.length, e.length) - d) / Math.max(s.length, e.length)) * 100)
 }
 
+// ── POS → emoji mapping for vocabulary words ─────────────────────────────────
+function posEmoji(pos: string): string {
+  const map: Record<string, string> = {
+    noun: '📝',
+    verb: '🏃',
+    adjective: '🎨',
+    pronoun: '👤',
+    adverb: '➡️',
+    particle: '✨',
+    fixed: '📌',
+    measure: '📏',
+    preposition: '📍',
+    conjunction: '🔗',
+    numeral: '🔢',
+    onomatopoeia: '🗣️',
+  }
+  return map[pos] || '📖'
+}
+
+// ── Unified word interface for pronunciation ────────────────────────────────
+interface PronWord {
+  id: number
+  hanzi: string
+  pinyin: string
+  arabic: string
+  emoji: string
+}
+
 // ── Quiz option type ────────────────────────────────────────────────────────
 interface QuizQuestion {
   word: VisualDictWord
@@ -98,7 +128,16 @@ export default function VisualDictionary() {
   const [pronSupported, setPronSupported] = useState(true)
   const recognitionRef = useRef<any>(null)
 
-  // Current words based on active category
+  // Pronunciation category (separate from browse category)
+  const [pronCategory, setPronCategory] = useState('all')
+  const [showOnlyUnlearned, setShowOnlyUnlearned] = useState(false)
+
+  // Learning store
+  const toggleLearned = useLearningStore((s) => s.toggleLearned)
+  const isLearned = useLearningStore((s) => s.isLearned)
+  const learnedWords = useLearningStore((s) => s.learnedWords)
+
+  // Current words based on active category (for browse)
   const currentWords = useMemo(
     () =>
       VISUAL_DICT_CATEGORIES.find((c) => c.key === activeCategory)?.words ?? [],
@@ -112,6 +151,59 @@ export default function VisualDictionary() {
   )
 
   const totalWords = allWords.length
+
+  // Map vocabulary to PronWord format
+  const vocabWords: PronWord[] = useMemo(
+    () =>
+      vocabulary.map((w) => ({
+        id: w.id,
+        hanzi: w.zh,
+        pinyin: w.pinyin,
+        arabic: w.meaning,
+        emoji: posEmoji(w.pos),
+      })),
+    [],
+  )
+
+  // Map visual dict words to PronWord (negative IDs to avoid collision)
+  const visualDictPronWords: PronWord[] = useMemo(
+    () =>
+      allWords.map((w, i) => ({
+        id: -(i + 1),
+        hanzi: w.hanzi,
+        pinyin: w.pinyin,
+        arabic: w.arabic,
+        emoji: w.emoji,
+      })),
+    [allWords],
+  )
+
+  // Words for pronunciation based on selected pronCategory
+  const pronWords: PronWord[] = useMemo(() => {
+    if (pronCategory === 'all-vocab') return vocabWords
+    if (pronCategory === 'all') return visualDictPronWords
+    const cat = VISUAL_DICT_CATEGORIES.find((c) => c.key === pronCategory)
+    if (!cat) return visualDictPronWords
+    return cat.words.map((w, i) => ({
+      id: -(cat.words.indexOf(w) + 1),
+      hanzi: w.hanzi,
+      pinyin: w.pinyin,
+      arabic: w.arabic,
+      emoji: w.emoji,
+    }))
+  }, [pronCategory, vocabWords, visualDictPronWords])
+
+  // Filtered pronunciation words (unlearned only toggle)
+  const filteredPronWords = useMemo(() => {
+    if (!showOnlyUnlearned) return pronWords
+    return pronWords.filter((w) => !isLearned(w.id))
+  }, [pronWords, showOnlyUnlearned, isLearned])
+
+  // Learned count for current pronunciation list
+  const pronLearnedCount = useMemo(
+    () => pronWords.filter((w) => isLearned(w.id)).length,
+    [pronWords, isLearned],
+  )
 
   // Check speech recognition support
   if (typeof window !== 'undefined' && !pronSupported) {
@@ -190,9 +282,10 @@ export default function VisualDictionary() {
       const results = event.results
       let bestSim = 0
       let bestSpoken = ''
+      const currentHanzi = filteredPronWords[pronounceWordIdx]?.hanzi || ''
       for (let i = 0; i < results[0].length; i++) {
         const alt = results[0][i]
-        const sim = similarity(alt.transcript, currentWords[pronounceWordIdx]?.hanzi || '')
+        const sim = similarity(alt.transcript, currentHanzi)
         if (sim > bestSim) { bestSim = sim; bestSpoken = alt.transcript }
       }
 
@@ -204,6 +297,14 @@ export default function VisualDictionary() {
         msg: s >= 85 ? 'ممتاز! نطقك رائع! 🎉' : s >= 60 ? 'جيد! استمر بالتدريب 💪' : 'حاول مرة أخرى، استمع أولاً 🎧',
       })
       setIsRecording(false)
+
+      // Auto-mark as learned when score >= 85
+      if (s >= 85 && filteredPronWords[pronounceWordIdx]) {
+        const wordId = filteredPronWords[pronounceWordIdx].id
+        if (!isLearned(wordId)) {
+          toggleLearned(wordId)
+        }
+      }
     }
 
     recognition.onerror = () => setIsRecording(false)
@@ -211,11 +312,27 @@ export default function VisualDictionary() {
 
     recognitionRef.current = recognition
     recognition.start()
-  }, [currentWords, pronounceWordIdx])
+  }, [filteredPronWords, pronounceWordIdx, isLearned, toggleLearned])
 
   const stopRecording = useCallback(() => {
     if (recognitionRef.current) recognitionRef.current.stop()
     setIsRecording(false)
+  }, [])
+
+  // ── Reset learned words ─────────────────────────────────────────────────
+  const resetLearned = useCallback(() => {
+    pronWords.forEach((w) => {
+      if (isLearned(w.id)) {
+        toggleLearned(w.id)
+      }
+    })
+  }, [pronWords, isLearned, toggleLearned])
+
+  // ── Handle pronunciation category change ────────────────────────────────
+  const handlePronCategoryChange = useCallback((cat: string) => {
+    setPronCategory(cat)
+    setPronounceWordIdx(0)
+    setPronResult(null)
   }, [])
 
   // ── Score feedback ──────────────────────────────────────────────────────
@@ -242,14 +359,16 @@ export default function VisualDictionary() {
               القاموس المرئي والنطق
             </h2>
             <p className="text-red-100 mt-1 text-sm sm:text-base">
-              تعلّم الكلمات الصينية بالصور والنطق الصحيح — {totalWords} كلمة في {VISUAL_DICT_CATEGORIES.length} فئات
+              تعلّم الكلمات الصينية بالصور والنطق الصحيح — {totalWords + vocabulary.length} كلمة شاملة
             </p>
           </div>
           <div className="flex gap-2">
             <Button
               onClick={() => setActiveView('browse')}
               variant={activeView === 'browse' ? 'secondary' : 'ghost'}
-              className={`${activeView === 'browse' ? 'bg-white/20 hover:bg-white/30 text-white' : 'text-red-100 hover:text-white hover:bg-white/10'}`}
+              className={activeView === 'browse'
+                ? 'bg-white/20 hover:bg-white/30 text-white'
+                : 'text-red-100 hover:text-white hover:bg-white/10'}
               size="sm"
             >
               <Languages className="w-4 h-4 ml-1" />
@@ -258,7 +377,9 @@ export default function VisualDictionary() {
             <Button
               onClick={() => { setActiveView('pronounce'); setPronounceWordIdx(0); setPronResult(null) }}
               variant={activeView === 'pronounce' ? 'secondary' : 'ghost'}
-              className={`${activeView === 'pronounce' ? 'bg-white/20 hover:bg-white/30 text-white' : 'text-red-100 hover:text-white hover:bg-white/10'}`}
+              className={activeView === 'pronounce'
+                ? 'bg-white/20 hover:bg-white/30 text-white'
+                : 'text-red-100 hover:text-white hover:bg-white/10'}
               size="sm"
               disabled={!pronSupported}
             >
@@ -268,7 +389,9 @@ export default function VisualDictionary() {
             <Button
               onClick={() => { startQuiz(); setActiveView('quiz') }}
               variant={activeView === 'quiz' ? 'secondary' : 'ghost'}
-              className={`${activeView === 'quiz' ? 'bg-white/20 hover:bg-white/30 text-white' : 'text-red-100 hover:text-white hover:bg-white/10'}`}
+              className={activeView === 'quiz'
+                ? 'bg-white/20 hover:bg-white/30 text-white'
+                : 'text-red-100 hover:text-white hover:bg-white/10'}
               size="sm"
             >
               <Gamepad2 className="w-4 h-4 ml-1" />
@@ -289,19 +412,15 @@ export default function VisualDictionary() {
               <button
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
-                className={`whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                  activeCategory === cat.key
-                    ? 'bg-red-600 text-white shadow-md shadow-red-600/25'
-                    : 'bg-white text-gray-600 hover:bg-red-50 hover:text-red-600 border border-gray-200'
-                }`}
+                className={activeCategory === cat.key
+                  ? 'whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 bg-red-600 text-white shadow-md shadow-red-600/25'
+                  : 'whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 bg-white text-gray-600 hover:bg-red-50 hover:text-red-600 border border-gray-200'}
               >
                 <span>{cat.icon}</span>
                 {cat.label}
                 <Badge
                   variant={activeCategory === cat.key ? 'secondary' : 'outline'}
-                  className={`text-[10px] px-1.5 py-0 ${
-                    activeCategory === cat.key ? 'bg-white/20 text-white border-0' : ''
-                  }`}
+                  className={activeCategory === cat.key ? 'text-[10px] px-1.5 py-0 bg-white/20 text-white border-0' : 'text-[10px] px-1.5 py-0'}
                 >
                   {cat.words.length}
                 </Badge>
@@ -323,7 +442,6 @@ export default function VisualDictionary() {
               variant="outline"
               className="text-red-600 border-red-200 hover:bg-red-50"
               onClick={() => {
-                // Speak all words in sequence
                 let i = 0
                 const speakNext = () => {
                   if (i < currentWords.length) {
@@ -350,53 +468,68 @@ export default function VisualDictionary() {
               transition={{ duration: 0.25 }}
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4"
             >
-              {currentWords.map((w, i) => (
-                <motion.div
-                  key={w.hanzi}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-red-200 hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden"
-                  onClick={() => speak(w.hanzi)}
-                >
-                  {/* Emoji background */}
-                  <div className="absolute top-2 left-2 text-3xl opacity-10 group-hover:opacity-20 transition-opacity">
-                    {w.emoji}
-                  </div>
+              {currentWords.map((w, i) => {
+                const wordId = -(allWords.indexOf(w) + 1)
+                const learned = isLearned(wordId)
+                return (
+                  <motion.div
+                    key={w.hanzi}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-red-200 hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden"
+                    onClick={() => speak(w.hanzi)}
+                  >
+                    {/* Learned indicator */}
+                    {learned && (
+                      <div className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-sm">
+                        <Check className="w-3.5 h-3.5 text-white" />
+                      </div>
+                    )}
 
-                  <div className="p-4 text-center space-y-2 relative">
-                    {/* Emoji */}
-                    <span className="text-4xl block drop-shadow-sm">{w.emoji}</span>
+                    {/* Emoji background */}
+                    <div className="absolute top-2 left-2 text-3xl opacity-10 group-hover:opacity-20 transition-opacity">
+                      {w.emoji}
+                    </div>
 
-                    {/* Hanzi */}
-                    <span className="block text-2xl font-bold text-gray-900 font-chinese-serif">
-                      {w.hanzi}
-                    </span>
+                    <div className="p-4 text-center space-y-2 relative">
+                      {/* Emoji */}
+                      <span className="text-4xl block drop-shadow-sm">{w.emoji}</span>
 
-                    {/* Pinyin */}
-                    <span className="block text-sm text-rose-600 font-medium font-chinese-sans">
-                      {w.pinyin}
-                    </span>
+                      {/* Hanzi */}
+                      <span className="block text-2xl font-bold text-gray-900 font-chinese-serif">
+                        {w.hanzi}
+                      </span>
 
-                    {/* Arabic meaning */}
-                    <span className="block text-xs text-gray-500 truncate" dir="rtl">
-                      {w.arabic}
-                    </span>
+                      {/* Pinyin */}
+                      <span className="block text-sm text-rose-600 font-medium font-chinese-sans">
+                        {w.pinyin}
+                      </span>
 
-                    {/* Play button - always visible */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        speak(w.hanzi)
-                      }}
-                      className="mx-auto mt-1 w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors group-hover:bg-red-600 group-hover:text-white"
-                      aria-label={`نطق ${w.hanzi}`}
-                    >
-                      <Volume2 className="w-3.5 h-3.5 text-red-500 group-hover:text-white transition-colors" />
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
+                      {/* Arabic meaning */}
+                      <span className="block text-xs text-gray-500 truncate" dir="rtl">
+                        {w.arabic}
+                      </span>
+
+                      {/* Play button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          speak(w.hanzi)
+                        }}
+                        className={learned
+                          ? 'mx-auto mt-1 w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 flex items-center justify-center transition-colors'
+                          : 'mx-auto mt-1 w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors group-hover:bg-red-600 group-hover:text-white'}
+                        aria-label={`نطق ${w.hanzi}`}
+                      >
+                        <Volume2 className={learned
+                          ? 'w-3.5 h-3.5 text-green-500 transition-colors'
+                          : 'w-3.5 h-3.5 text-red-500 group-hover:text-white transition-colors'} />
+                      </button>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -414,66 +547,129 @@ export default function VisualDictionary() {
             </div>
           ) : (
             <>
+              {/* Pronounce view header: stats + controls */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <Badge variant="secondary" className="flex items-center gap-1.5 bg-green-50 text-green-700 border-green-200">
+                    <BookCheck className="w-3.5 h-3.5" />
+                    تم حفظ {pronLearnedCount} من {pronWords.length}
+                  </Badge>
+                  {pronLearnedCount > 0 && (
+                    <span className="text-xs text-gray-400">
+                      {Math.round((pronLearnedCount / pronWords.length) * 100)}%
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Show only unlearned toggle */}
+                  <Button
+                    variant={showOnlyUnlearned ? 'default' : 'outline'}
+                    size="sm"
+                    className={showOnlyUnlearned
+                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      : 'text-gray-500 border-gray-200 hover:bg-red-50 hover:text-red-600'}
+                    onClick={() => {
+                      setShowOnlyUnlearned((v) => !v)
+                      setPronounceWordIdx(0)
+                      setPronResult(null)
+                    }}
+                  >
+                    <Filter className="w-4 h-4 ml-1" />
+                    {showOnlyUnlearned ? 'عرض الكل' : 'غير المحفوظة فقط'}
+                  </Button>
+                  {/* Reset learned */}
+                  {pronLearnedCount > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-gray-500 border-gray-200 hover:bg-red-50 hover:text-red-600"
+                      onClick={resetLearned}
+                    >
+                      <Trash2 className="w-4 h-4 ml-1" />
+                      إعادة تعيين
+                    </Button>
+                  )}
+                </div>
+              </div>
+
               {/* Category selector for pronunciation */}
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
                 <button
-                  onClick={() => { setActiveCategory('all'); setPronounceWordIdx(0); setPronResult(null) }}
-                  className={`whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    activeCategory === 'all'
-                      ? 'bg-red-600 text-white'
-                      : 'bg-white text-gray-500 hover:bg-red-50 border border-gray-200'
-                  }`}
+                  onClick={() => handlePronCategoryChange('all')}
+                  className={pronCategory === 'all'
+                    ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-red-600 text-white'
+                    : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-white text-gray-500 hover:bg-red-50 border border-gray-200'}
                 >
                   الكل ({totalWords})
+                </button>
+                <button
+                  onClick={() => handlePronCategoryChange('all-vocab')}
+                  className={pronCategory === 'all-vocab'
+                    ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-red-600 text-white'
+                    : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-white text-gray-500 hover:bg-red-50 border border-gray-200'}
+                >
+                  📚 كل المفردات ({vocabulary.length})
                 </button>
                 {VISUAL_DICT_CATEGORIES.map((cat) => (
                   <button
                     key={cat.key}
-                    onClick={() => { setActiveCategory(cat.key); setPronounceWordIdx(0); setPronResult(null) }}
-                    className={`whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                      activeCategory === cat.key
-                        ? 'bg-red-600 text-white'
-                        : 'bg-white text-gray-500 hover:bg-red-50 border border-gray-200'
-                    }`}
+                    onClick={() => handlePronCategoryChange(cat.key)}
+                    className={pronCategory === cat.key
+                      ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-red-600 text-white'
+                      : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-white text-gray-500 hover:bg-red-50 border border-gray-200'}
                   >
                     {cat.icon} {cat.label} ({cat.words.length})
                   </button>
                 ))}
               </div>
 
-              {currentWords.length > 0 && pronounceWordIdx < currentWords.length && (
+              {filteredPronWords.length > 0 && pronounceWordIdx < filteredPronWords.length && (
                 <div className="max-w-lg mx-auto">
                   <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     {/* Progress */}
                     <div className="h-1 bg-gray-100">
                       <div
                         className="h-full bg-gradient-to-l from-red-500 to-rose-500 transition-all duration-300"
-                        style={{ width: `${((pronounceWordIdx + 1) / currentWords.length) * 100}%` }}
+                        style={{ width: `${((pronounceWordIdx + 1) / filteredPronWords.length) * 100}%` }}
                       />
                     </div>
 
                     <div className="p-6 sm:p-8 text-center space-y-6">
-                      {/* Counter */}
-                      <p className="text-sm text-gray-400">
-                        {pronounceWordIdx + 1} / {currentWords.length}
-                      </p>
+                      {/* Counter + learned indicator */}
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-gray-400">
+                          {pronounceWordIdx + 1} / {filteredPronWords.length}
+                        </p>
+                        {isLearned(filteredPronWords[pronounceWordIdx].id) && (
+                          <div className="flex items-center gap-1 text-green-600 text-xs font-medium">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            محفوظة ✓
+                          </div>
+                        )}
+                      </div>
 
                       {/* Word card */}
                       <motion.div
-                        key={`pron-${pronounceWordIdx}`}
+                        key={`pron-${pronounceWordIdx}-${pronCategory}`}
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="space-y-4"
                       >
-                        <span className="text-5xl block">{currentWords[pronounceWordIdx].emoji}</span>
-                        <div className="text-5xl font-bold text-gray-900 font-chinese-serif">
-                          {currentWords[pronounceWordIdx].hanzi}
+                        <span className="text-5xl block">{filteredPronWords[pronounceWordIdx].emoji}</span>
+                        <div
+                          className="text-5xl font-bold text-gray-900 font-chinese-serif cursor-pointer hover:text-red-600 transition-colors"
+                          onClick={() => speak(filteredPronWords[pronounceWordIdx].hanzi)}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`نطق ${filteredPronWords[pronounceWordIdx].hanzi}`}
+                        >
+                          {filteredPronWords[pronounceWordIdx].hanzi}
                         </div>
                         <div className="text-xl text-rose-600 font-medium font-chinese-sans">
-                          {currentWords[pronounceWordIdx].pinyin}
+                          {filteredPronWords[pronounceWordIdx].pinyin}
                         </div>
                         <div className="text-base text-gray-600" dir="rtl">
-                          {currentWords[pronounceWordIdx].arabic}
+                          {filteredPronWords[pronounceWordIdx].arabic}
                         </div>
                       </motion.div>
 
@@ -482,10 +678,25 @@ export default function VisualDictionary() {
                         variant="outline"
                         size="lg"
                         className="mx-auto gap-2 text-red-600 border-red-200 hover:bg-red-50"
-                        onClick={() => speak(currentWords[pronounceWordIdx].hanzi)}
+                        onClick={() => speak(filteredPronWords[pronounceWordIdx].hanzi)}
                       >
                         <Volume2 className="w-5 h-5" />
-                        استمع للنطق الصحيح
+                        سماع
+                      </Button>
+
+                      {/* Mark as learned button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={isLearned(filteredPronWords[pronounceWordIdx].id)
+                          ? 'mx-auto gap-2 text-green-600 border-green-300 bg-green-50'
+                          : 'mx-auto gap-2 text-gray-400 border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300'}
+                        onClick={() => toggleLearned(filteredPronWords[pronounceWordIdx].id)}
+                      >
+                        {isLearned(filteredPronWords[pronounceWordIdx].id)
+                          ? <CheckCircle2 className="w-4 h-4" />
+                          : <CheckCircle2 className="w-4 h-4" />}
+                        {isLearned(filteredPronWords[pronounceWordIdx].id) ? 'محفوظة' : 'علّم كمحفوظة'}
                       </Button>
 
                       {/* Mic button */}
@@ -494,11 +705,9 @@ export default function VisualDictionary() {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={isRecording ? stopRecording : startRecording}
-                          className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all ${
-                            isRecording
-                              ? 'bg-red-600 shadow-lg shadow-red-200'
-                              : 'bg-red-50 border-2 border-red-300 hover:border-red-500 hover:bg-red-100'
-                          }`}
+                          className={isRecording
+                            ? 'relative w-20 h-20 rounded-full flex items-center justify-center transition-all bg-red-600 shadow-lg shadow-red-200'
+                            : 'relative w-20 h-20 rounded-full flex items-center justify-center transition-all bg-red-50 border-2 border-red-300 hover:border-red-500 hover:bg-red-100'}
                         >
                           {isRecording && (
                             <motion.div
@@ -513,7 +722,7 @@ export default function VisualDictionary() {
                           }
                         </motion.button>
                         <p className="text-xs text-gray-400">
-                          {isRecording ? 'جاري التسجيل... اضغط للإيقاف' : 'سجّل نطقك'}
+                          {isRecording ? 'جاري التسجيل... اضغط للإيقاف' : 'تسجيل'}
                         </p>
                       </div>
 
@@ -566,7 +775,7 @@ export default function VisualDictionary() {
                               <div className="flex justify-between">
                                 <span className="text-gray-400">الصحيح:</span>
                                 <span className="font-chinese-sans font-bold text-red-600">
-                                  {currentWords[pronounceWordIdx].hanzi}
+                                  {filteredPronWords[pronounceWordIdx].hanzi}
                                 </span>
                               </div>
                             </div>
@@ -588,7 +797,7 @@ export default function VisualDictionary() {
                         <Button
                           size="sm"
                           className="bg-red-600 hover:bg-red-700"
-                          disabled={pronounceWordIdx >= currentWords.length - 1}
+                          disabled={pronounceWordIdx >= filteredPronWords.length - 1}
                           onClick={() => { setPronounceWordIdx(p => p + 1); setPronResult(null) }}
                         >
                           التالي
@@ -597,6 +806,30 @@ export default function VisualDictionary() {
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Empty state when all words are learned */}
+              {filteredPronWords.length === 0 && (
+                <div className="max-w-lg mx-auto text-center py-12">
+                  <div className="text-6xl mb-4">🎉</div>
+                  <p className="text-xl font-semibold text-gray-800" dir="rtl">
+                    أحسنت! لقد حفظت جميع الكلمات!
+                  </p>
+                  <p className="text-gray-500 mt-2" dir="rtl">
+                    قم بإيقاف عامل التصفية لمراجعة جميع الكلمات
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => {
+                      setShowOnlyUnlearned(false)
+                      setPronounceWordIdx(0)
+                      setPronResult(null)
+                    }}
+                  >
+                    عرض جميع الكلمات
+                  </Button>
                 </div>
               )}
             </>

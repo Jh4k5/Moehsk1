@@ -176,3 +176,43 @@ Stage Summary:
 - Root causes: (1) missing `[` brackets in 3 quiz option arrays, (2) Turbopack JSX parser incompatibility with template literals in className attributes, (3) function declaration order in PomodoroTimer, (4) missing JSX closing `>`
 - Lint passes clean for all source files (only script files have warnings)
 - All fixes preserve original styling and logic
+
+---
+Task ID: 2
+Agent: Main Agent + Subagents
+Task: Merge pronunciation with vocabulary + Rebuild flashcards Quizlet-style
+
+Work Log:
+- Analyzed current VocabularySection (lines ~970-1160 in page.tsx) - basic flashcards
+- Analyzed VisualDictionary.tsx - pronunciation only worked with ~62 visual dict words
+- Deployed subagent to rebuild VocabularySection with Quizlet-style features
+- Deployed subagent to merge pronunciation with ALL 410 vocabulary words
+
+Quizlet Flashcard Features Added:
+- 4 study modes: البطاقات (Cards), تعلّم (Learn), اختبار (Test), مطابقة (Match)
+- Swipe navigation on mobile, arrow keys on desktop
+- Progress bar + card counter
+- Learn mode: type Arabic meaning, instant feedback
+- Test mode: 10-question multiple choice quiz
+- Match mode: timed matching game (6 pairs)
+- Session tracking: correct/incorrect, cards seen
+- Shuffle and Reset buttons
+
+Pronunciation Merge Features:
+- Added vocabulary import to VisualDictionary
+- New "📚 كل المفردات (410)" category in pronunciation mode
+- POS-based emoji mapping for vocabulary words
+- Tappable Chinese character to hear pronunciation
+- Previous/Next navigation + progress indicator
+- isLearned integration: green checkmarks, learned badge
+- Auto-mark as learned when pronunciation score >= 85
+- "Show unlearned only" filter toggle
+- "Reset learned" button
+- Empty state with congratulations message
+
+Stage Summary:
+- Build compiles successfully (HTTP 200)
+- Lint passes clean on both changed files
+- Flashcards now match Quizlet UX with 4 study modes
+- Pronunciation covers all 410 vocabulary words (not just visual dict)
+- Learned word tracking integrated across both features

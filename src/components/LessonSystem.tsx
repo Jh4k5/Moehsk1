@@ -263,35 +263,465 @@ const lessons: Lesson[] = [
       { zh: '茶 تعني:', options: ['ماء', 'حليب', 'قهوة', 'شاي'], correct: 3 },
     ],
   },
-  // Lessons 7-15 generated with similar structure
-  ...Array.from({ length: 9 }, (_, i) => ({
-    id: i + 7,
-    titleAr: ['المكان والاتجاهات', 'المواصلات والتسوق', 'الحياة اليومية', 'العمل والمهنة', 'الصحة والمرض', 'الهوايات والرياضة', 'الطقس والمواسم', 'السفر والعطلات', 'مراجعة شاملة'][i],
-    titleZh: ['地点与方向', '交通与购物', '日常生活', '工作与职业', '健康与疾病', '爱好与运动', '天气与季节', '旅行与假期', '综合复习'][i],
+  {
+    id: 7, titleAr: 'هاتفك المحمول وبيتك', titleZh: '你的手机号是多少？',
     words: [
-      { zh: '这个', pinyin: 'zhège', meaning: 'هذا' },
-      { zh: '哪个', pinyin: 'nǎge', meaning: 'أي' },
-      { zh: '在', pinyin: 'zài', meaning: 'في' },
-      { zh: '去', pinyin: 'qù', meaning: 'يذهب' },
-      { zh: '来', pinyin: 'lái', meaning: 'يأتي' },
-      { zh: '想', pinyin: 'xiǎng', meaning: 'يريد' },
+      { zh: '手机', pinyin: 'shǒujī', meaning: 'هاتف محمول' },
+      { zh: '号', pinyin: 'hào', meaning: 'رقم' },
+      { zh: '电脑', pinyin: 'diànnǎo', meaning: 'حاسوب' },
+      { zh: '多少', pinyin: 'duōshao', meaning: 'كم (للأسعار والأرقام)' },
+      { zh: '钱', pinyin: 'qián', meaning: 'مال / نقود' },
+      { zh: '块', pinyin: 'kuài', meaning: 'يوان (عملة)' },
+      { zh: '很', pinyin: 'hěn', meaning: 'جداً' },
+      { zh: '太', pinyin: 'tài', meaning: 'أكثر من اللازم' },
+      { zh: '大', pinyin: 'dà', meaning: 'كبير' },
+      { zh: '小', pinyin: 'xiǎo', meaning: 'صغير' },
+      { zh: '多', pinyin: 'duō', meaning: 'كثير' },
+      { zh: '少', pinyin: 'shǎo', meaning: 'قليل' },
+      { zh: '高', pinyin: 'gāo', meaning: 'طويل / عالٍ' },
+      { zh: '好看', pinyin: 'hǎokàn', meaning: 'جميل' },
+      { zh: '便宜', pinyin: 'piányí', meaning: 'رخيص' },
+      { zh: '贵', pinyin: 'guì', meaning: 'غالٍ' },
+      { zh: '别', pinyin: 'bié', meaning: 'لا تفعل' },
+      { zh: '长', pinyin: 'cháng', meaning: 'طويل' },
+      { zh: '短', pinyin: 'duǎn', meaning: 'قصير' },
+      { zh: '新', pinyin: 'xīn', meaning: 'جديد' },
+      { zh: '旧', pinyin: 'jiù', meaning: 'قديم' },
+      { zh: '合适', pinyin: 'héshì', meaning: 'مناسب' },
     ],
     sentences: [
-      { zh: '请问，厕所在哪儿？', pinyin: 'Qǐngwèn, cèsuǒ zài nǎr?', ar: 'عفواً، أين الحمام؟' },
-      { zh: '我想去北京。', pinyin: 'Wǒ xiǎng qù Běijīng.', ar: 'أريد الذهاب لبكين.' },
+      { zh: '你的手机号是多少？', pinyin: 'Nǐ de shǒujī hào shì duōshao?', ar: 'ما رقم هاتفك المحمول؟' },
+      { zh: '这个手机多少钱？', pinyin: 'Zhège shǒujī duōshao qián?', ar: 'بكم هذا الهاتف المحمول؟' },
+      { zh: '太贵了！', pinyin: 'Tài guì le!', ar: 'غالٍ جداً!' },
+      { zh: '这个很便宜。', pinyin: 'Zhège hěn piányí.', ar: 'هذا رخيص جداً.' },
+      { zh: '我的电脑是新的。', pinyin: 'Wǒ de diànnǎo shì xīn de.', ar: 'حاسوبي جديد.' },
     ],
     conversation: [
-      { speaker: 'A', name: 'سائح', hanzi: '请问，火车站在哪儿？', pinyin: 'Qǐngwèn, huǒchēzhàn zài nǎr?', arabic: 'عفواً، أين محطة القطار؟' },
-      { speaker: 'B', name: 'مارة', hanzi: '往前走，在左边。', pinyin: 'Wǎng qián zǒu, zài zuǒbiān.', arabic: 'امشِ للأمام، على اليسار.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '请问，你的手机号是多少？', pinyin: 'Qǐngwèn, nǐ de shǒujī hào shì duōshao?', arabic: 'من فضلك، ما رقم هاتفك المحمول؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '我的手机号是一三八零零一二三四五六。', pinyin: 'Wǒ de shǒujī hào shì yī sān bā líng líng yī èr sān sì wǔ liù.', arabic: 'رقم هاتفي هو 138-0012-3456.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '谢谢！你的电脑多少钱？', pinyin: 'Xièxie! Nǐ de diànnǎo duōshao qián?', arabic: 'شكراً! بكم حاسوبك؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '五千块。', pinyin: 'Wǔqiān kuài.', arabic: 'خمسة آلاف يوان.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '太贵了！我要便宜的。', pinyin: 'Tài guì le! Wǒ yào piányí de.', arabic: 'غالٍ جداً! أريد أرخص.' },
     ],
     grammar: [
-      { title: 'أساسية', description: 'قواعد أساسية للدرس', pattern: 'فاعل + فعل + مفعول', example: '我去学校。', exampleAr: 'أذهب للمدرسة.' },
+      { title: 'سؤال عن رقم الهاتف', description: '手机号是多少؟', pattern: '手机号 + 是 + 多少？', example: '你的手机号是多少？', exampleAr: 'ما رقم هاتفك؟' },
+      { title: 'أسلوب التفضيل', description: '形容词 + 的 + اسم', pattern: '我 + 要 + صفة + 的 + اسم', example: '我要便宜的。', exampleAr: 'أريد الرخيص.' },
     ],
     exerciseQuestions: [
-      { zh: 'سؤال تمريني', options: ['خيار 1', 'خيار 2', 'خيار 3', 'خيار 4'], correct: 0 },
-      { zh: 'سؤال ثانٍ', options: ['أ', 'ب', 'ج', 'د'], correct: 1 },
+      { zh: '手机号是多少？ سؤال عن:', options: ['الاسم', 'رقم الهاتف', 'العمر', 'العنوان'], correct: 1 },
+      { zh: '太贵了 تعني:', options: ['رخيص جداً', 'غالٍ جداً', 'معقول', 'جديد'], correct: 1 },
+      { zh: '便宜 تعني:', options: ['غالٍ', 'كبير', 'رخيص', 'قديم'], correct: 2 },
+      { zh: '多少 تستخدم مع:', options: ['الأشخاص', 'الأوقات', 'الأرقام والأسعار', 'الأماكن'], correct: 2 },
+      { zh: '手机 تعني:', options: 'حاسوب', 'هاتف محمول', 'تلفزيون', 'تابلت'], correct: 1 },
     ],
-  })),
+  },
+  {
+    id: 8, titleAr: 'مواعيد العمل والدراسة', titleZh: '我晚上六点半下班',
+    words: [
+      { zh: '上班', pinyin: 'shàngbān', meaning: 'يذهب للعمل' },
+      { zh: '下班', pinyin: 'xiàbān', meaning: 'ينهي العمل' },
+      { zh: '开始', pinyin: 'kāishǐ', meaning: 'يبدأ' },
+      { zh: '已经', pinyin: 'yǐjīng', meaning: 'بالفعل' },
+      { zh: '一半', pinyin: 'yíbàn', meaning: 'نصف' },
+      { zh: '点', pinyin: 'diǎn', meaning: 'ساعة (في الوقت)' },
+      { zh: '分', pinyin: 'fēn', meaning: 'دقيقة' },
+      { zh: '半', pinyin: 'bàn', meaning: 'نصف' },
+      { zh: '早上', pinyin: 'zǎoshang', meaning: 'صباحاً' },
+      { zh: '中午', pinyin: 'zhōngwǔ', meaning: 'ظهراً' },
+      { zh: '下午', pinyin: 'xiàwǔ', meaning: 'بعد الظهر' },
+      { zh: '晚上', pinyin: 'wǎnshang', meaning: 'مساءً' },
+      { zh: '分钟', pinyin: 'fēnzhōng', meaning: 'دقيقة' },
+      { zh: '小时', pinyin: 'xiǎoshí', meaning: 'ساعة (وحدة زمن)' },
+      { zh: '课', pinyin: 'kè', meaning: 'درس / حصة' },
+      { zh: '教室', pinyin: 'jiàoshì', meaning: 'فصل دراسي' },
+      { zh: '休息', pinyin: 'xiūxi', meaning: 'يستريح' },
+      { zh: '忙', pinyin: 'máng', meaning: 'مشغول' },
+      { zh: '早', pinyin: 'zǎo', meaning: 'مبكر' },
+      { zh: '晚', pinyin: 'wǎn', meaning: 'متأخر' },
+      { zh: '刚才', pinyin: 'gāngcái', meaning: 'للتوّ' },
+      { zh: '经常', pinyin: 'jīngcháng', meaning: 'غالباً' },
+    ],
+    sentences: [
+      { zh: '我晚上六点半下班。', pinyin: 'Wǒ wǎnshang liù diǎn bàn xiàbān.', ar: 'أنهي العمل الساعة ستة ونصف مساءً.' },
+      { zh: '他每天早上八点上班。', pinyin: 'Tā měitiān zǎoshang bā diǎn shàngbān.', ar: 'يذهب للعمل كل يوم الساعة الثامنة صباحاً.' },
+      { zh: '现在几点了？已经十点半了。', pinyin: 'Xiànzài jǐ diǎn le? Yǐjīng shí diǎn bàn le.', ar: 'الساعة كم الآن؟ عشر ونصف بالفعل.' },
+      { zh: '我休息十分钟。', pinyin: 'Wǒ xiūxi shí fēnzhōng.', ar: 'أستريح عشر دقائق.' },
+    ],
+    conversation: [
+      { speaker: 'A', name: 'لي مينغ', hanzi: '你现在忙吗？', pinyin: 'Nǐ xiànzài máng ma?', arabic: 'هل أنت مشغول الآن؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '不忙。我已经下班了。', pinyin: 'Bù máng. Wǒ yǐjīng xiàbān le.', arabic: 'لا، لست مشغولة. أنهيت العمل بالفعل.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '你几点下班？', pinyin: 'Nǐ jǐ diǎn xiàbān?', arabic: 'كم تنهي العمل؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '我晚上六点半下班。', pinyin: 'Wǒ wǎnshang liù diǎn bàn xiàbān.', arabic: 'أنهي العمل الساعة ستة ونصف مساءً.' },
+    ],
+    grammar: [
+      { title: 'التعبير عن الوقت', description: 'الساعة + رقم + 点 (+ نصف = 半)', pattern: '现在 + 是 + [ساعة] + 点', example: '现在是六点半。', exampleAr: 'الآن الساعة ستة ونصف.' },
+      { title: 'التعبير عن العمل والراحة', description: '上班 / 下班 / 休息', pattern: '我 + [وقت] + 上班/下班', example: '我早上八点上班。', exampleAr: 'أذهب للعمل الساعة الثامنة صباحاً.' },
+    ],
+    exerciseQuestions: [
+      { zh: '下班 تعني:', options: ['يذهب للعمل', 'ينهي العمل', 'يستريح', 'ينام'], correct: 1 },
+      { zh: '六点半 تعني:', options: ['6:00', '6:15', '6:30', '6:45'], correct: 2 },
+      { zh: '已经 تعني:', options: ['لا يزال', 'بالفعل', 'سابقاً', 'لاحقاً'], correct: 1 },
+      { zh: '休息 تعني:', options: ['يعمل', 'يستريح', 'يأكل', 'ينام'], correct: 1 },
+      { zh: '分钟 تعني:', options: ['ساعة', 'يوم', 'دقيقة', 'ثانية'], correct: 2 },
+    ],
+  },
+  {
+    id: 9, titleAr: 'العمل في المستشفى', titleZh: '我爸爸也在医院工作',
+    words: [
+      { zh: '医院', pinyin: 'yīyuàn', meaning: 'مستشفى' },
+      { zh: '也', pinyin: 'yě', meaning: 'أيضاً' },
+      { zh: '都', pinyin: 'dōu', meaning: 'كل / جميع' },
+      { zh: '做', pinyin: 'zuò', meaning: 'يفعل / يعمل' },
+      { zh: '医生', pinyin: 'yīshēng', meaning: 'طبيب' },
+      { zh: '护士', pinyin: 'hùshi', meaning: 'ممرض/ة' },
+      { zh: '公司', pinyin: 'gōngsī', meaning: 'شركة' },
+      { zh: '银行', pinyin: 'yínháng', meaning: 'بنك' },
+      { zh: '商店', pinyin: 'shāngdiàn', meaning: 'متجر' },
+      { zh: '前面', pinyin: 'qiánmiàn', meaning: 'أمام' },
+      { zh: '后面', pinyin: 'hòumiàn', meaning: 'خلف' },
+      { zh: '左边', pinyin: 'zuǒbiān', meaning: 'يسار' },
+      { zh: '右边', pinyin: 'yòubiān', meaning: 'يمين' },
+      { zh: '旁边', pinyin: 'pángbiān', meaning: 'بجانب' },
+      { zh: '对面', pinyin: 'duìmiàn', meaning: 'مقابل' },
+      { zh: '里', pinyin: 'lǐ', meaning: 'داخل' },
+      { zh: '外', pinyin: 'wài', meaning: 'خارج' },
+      { zh: '上', pinyin: 'shàng', meaning: 'فوق' },
+      { zh: '下', pinyin: 'xià', meaning: 'تحت' },
+      { zh: '旁边', pinyin: 'pángbiān', meaning: 'بجانب' },
+      { zh: '附近', pinyin: 'fùjìn', meaning: 'قريب / بالقرب' },
+      { zh: '远', pinyin: 'yuǎn', meaning: 'بعيد' },
+    ],
+    sentences: [
+      { zh: '我爸爸也在医院工作。', pinyin: 'Wǒ bàba yě zài yīyuàn gōngzuò.', ar: 'أبي أيضاً يعمل في المستشفى.' },
+      { zh: '医院在学校的旁边。', pinyin: 'Yīyuàn zài xuéxiào de pángbiān.', ar: 'المستشفى بجانب المدرسة.' },
+      { zh: '我们都学习中文。', pinyin: 'Wǒmen dōu xuéxí Zhōngwén.', ar: 'نحن جميعاً ندرس الصينية.' },
+      { zh: '银行在左边，商店在右边。', pinyin: 'Yínháng zài zuǒbiān, shāngdiàn zài yòubiān.', ar: 'البنك على اليسار، المتجر على اليمين.' },
+    ],
+    conversation: [
+      { speaker: 'A', name: 'لي مينغ', hanzi: '你爸爸在哪儿工作？', pinyin: 'Nǐ bàba zài nǎr gōngzuò?', arabic: 'أين يعمل أبوك؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '我爸爸在医院工作。他是医生。', pinyin: 'Wǒ bàba zài yīyuàn gōngzuò. Tā shì yīshēng.', arabic: 'أبي يعمل في المستشفى. هو طبيب.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '我妈妈也在医院工作。她是护士。', pinyin: 'Wǒ māma yě zài yīyuàn gōngzuò. Tā shì hùshi.', arabic: 'أمي أيضاً تعمل في المستشفى. هي ممرضة.' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '你爸爸你妈妈都在医院工作！', pinyin: 'Nǐ bàba nǐ māma dōu zài yīyuàn gōngzuò!', arabic: 'أبوك وأمك يعملان كلاهما في المستشفى!' },
+    ],
+    grammar: [
+      { title: 'أيضاً = 也', description: '也 تأتي قبل الفعل', pattern: 'فاعل + 也 + فعل', example: '我也学习中文。', exampleAr: 'أنا أيضاً أدرس الصينية.' },
+      { title: 'جميعاً = 都', description: '都 تأتي بعد الفاعل', pattern: 'فاعل + 都 + فعل', example: '我们都去学校。', exampleAr: 'نحن جميعاً نذهب للمدرسة.' },
+      { title: 'في مكان = 在', description: 'التعبير عن الموقع', pattern: 'مكان + 在 + اسم', example: '银行在学校旁边。', exampleAr: 'البنك بجانب المدرسة.' },
+    ],
+    exerciseQuestions: [
+      { zh: '医院 تعني:', options: ['مدرسة', 'مستشفى', 'بنك', 'شركة'], correct: 1 },
+      { zh: '也 تعني:', options: ['كل', 'لا', 'أيضاً', 'لكن'], correct: 2 },
+      { zh: '都 تعني:', options: ['أيضاً', 'كل / جميع', 'ليس', 'بعض'], correct: 1 },
+      { zh: '医生 تعني:', options: ['ممرض', 'طبيب', 'معلم', 'شرطي'], correct: 1 },
+      { zh: '左边 تعني:', options: 'فوق', 'تحت', 'يسار', 'يمين'], correct: 2 },
+    ],
+  },
+  {
+    id: 10, titleAr: 'الدراسة في المدرسة', titleZh: '我明天上午在学校学习',
+    words: [
+      { zh: '明天', pinyin: 'míngtiān', meaning: 'غداً' },
+      { zh: '上午', pinyin: 'shàngwǔ', meaning: 'صباحاً (قبل الظهر)' },
+      { zh: '学习', pinyin: 'xuéxí', meaning: 'يدرس / يتعلم' },
+      { zh: '看', pinyin: 'kàn', meaning: 'يرى / يشاهد' },
+      { zh: '写', pinyin: 'xiě', meaning: 'يكتب' },
+      { zh: '听', pinyin: 'tīng', meaning: 'يسمع' },
+      { zh: '说', pinyin: 'shuō', meaning: 'يقول / يتحدث' },
+      { zh: '读', pinyin: 'dú', meaning: 'يقرأ' },
+      { zh: '汉语', pinyin: 'Hànyǔ', meaning: 'اللغة الصينية' },
+      { zh: '英语', pinyin: 'Yīngyǔ', meaning: 'اللغة الإنجليزية' },
+      { zh: '一起', pinyin: 'yīqǐ', meaning: 'معاً' },
+      { zh: '只', pinyin: 'zhǐ', meaning: 'فقط' },
+      { zh: '能', pinyin: 'néng', meaning: 'يستطيع' },
+      { zh: '会', pinyin: 'huì', meaning: 'يستطيع / يعرف كيف' },
+      { zh: '可以', pinyin: 'kěyǐ', meaning: 'يمكن' },
+      { zh: '应该', pinyin: 'yīnggāi', meaning: 'يجب أن' },
+      { zh: '要', pinyin: 'yào', meaning: 'يريد / سوف' },
+      { zh: '希望', pinyin: 'xīwàng', meaning: 'يأمل' },
+      { zh: '觉得', pinyin: 'juéde', meaning: 'يشعر / يعتقد' },
+      { zh: '难', pinyin: 'nán', meaning: 'صعب' },
+      { zh: '容易', pinyin: 'róngyì', meaning: 'سهل' },
+      { zh: '有意思', pinyin: 'yǒuyìsi', meaning: 'ممتع / مثير للاهتمام' },
+    ],
+    sentences: [
+      { zh: '我明天上午在学校学习。', pinyin: 'Wǒ míngtiān shàngwǔ zài xuéxiào xuéxí.', ar: 'سأدرس في المدرسة غداً صباحاً.' },
+      { zh: '你会说英语吗？', pinyin: 'Nǐ huì shuō Yīngyǔ ma?', ar: 'هل تستطيع التحدث بالإنجليزية؟' },
+      { zh: '我觉得汉语很难，但很有意思。', pinyin: 'Wǒ juéde Hànyǔ hěn nán, dàn hěn yǒuyìsi.', ar: 'أعتقد الصينية صعبة لكنها ممتعة.' },
+      { zh: '我们明天一起去图书馆。', pinyin: 'Wǒmen míngtiān yīqǐ qù túshūguǎn.', ar: 'نذهب معاً للمكتبة غداً.' },
+    ],
+    conversation: [
+      { speaker: 'A', name: 'لي مينغ', hanzi: '你明天做什么？', pinyin: 'Nǐ míngtiān zuò shénme?', arabic: 'ماذا ستفعل غداً؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '我明天上午在学校学习。', pinyin: 'Wǒ míngtiān shàngwǔ zài xuéxiào xuéxí.', arabic: 'سأدرس في المدرسة غداً صباحاً.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '你能来吗？', pinyin: 'Nǐ néng lái ma?', arabic: 'هل تستطيع المجيء؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '可以。我们一起学习吧！', pinyin: 'Kěyǐ. Wǒmen yīqǐ xuéxí ba!', arabic: 'نعم. لندرس معاً!' },
+    ],
+    grammar: [
+      { title: 'التعبير عن المستقبل', description: '明天 / 后天 + فعل', pattern: '我 + [وقت مستقبلي] + فعل', example: '我明天去学校。', exampleAr: 'سأذهب للمدرسة غداً.' },
+      { title: 'القدرة: 能 / 会 / 可以', description: '能 = قدرة عامة، 会 = مهارة مكتسبة، 可以 = إذن', pattern: 'فاعل + 能/会/可以 + فعل', example: '我会说汉语。', exampleAr: 'أستطيع التحدث بالصينية.' },
+    ],
+    exerciseQuestions: [
+      { zh: '明天 تعني:', options: ['اليوم', 'أمس', 'غداً', 'الآن'], correct: 2 },
+      { zh: '学习 تعني:', options: ['يعمل', 'يدرس', 'يلعب', 'ينام'], correct: 1 },
+      { zh: '一起 تعني:', options: ['وحيد', 'معاً', 'سريع', 'ببطء'], correct: 1 },
+      { zh: '觉得 تعني:', options: ['يرى', 'يشعر / يعتقد', 'يسمع', 'يأكل'], correct: 1 },
+      { zh: '难 تعني:', options: ['سهل', 'صعب', 'كبير', 'جميل'], correct: 1 },
+    ],
+  },
+  {
+    id: 11, titleAr: 'التفاح هنا رخيص!', titleZh: '这儿的苹果真便宜！',
+    words: [
+      { zh: '这儿', pinyin: 'zhèr', meaning: 'هنا' },
+      { zh: '那儿', pinyin: 'nàr', meaning: 'هناك' },
+      { zh: '苹果', pinyin: 'píngguǒ', meaning: 'تفاح' },
+      { zh: '香蕉', pinyin: 'xiāngjiāo', meaning: 'موز' },
+      { zh: '水果', pinyin: 'shuǐguǒ', meaning: 'فواكه' },
+      { zh: '买', pinyin: 'mǎi', meaning: 'يشتري' },
+      { zh: '卖', pinyin: 'mài', meaning: 'يبيع' },
+      { zh: '种', pinyin: 'zhǒng', meaning: 'نوع / يزرع' },
+      { zh: '斤', pinyin: 'jīn', meaning: 'رطل (500 غرام)' },
+      { zh: '个', pinyin: 'gè', meaning: 'عدد عام' },
+      { zh: '本', pinyin: 'běn', meaning: 'عداد للكتب' },
+      { zh: '瓶', pinyin: 'píng', meaning: 'عداد للزجاجات' },
+      { zh: '杯', pinyin: 'bēi', meaning: 'عداد للأكواب' },
+      { zh: '碗', pinyin: 'wǎn', meaning: 'عداد للأطباق' },
+      { zh: '最好', pinyin: 'zuì hǎo', meaning: 'الأفضل' },
+      { zh: '特别', pinyin: 'tèbié', meaning: 'خاصة / بشكل خاص' },
+      { zh: '真', pinyin: 'zhēn', meaning: 'حقاً / فعلاً' },
+      { zh: '一些', pinyin: 'yìxiē', meaning: 'بعض / قليلاً' },
+      { zh: '别人', pinyin: 'biérén', meaning: 'الآخرون' },
+      { zh: '大家', pinyin: 'dàjiā', meaning: 'الجميع' },
+      { zh: '因为', pinyin: 'yīnwèi', meaning: 'لأن' },
+      { zh: '所以', pinyin: 'suǒyǐ', meaning: 'لذلك' },
+    ],
+    sentences: [
+      { zh: '这儿的苹果真便宜！', pinyin: 'Zhèr de píngguǒ zhēn piányí!', ar: 'التفاح هنا رخيص فعلاً!' },
+      { zh: '我要买两斤苹果。', pinyin: 'Wǒ yào mǎi liǎng jīn píngguǒ.', ar: 'أريد شراء رطلين من التفاح.' },
+      { zh: '哪种水果最好吃？', pinyin: 'Nǎ zhǒng shuǐguǒ zuì hǎochī?', ar: 'أي نوع من الفواكه ألذ؟' },
+      { zh: '因为下雨，所以我没去。', pinyin: 'Yīnwèi xiàyǔ, suǒyǐ wǒ méi qù.', ar: 'لأنها تمطر، لم أذهب.' },
+    ],
+    conversation: [
+      { speaker: 'A', name: 'لي مينغ', hanzi: '这儿的苹果真便宜！', pinyin: 'Zhèr de píngguǒ zhēn piányí!', arabic: 'التفاح هنا رخيص فعلاً!' },
+      { speaker: 'B', name: 'البائعة', hanzi: '是啊，三块钱一斤。', pinyin: 'Shì a, sān kuài qián yì jīn.', arabic: 'نعم، ثلاثة يوانات للرطل.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '我要两斤苹果和一斤香蕉。', pinyin: 'Wǒ yào liǎng jīn píngguǒ hé yì jīn xiāngjiāo.', arabic: 'أريد رطلين تفاح ورطلاً موز.' },
+      { speaker: 'B', name: 'البائعة', hanzi: '一共十二块。', pinyin: 'Yīgòng shíèr kuài.', arabic: 'المجموع اثنا عشر يواناً.' },
+    ],
+    grammar: [
+      { title: 'العدادات (量词)', description: 'كل اسم له عدد محدد', pattern: 'عدد + عداد + اسم', example: '两斤苹果 / 一本书', exampleAr: 'رطلان تفاح / كتاب واحد' },
+      { title: 'العلة والنتيجة', description: 'لأن... لذلك...', pattern: '因为 + جملة，所以 + جملة', example: '因为下雨，所以我没去。', exampleAr: 'لأنها تمطر، لم أذهب.' },
+    ],
+    exerciseQuestions: [
+      { zh: '这儿的苹果真便宜！这儿 تعني:', options: ['هناك', 'هنا', 'أين', 'كل مكان'], correct: 1 },
+      { zh: '两斤 تعني:', options: ['كيلو واحد', 'كيلو', 'رطلان', 'ثلاثة أرطال'], correct: 2 },
+      { zh: '因为...所以...', options: ['بسبب فقط', 'علة ونتيجة', 'سؤال', 'نفي'], correct: 1 },
+      { zh: '买 تعني:', options: ['يبيع', 'يشتري', 'يعطي', 'يأخذ'], correct: 1 },
+      { zh: '水果 تعني:', options: ['خضروات', 'لحوم', 'فواكه', 'حلويات'], correct: 2 },
+    ],
+  },
+  {
+    id: 12, titleAr: 'أدرس في الجامعة', titleZh: '我读大学呢',
+    words: [
+      { zh: '大学', pinyin: 'dàxué', meaning: 'جامعة' },
+      { zh: '呢', pinyin: 'ne', meaning: 'حرف تنبيه استفهامي' },
+      { zh: '怎么', pinyin: 'zěnme', meaning: 'كيف' },
+      { zh: '为什么', pinyin: 'wèishénme', meaning: 'لماذا' },
+      { zh: '什么时候', pinyin: 'shénme shíhou', meaning: 'متى' },
+      { zh: '哪儿', pinyin: 'nǎr', meaning: 'أين' },
+      { zh: '怎么样', pinyin: 'zěnmeyàng', meaning: 'كيف حالك؟ / كيف؟' },
+      { zh: '比较', pinyin: 'bǐjiào', meaning: 'نسبياً / بالمقارنة' },
+      { zh: '最', pinyin: 'zuì', meaning: 'الأكثر / الأفضل' },
+      { zh: '还', pinyin: 'hái', meaning: 'لا يزال / بعد ذلك' },
+      { zh: '没', pinyin: 'méi', meaning: 'لم (نفي الماضي)' },
+      { zh: '正在', pinyin: 'zhèngzài', meaning: 'في طور الآن' },
+      { zh: '过', pinyin: 'guò', meaning: 'تجربة في الماضي' },
+      { zh: '了', pinyin: 'le', meaning: 'التغيير / اكتمال الفعل' },
+      { zh: '吧', pinyin: 'ba', meaning: 'حرف اقتراح' },
+      { zh: '啊', pinyin: 'a', meaning: 'حرف تعجب' },
+      { zh: '呢', pinyin: 'ne', meaning: 'تنبيه' },
+      { zh: '准备', pinyin: 'zhǔnbèi', meaning: 'يستعد' },
+      { zh: '考试', pinyin: 'kǎoshì', meaning: 'امتحان' },
+      { zh: '成绩', pinyin: 'chéngjì', meaning: 'درجة / نتيجة' },
+      { zh: '毕业', pinyin: 'bìyè', meaning: 'يتخرج' },
+      { zh: '专业', pinyin: 'zhuānyè', meaning: 'تخصص' },
+    ],
+    sentences: [
+      { zh: '我读大学呢。', pinyin: 'Wǒ dú dàxué ne.', ar: 'أنا أدرس في الجامعة.' },
+      { zh: '你怎么去学校？', pinyin: 'Nǐ zěnme qù xuéxiào?', ar: 'كيف تذهب للمدرسة؟' },
+      { zh: '他正在做什么？', pinyin: 'Tā zhèngzài zuò shénme?', ar: 'ماذا يفعل الآن؟' },
+      { zh: '你学什么专业？', pinyin: 'Nǐ xué shénme zhuānyè?', ar: 'ما تخصصك؟' },
+    ],
+    conversation: [
+      { speaker: 'A', name: 'لي مينغ', hanzi: '你现在做什么？', pinyin: 'Nǐ xiànzài zuò shénme?', arabic: 'ماذا تفعل الآن؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '我读大学呢。我学中文专业。', pinyin: 'Wǒ dú dàxué ne. Wǒ xué Zhōngwén zhuānyè.', arabic: 'أنا أدرس في الجامعة. تخصصي اللغة الصينية.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '中文难吗？', pinyin: 'Zhōngwén nán ma?', arabic: 'هل الصينية صعبة؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '比较难，但是很有意思。', pinyin: 'Bǐjiào nán, dànshì hěn yǒuyìsi.', arabic: 'صعبة نسبياً، لكنها ممتعة جداً.' },
+    ],
+    grammar: [
+      { title: 'السؤال بكيف: 怎么', description: 'للسؤال عن الطريقة', pattern: '怎么 + فعل', example: '你怎么去学校？', exampleAr: 'كيف تذهب للمدرسة؟' },
+      { title: '正在: الفعل المستمر', description: 'يعبر عن فعل يجري الآن', pattern: '正在 + فعل + 呢', example: '他正在学习。', exampleAr: 'هو يدرس الآن.' },
+    ],
+    exerciseQuestions: [
+      { zh: '大学 تعني:', options: ['مدرسة', 'جامعة', 'مكتبة', 'معمل'], correct: 1 },
+      { zh: '怎么 تعني:', options: ['أين', 'متى', 'كيف', 'ماذا'], correct: 2 },
+      { zh: '正在 تعني:', options: ['كان', 'سيكون', 'في طور الآن', 'عادةً'], correct: 2 },
+      { zh: '专业 تعني:', options: ['وظيفة', 'تخصص', 'مهارة', 'لغة'], correct: 1 },
+      { zh: '呢 في نهاية الجملة تعبر عن:', options: ['نفي', 'تأكيد', 'تنبيه / استمرار', 'سؤال'], correct: 2 },
+    ],
+  },
+  {
+    id: 13, titleAr: 'أمس نزل الثلج', titleZh: '昨天下雪了',
+    words: [
+      { zh: '昨天', pinyin: 'zuótiān', meaning: 'أمس' },
+      { zh: '下雪', pinyin: 'xià xuě', meaning: 'ينزل الثلج' },
+      { zh: '下雨', pinyin: 'xià yǔ', meaning: 'تمطر' },
+      { zh: '天气', pinyin: 'tiānqì', meaning: 'طقس' },
+      { zh: '冷', pinyin: 'lěng', meaning: 'بارد' },
+      { zh: '热', pinyin: 'rè', meaning: 'حار' },
+      { zh: '温度', pinyin: 'wēndù', meaning: 'درجة حرارة' },
+      { zh: '度', pinyin: 'dù', meaning: 'درجة' },
+      { zh: '春天', pinyin: 'chūntiān', meaning: 'الربيع' },
+      { zh: '夏天', pinyin: 'xiàtiān', meaning: 'الصيف' },
+      { zh: '秋天', pinyin: 'qiūtiān', meaning: 'الخريف' },
+      { zh: '冬天', pinyin: 'dōngtiān', meaning: 'الشتاء' },
+      { zh: '风', pinyin: 'fēng', meaning: 'ريح' },
+      { zh: '不', pinyin: 'bú', meaning: 'لا (نفي الحاضر)' },
+      { zh: '没', pinyin: 'méi', meaning: 'لم (نفي الماضي)' },
+      { zh: '穿', pinyin: 'chuān', meaning: 'يرتدي' },
+      { zh: '衣服', pinyin: 'yīfu', meaning: 'ملابس' },
+      { zh: '带', pinyin: 'dài', meaning: 'يحمل / يأخذ معه' },
+      { zh: '雨伞', pinyin: 'yǔsǎn', meaning: 'مظلة' },
+      { zh: '感冒', pinyin: 'gǎnmào', meaning: 'زكام' },
+      { zh: '不舒服', pinyin: 'bù shūfu', meaning: 'غير مرتاح' },
+      { zh: '头疼', pinyin: 'tóu téng', meaning: 'صداع' },
+    ],
+    sentences: [
+      { zh: '昨天下雪了。', pinyin: 'Zuótiān xià xuě le.', ar: 'أمس نزل الثلج.' },
+      { zh: '今天天气很冷。', pinyin: 'Jīntiān tiānqì hěn lěng.', ar: 'الطقس اليوم بارد جداً.' },
+      { zh: '我感冒了，头疼。', pinyin: 'Wǒ gǎnmào le, tóu téng.', ar: 'أنا مصاب بالزكام، عندي صداع.' },
+      { zh: '你应该多穿衣服。', pinyin: 'Nǐ yīnggāi duō chuān yīfu.', ar: 'يجب أن ترتدي ملابس أكثر.' },
+    ],
+    conversation: [
+      { speaker: 'A', name: 'لي مينغ', hanzi: '今天天气怎么样？', pinyin: 'Jīntiān tiānqì zěnmeyàng?', arabic: 'كيف الطقس اليوم؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '很冷。昨天下雪了。', pinyin: 'Hěn lěng. Zuótiān xià xuě le.', arabic: 'بارد جداً. أمس نزل الثلج.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '我不舒服，我感冒了。', pinyin: 'Wǒ bù shūfu, wǒ gǎnmào le.', arabic: 'أنا لست مرتاحاً، عندي زكام.' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '你应该去医院。', pinyin: 'Nǐ yīnggāi qù yīyuàn.', arabic: 'يجب أن تذهب للمستشفى.' },
+    ],
+    grammar: [
+      { title: 'نفي الماضي: 没(有)', description: '没 + فعل يعبر عن نفي في الماضي', pattern: '没 + فعل + 了', example: '昨天没下雨。', exampleAr: 'لم تمطر أمس.' },
+      { title: 'التعبير عن المرض', description: '不舒服 / 感冒 / 疼', pattern: '我 +不舒服 / 感冒了', example: '我头疼。', exampleAr: 'عندي صداع.' },
+    ],
+    exerciseQuestions: [
+      { zh: '昨天 تعني:', options: ['اليوم', 'غداً', 'أمس', 'الآن'], correct: 2 },
+      { zh: '下雪 تعني:', options: 'تمطر', 'يشرق الشمس', 'ينزل الثلج', 'تكون غائمة'], correct: 2 },
+      { zh: '不舒服 تعني:', options: ['سعيد', 'متعب', 'غير مرتاح', 'جائع'], correct: 2 },
+      { zh: '感冒 تعني:', options: ['حمى', 'زكام', 'صداع', 'ألم'], correct: 1 },
+      { zh: '没 + فعل يعبر عن:', options: ['نفي الحاضر', 'نفي الماضي', 'أمر', 'اقتراح'], correct: 1 },
+    ],
+  },
+  {
+    id: 14, titleAr: 'شاي من فضلك', titleZh: '请给我一杯茶',
+    words: [
+      { zh: '给', pinyin: 'gěi', meaning: 'يعطي' },
+      { zh: '杯', pinyin: 'bēi', meaning: 'كوب (عداد)' },
+      { zh: '瓶', pinyin: 'píng', meaning: 'زجاجة (عداد)' },
+      { zh: '张', pinyin: 'zhāng', meaning: 'ورقة / تذكرة (عداد)' },
+      { zh: '把', pinyin: 'bǎ', meaning: 'أداة حصر' },
+      { zh: '让', pinyin: 'ràng', meaning: 'يدع / يسمح' },
+      { zh: '帮', pinyin: 'bāng', meaning: 'يساعد' },
+      { zh: '告诉', pinyin: 'gàosu', meaning: 'يخبر' },
+      { zh: '请', pinyin: 'qǐng', meaning: 'من فضلك / يرجى' },
+      { zh: '一下', pinyin: 'yíxià', meaning: 'قليلاً / للحظة' },
+      { zh: '慢', pinyin: 'màn', meaning: 'بطيء' },
+      { zh: '快', pinyin: 'kuài', meaning: 'سريع' },
+      { zh: '等', pinyin: 'děng', meaning: 'ينتظر' },
+      { zh: '分钟', pinyin: 'fēnzhōng', meaning: 'دقيقة' },
+      { zh: '电影', pinyin: 'diànyǐng', meaning: 'فيلم / سينما' },
+      { zh: '电视', pinyin: 'diànshì', meaning: 'تلفزيون' },
+      { zh: '音乐', pinyin: 'yīnyuè', meaning: 'موسيقى' },
+      { zh: '运动', pinyin: 'yùndòng', meaning: 'رياضة / حركة' },
+      { zh: '跑', pinyin: 'pǎo', meaning: 'يركض' },
+      { zh: '游泳', pinyin: 'yóuyǒng', meaning: 'السباحة' },
+      { zh: '喜欢', pinyin: 'xǐhuan', meaning: 'يحب' },
+      { zh: '爱', pinyin: 'ài', meaning: 'يحب (عميق)' },
+      { zh: '认识', pinyin: 'rènshi', meaning: 'يعرف / يتعرف على' },
+    ],
+    sentences: [
+      { zh: '请给我一杯茶。', pinyin: 'Qǐng gěi wǒ yì bēi chá.', ar: 'من فضلك أعطني كوب شاي.' },
+      { zh: '请等一下。', pinyin: 'Qǐng děng yíxià.', ar: 'من فضلك انتظر قليلاً.' },
+      { zh: '我喜欢看电影。', pinyin: 'Wǒ xǐhuan kàn diànyǐng.', ar: 'أحب مشاهدة الأفلام.' },
+      { zh: '请帮我说英语。', pinyin: 'Qǐng bāng wǒ shuō Yīngyǔ.', ar: 'ساعدني على التحدث بالإنجليزية من فضلك.' },
+    ],
+    conversation: [
+      { speaker: 'A', name: 'لي مينغ', hanzi: '服务员，请给我一杯茶。', pinyin: 'Fúwùyuán, qǐng gěi wǒ yì bēi chá.', arabic: 'النادل، من فضلك أعطني كوب شاي.' },
+      { speaker: 'B', name: 'النادل', hanzi: '好的，请等一下。', pinyin: 'Hǎo de, qǐng děng yíxià.', arabic: 'حسناً، انتظر قليلاً.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '谢谢。你们的茶怎么样？', pinyin: 'Xièxie. Nǐmen de chá zěnmeyàng?', arabic: 'شكراً. كيف شايكم؟' },
+      { speaker: 'B', name: 'النادل', hanzi: '我们有很多种茶。绿茶、红茶、花茶。', pinyin: 'Wǒmen yǒu hěn duō zhǒng chá. Lǜchá, hóngchá, huāchá.', arabic: 'لدينا أنواع كثيرة من الشاي. شاي أخضر، أحمر، زهري.' },
+    ],
+    grammar: [
+      { title: 'المفعول المزدوج: 给 + شخص + شيء', description: 'فعل + شخص + شيء', pattern: '请 + 给 + شخص + شيء', example: '请给我一杯茶。', exampleAr: 'من فضلك أعطني كوب شاي.' },
+      { title: '一下 للتخفيف', description: 'فعل + 一下 = للحظة', pattern: 'فعل + 一下', example: '请等一下。', exampleAr: 'من فضلك انتظر قليلاً.' },
+    ],
+    exerciseQuestions: [
+      { zh: '请给我一杯茶。给 تعني:', options: ['يأخذ', 'يعطي', 'يبيع', 'يشتري'], correct: 1 },
+      { zh: '一下 تعني:', options: ['كثير', 'قليلاً', 'لا شيء', 'دائماً'], correct: 1 },
+      { zh: '喜欢 تعني:', options: ['يكره', 'يحب', 'يعرف', 'يفهم'], correct: 1 },
+      { zh: '快 تعني:', options: ['بطيء', 'سريع', 'جميل', 'جديد'], correct: 1 },
+      { zh: '请等一下 تعني:', options: ['اذهب', 'تعال', 'انتظر قليلاً', 'اجلس'], correct: 2 },
+    ],
+  },
+  {
+    id: 15, titleAr: 'اللقاء في مطار داكسينغ', titleZh: '大兴机场见！',
+    words: [
+      { zh: '机场', pinyin: 'jīchǎng', meaning: 'مطار' },
+      { zh: '飞机', pinyin: 'fēijī', meaning: 'طائرة' },
+      { zh: '出租车', pinyin: 'chūzūchē', meaning: 'تاكسي' },
+      { zh: '火车', pinyin: 'huǒchē', meaning: 'قطار' },
+      { zh: '地铁', pinyin: 'dìtiě', meaning: 'مترو أنفاق' },
+      { zh: '票', pinyin: 'piào', meaning: 'تذكرة' },
+      { zh: '护照', pinyin: 'hùzhào', meaning: 'جواز سفر' },
+      { zh: '行李', pinyin: 'xínglǐ', meaning: 'أمتعة' },
+      { zh: '到达', pinyin: 'dàodá', meaning: 'يصل' },
+      { zh: '出发', pinyin: 'chūfā', meaning: 'ينطلق' },
+      { zh: '接', pinyin: 'jiē', meaning: 'يستقبل / يلتقط' },
+      { zh: '送', pinyin: 'sòng', meaning: 'يودّع / يرسل' },
+      { zh: '见', pinyin: 'jiàn', meaning: 'يرى / يلتقي' },
+      { zh: '旅行', pinyin: 'lǚxíng', meaning: 'سفر / رحلة' },
+      { zh: '旅游', pinyin: 'lǚyóu', meaning: 'سياحة' },
+      { zh: '回来', pinyin: 'huílái', meaning: 'يعود' },
+      { zh: '路上', pinyin: 'lùshang', meaning: 'على الطريق' },
+      { zh: '安全', pinyin: 'ānquán', meaning: 'آمن' },
+      { zh: '注意', pinyin: 'zhùyì', meaning: 'ينتبه' },
+      { zh: '开心', pinyin: 'kāixīn', meaning: 'سعيد' },
+      { zh: '担心', pinyin: 'dānxīn', meaning: 'يشفق / يقلق' },
+      { zh: '路上小心', pinyin: 'lùshang xiǎoxīn', meaning: 'كن حذراً في الطريق' },
+      { zh: '再见', pinyin: 'zàijiàn', meaning: 'مع السلامة' },
+    ],
+    sentences: [
+      { zh: '大兴机场见！', pinyin: 'Dàxīng jīchǎng jiàn!', ar: 'أراك في مطار داكسينغ!' },
+      { zh: '我的飞机下午三点起飞。', pinyin: 'Wǒ de fēijī xiàwǔ sān diǎn qǐfēi.', ar: 'طائرتي تقلع الساعة الثالثة بعد الظهر.' },
+      { zh: '路上小心。', pinyin: 'Lùshang xiǎoxīn.', ar: 'كن حذراً في الطريق.' },
+      { zh: '祝你好运！', pinyin: 'Zhù nǐ hǎo yùn!', ar: 'حظاً سعيداً!' },
+    ],
+    conversation: [
+      { speaker: 'A', name: 'لي مينغ', hanzi: '你明天去哪儿？', pinyin: 'Nǐ míngtiān qù nǎr?', arabic: 'إلى أين تذهب غداً؟' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '我明天去北京。大兴机场见！', pinyin: 'Wǒ míngtiān qù Běijīng. Dàxīng jīchǎng jiàn!', arabic: 'أذهب لبكين غداً. أراك في مطار داكسينغ!' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '好的！路上小心。', pinyin: 'Hǎo de! Lùshang xiǎoxīn.', arabic: 'حسناً! كن حذراً في الطريق.' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '谢谢！三天以后见。', pinyin: 'Xièxie! Sān tiān yǐhòu jiàn.', arabic: 'شكراً! أراك بعد ثلاثة أيام.' },
+      { speaker: 'A', name: 'لي مينغ', hanzi: '祝你好运！', pinyin: 'Zhù nǐ hǎo yùn!', arabic: 'حظاً سعيداً!' },
+      { speaker: 'B', name: 'وانغ فانغ', hanzi: '再见！', pinyin: 'Zàijiàn!', arabic: 'مع السلامة!' },
+    ],
+    grammar: [
+      { title: 'التعبير عن السفر', description: '去 + مكان', pattern: '我 + [وقت] + 去 + مكان', example: '我明天去北京。', exampleAr: 'أذهب لبكين غداً.' },
+      { title: 'التعبير عن اللقاء والوداع', description: '见 / 再见 / 祝你好运', pattern: '机场 + 见', example: '大兴机场见！', exampleAr: 'أراك في مطار داكسينغ!' },
+      { title: 'الأمن والسلامة', description: '路上小心 / 祝你好运', pattern: '路上 + 小心', example: '路上小心。', exampleAr: 'كن حذراً في الطريق.' },
+    ],
+    exerciseQuestions: [
+      { zh: '机场 تعني:', options: ['محطة قطار', 'مطار', 'ميناء', 'محطة حافلات'], correct: 1 },
+      { zh: '飞机 تعني:', options: ['قطار', 'تاكسي', 'طائرة', 'حافلة'], correct: 2 },
+      { zh: '再见 تعني:', options: ['مرحباً', 'مع السلامة', 'شكراً', 'من فضلك'], correct: 1 },
+      { zh: '路上小心 تعني:', options: ['امشِ بسرعة', 'كن حذراً في الطريق', 'الطريق قصير', 'الطريق طويل'], correct: 1 },
+      { zh: '旅行 تعني:', options: ['عمل', 'دراسة', 'سفر / رحلة', 'نوم'], correct: 2 },
+      { zh: '护照 تعني:', options: ['بطاقة شخصية', 'تذكرة', 'جواز سفر', 'رخصة قيادة'], correct: 2 },
+    ],
+  },
 ]
 
 // ─── Main Component ─────────────────────────────────────────
@@ -367,7 +797,7 @@ export default function LessonSystem() {
     <div dir="rtl" className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold text-red-700 flex items-center justify-center gap-3">
+        <h2 className="text-3xl font-bold text-[#0A90D4] flex items-center justify-center gap-3">
           <BookOpen className="w-8 h-8" />
           نظام الدروس
         </h2>
@@ -392,7 +822,7 @@ export default function LessonSystem() {
                     key={lesson.id}
                     className={`w-full text-right p-3 rounded-lg transition-all ${
                       isActive
-                        ? 'bg-red-50 border-2 border-red-500'
+                        ? 'bg-[#E0F6FF] border-2 border-[#1CB0F6]'
                         : unlocked
                           ? 'hover:bg-gray-50 border border-transparent'
                           : 'opacity-50 cursor-not-allowed'
@@ -402,7 +832,7 @@ export default function LessonSystem() {
                   >
                     <div className="flex items-center gap-2">
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                        isActive ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'
+                        isActive ? 'bg-[#1CB0F6] text-white' : 'bg-gray-100 text-gray-600'
                       }`}>
                         {unlocked ? lesson.id : <Lock className="w-3 h-3" />}
                       </div>
@@ -430,12 +860,12 @@ export default function LessonSystem() {
               transition={{ duration: 0.2 }}
             >
               {/* Lesson Header */}
-              <Card className="mb-4 border-2 border-red-200">
+              <Card className="mb-4 border-2 border-[#1CB0F6]"
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-red-600 text-white">الدرس {currentLesson.id}</Badge>
+                        <Badge className="bg-[#1CB0F6] text-white">الدرس {currentLesson.id}</Badge>
                         <h3 className="text-xl font-bold">{currentLesson.titleAr}</h3>
                       </div>
                       <p className="text-gray-500 font-chinese-sans mt-1">{currentLesson.titleZh}</p>
@@ -536,7 +966,7 @@ export default function LessonSystem() {
                               exit={{ rotateY: 90 }}
                               className="text-center space-y-3"
                             >
-                              <div className="font-chinese-serif text-6xl text-red-700">{currentLesson.words[flashcardIndex]?.zh}</div>
+                              <div className="font-chinese-serif text-6xl text-[#0A90D4]">{currentLesson.words[flashcardIndex]?.zh}</div>
                               <div className="text-sm text-gray-400">اضغط لقلب البطاقة</div>
                             </motion.div>
                           )}
@@ -576,11 +1006,11 @@ export default function LessonSystem() {
                         <Card
                           key={idx}
                           className={`p-3 text-center cursor-pointer hover:shadow-sm transition-all ${
-                            idx === flashcardIndex ? 'border-red-500 border-2' : ''
-                          } ${learnedWords.has(key) ? 'bg-green-50' : ''}`}
+                            idx === flashcardIndex ? 'border-[#1CB0F6] border-2' : ''
+                          } ${learnedWords.has(key) ? 'bg-[#E5F9DB]' : ''}`}
                           onClick={() => { setFlashcardIndex(idx); setIsFlipped(false) }}
                         >
-                          <div className="font-chinese-serif text-xl text-red-700">{word.zh}</div>
+                          <div className="font-chinese-serif text-xl text-[#0A90D4]">{word.zh}</div>
                           <div className="text-[10px] text-gray-500 font-chinese-sans">{word.pinyin}</div>
                           <div className="text-xs text-gray-600">{word.meaning}</div>
                           {learnedWords.has(key) && <CheckCircle className="w-3 h-3 text-green-500 mx-auto mt-1" />}
@@ -622,7 +1052,7 @@ export default function LessonSystem() {
                   <Card className="bg-gray-50">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-4">
-                        <MessageCircle className="w-5 h-5 text-red-600" />
+                        <MessageCircle className="w-5 h-5 text-[#1CB0F6]" />
                         <h4 className="font-bold">محادثة: {currentLesson.titleAr}</h4>
                       </div>
                       <div className="space-y-3">
@@ -636,10 +1066,10 @@ export default function LessonSystem() {
                           >
                             <div className={`rounded-2xl p-3 max-w-[80%] ${
                               turn.speaker === 'A'
-                                ? 'bg-red-50 rounded-tr-sm border border-red-100'
+                                ? 'bg-[#E0F6FF] rounded-tr-sm border border-[#1CB0F6]'
                                 : 'bg-blue-50 rounded-tl-sm border border-blue-100'
                             }`}>
-                              <div className={`text-xs mb-1 ${turn.speaker === 'A' ? 'text-red-500' : 'text-blue-500'}`}>
+                              <div className={`text-xs mb-1 ${turn.speaker === 'A' ? 'text-[#1CB0F6]' : 'text-blue-500'}`}>
                                 {turn.name}
                               </div>
                               <div className="font-chinese-serif text-lg">{turn.hanzi}</div>
@@ -666,14 +1096,14 @@ export default function LessonSystem() {
                       <CardHeader>
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-base flex items-center gap-2">
-                            <Target className="w-5 h-5 text-red-600" />
+                            <Target className="w-5 h-5 text-[#1CB0F6]" />
                             سؤال {exerciseIndex + 1} من {currentLesson.exerciseQuestions.length}
                           </CardTitle>
                           <Badge variant="outline">النتيجة: {exerciseScore}/{exerciseIndex + (exerciseAnswer !== null ? 1 : 0)}</Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="text-center bg-red-50 rounded-xl p-4">
+                        <div className="text-center bg-[#E0F6FF] rounded-xl p-4">
                           <p className="text-lg font-medium">{currentLesson.exerciseQuestions[exerciseIndex]?.zh}</p>
                         </div>
 
@@ -701,8 +1131,8 @@ export default function LessonSystem() {
                             animate={{ opacity: 1, y: 0 }}
                             className={`text-center p-3 rounded-lg ${
                               exerciseAnswer === currentLesson.exerciseQuestions[exerciseIndex].correct
-                                ? 'bg-green-50 text-green-700'
-                                : 'bg-red-50 text-red-700'
+                                ? 'bg-[#E5F9DB] text-green-700'
+                                : 'bg-[#E0F6FF] text-[#0A90D4]'
                             }`}
                           >
                             {exerciseAnswer === currentLesson.exerciseQuestions[exerciseIndex].correct
@@ -730,7 +1160,7 @@ export default function LessonSystem() {
                             {exerciseScore === currentLesson.exerciseQuestions.length ? '🏆' : exerciseScore >= currentLesson.exerciseQuestions.length / 2 ? '👍' : '💪'}
                           </div>
                           <h3 className="text-2xl font-bold">نتيجتك</h3>
-                          <div className="text-4xl font-bold text-red-700">
+                          <div className="text-4xl font-bold text-[#0A90D4]">
                             {exerciseScore}/{currentLesson.exerciseQuestions.length}
                           </div>
                           <p className="text-gray-600">
@@ -762,11 +1192,11 @@ export default function LessonSystem() {
                       <Card>
                         <CardContent className="p-4 space-y-3">
                           <div className="flex items-center gap-2">
-                            <GraduationCap className="w-5 h-5 text-red-600" />
+                            <GraduationCap className="w-5 h-5 text-[#1CB0F6]" />
                             <h4 className="font-bold text-lg">{rule.title}</h4>
                           </div>
                           <p className="text-sm text-gray-600">{rule.description}</p>
-                          <div className="bg-red-50 rounded-lg p-3 font-mono text-sm text-red-800">
+                          <div className="bg-[#E0F6FF] rounded-lg p-3 font-mono text-sm text-red-800">
                             {rule.pattern}
                           </div>
                           <div className="flex items-start gap-3 bg-gray-50 rounded-lg p-3">

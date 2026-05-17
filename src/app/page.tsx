@@ -34,6 +34,7 @@ import LessonSystem from '@/components/LessonSystem'
 import QASection from '@/components/QASection'
 import VisualDictionary from '@/components/VisualDictionary'
 import AchievementsSection from '@/components/AchievementsSection'
+import PomodoroTimer from '@/components/PomodoroTimer'
 
 // ─── TTS Helper ─────────────────────────────────────────────
 const speak = (text: string, lang = 'zh-CN') => {
@@ -678,10 +679,10 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col" dir="rtl">
       {/* ─── Header ──────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#1CB0F6] flex items-center justify-center shadow-sm" style={{ borderBottom: '3px solid #0A90D4' }}>
               <span className="font-chinese-serif text-white text-xl font-bold">汉</span>
             </div>
             <div>
@@ -690,12 +691,12 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="hidden sm:flex gap-1">
-              <Flame className="w-3 h-3 text-orange-500" />
+            <Badge className="hidden sm:flex gap-1 bg-amber-50 text-amber-700 border-amber-200">
+              <Flame className="w-3 h-3 text-amber-500" />
               <span>{store.dailyStreak} يوم متتالي</span>
             </Badge>
-            <Badge variant="outline" className="hidden sm:flex gap-1">
-              <Star className="w-3 h-3 text-yellow-500" />
+            <Badge className="hidden sm:flex gap-1 bg-blue-50 text-blue-700 border-blue-200">
+              <Star className="w-3 h-3 text-blue-500" />
               <span>{stats.learned}/{stats.total}</span>
             </Badge>
           </div>
@@ -704,24 +705,26 @@ export default function Home() {
 
       <div className="flex-1 flex max-w-7xl mx-auto w-full">
         {/* ─── Sidebar Navigation (Desktop) ──────────────── */}
-        <nav className="hidden lg:flex flex-col w-56 border-l border-gray-200 p-3 gap-1 sticky top-[60px] self-start max-h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar">
+        <nav className="hidden lg:flex flex-col w-56 border-l border-gray-100 p-3 gap-1 sticky top-[60px] self-start max-h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar bg-white/50">
           {navItems.map(item => (
             <button
               key={item.id}
               onClick={() => setCurrentSection(item.id)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 currentSection === item.id
-                  ? 'bg-red-50 text-red-700 shadow-sm'
+                  ? 'bg-[#E0F6FF] text-[#0A90D4] shadow-sm'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <item.icon className={`w-5 h-5 ${currentSection === item.id ? 'text-red-600' : 'text-gray-400'}`} />
+              <item.icon className={`w-5 h-5 ${currentSection === item.id ? 'text-[#1CB0F6]' : 'text-gray-400'}`} />
               <span>{item.label}</span>
             </button>
           ))}
-          <div className="mt-4 p-4 rounded-xl bg-gradient-to-b from-red-50 to-orange-50">
+          <div className="mt-4 p-4 rounded-xl bg-gradient-to-b from-[#E0F6FF] to-[#F0FAFF]">
             <div className="text-xs text-gray-600 mb-2 font-medium">التقدم العام</div>
-            <Progress value={stats.progress} className="h-2 mb-1" />
+            <div className="progress-duo mb-1">
+              <div className="progress-duo-fill" style={{ width: `${stats.progress}%` }} />
+            </div>
             <div className="text-xs text-gray-500 text-center">{stats.progress}%</div>
           </div>
         </nav>
@@ -733,7 +736,7 @@ export default function Home() {
               key={item.id}
               onClick={() => { setCurrentSection(item.id); incrementStreak() }}
               className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg min-w-[50px] ${
-                currentSection === item.id ? 'text-red-600' : 'text-gray-400'
+                currentSection === item.id ? 'text-[#1CB0F6]' : 'text-gray-400'
               }`}
             >
               <item.icon className="w-5 h-5" />
@@ -856,7 +859,7 @@ function DashboardSection({ stats, onNavigate }: {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <LayoutDashboard className="w-6 h-6 text-red-600" />
+          <LayoutDashboard className="w-6 h-6 text-[#1CB0F6]" />
           لوحة التحكم
         </h2>
         <p className="text-gray-500 mt-1">مرحباً بك في رحلة تعلم اللغة الصينية!</p>
@@ -865,7 +868,7 @@ function DashboardSection({ stats, onNavigate }: {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'كلمة محفوظة', value: stats.learned, total: stats.total, icon: BookOpen, color: 'from-red-500 to-red-600' },
+          { label: 'كلمة محفوظة', value: stats.learned, total: stats.total, icon: BookOpen, color: 'from-[#1CB0F6] to-[#0A90D4]' },
           { label: 'قاعدة نحوية', value: 26, total: 26, icon: GraduationCap, color: 'from-amber-500 to-amber-600' },
           { label: 'أيام متتالية', value: store.dailyStreak, icon: Flame, color: 'from-orange-500 to-orange-600' },
           { label: 'مستوى التقدم', value: `${stats.progress}%`, icon: Trophy, color: 'from-emerald-500 to-emerald-600' },
@@ -893,11 +896,26 @@ function DashboardSection({ stats, onNavigate }: {
             <div key={cat.value} className="flex items-center gap-3">
               <span className="text-sm w-20 text-gray-600 text-left">{cat.label}</span>
               <div className="flex-1">
-                <Progress value={cat.count > 0 ? (cat.learned / cat.count) * 100 : 0} className="h-2" />
+                <div className="progress-duo">
+                  <div className="progress-duo-fill" style={{ width: `${cat.count > 0 ? (cat.learned / cat.count) * 100 : 0}%` }} />
+                </div>
               </div>
               <span className="text-xs text-gray-500 w-16 text-left">{cat.learned}/{cat.count}</span>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      {/* Pomodoro Timer */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <span className="w-8 h-8 rounded-lg bg-[#E0F6FF] flex items-center justify-center text-sm">🍅</span>
+            مؤقت بومودورو
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PomodoroTimer />
         </CardContent>
       </Card>
 
@@ -927,8 +945,8 @@ function DashboardSection({ stats, onNavigate }: {
             onClick={() => onNavigate(action.section)}
           >
             <CardContent className="p-4 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition-colors">
-                <action.icon className="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-colors" />
+              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-[#E0F6FF] transition-colors">
+                <action.icon className="w-5 h-5 text-gray-500 group-hover:text-[#1CB0F6] transition-colors" />
               </div>
               <div>
                 <div className="font-medium text-gray-900 text-sm">{action.label}</div>
@@ -972,7 +990,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <BookOpen className="w-6 h-6 text-red-600" />
+          <BookOpen className="w-6 h-6 text-[#1CB0F6]" />
           المفردات
         </h2>
         <div className="flex items-center gap-2">
@@ -1017,10 +1035,10 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
             >
               {/* Front */}
               <div className="absolute inset-0 backface-hidden">
-                <Card className="h-full border-0 shadow-lg bg-gradient-to-br from-white to-red-50">
+                <Card className="h-full border-0 shadow-lg bg-gradient-to-br from-white to-[#E0F6FF]">
                   <CardContent className="flex flex-col items-center justify-center h-full p-8 text-center">
                     <div
-                      className="font-chinese-serif text-7xl mb-4 text-gray-900 cursor-pointer hover:text-red-600 transition-colors"
+                      className="font-chinese-serif text-7xl mb-4 text-gray-900 cursor-pointer hover:text-[#1CB0F6] transition-colors"
                       onClick={(e) => { e.stopPropagation(); speak(word.zh) }}
                     >
                       {word.zh}
@@ -1039,7 +1057,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                 <Card className="h-full border-0 shadow-lg bg-gradient-to-br from-white to-amber-50 overflow-y-auto custom-scrollbar">
                   <CardContent className="flex flex-col items-center justify-center h-full p-6 text-center space-y-3">
                     <div className="text-3xl font-bold text-gray-900">{word.meaning}</div>
-                    <div className="font-chinese-serif text-4xl text-red-700">{word.zh}</div>
+                    <div className="font-chinese-serif text-4xl text-[#0A90D4]">{word.zh}</div>
                     <div className="text-sm text-gray-500 font-chinese-sans">{word.pinyin}</div>
 
                     {/* Example Sentences with Audio */}
@@ -1149,7 +1167,7 @@ function GrammarSection() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <GraduationCap className="w-6 h-6 text-red-600" />
+          <GraduationCap className="w-6 h-6 text-[#1CB0F6]" />
           القواعد النحوية
         </h2>
         <Badge variant="secondary">26 قاعدة</Badge>
@@ -1165,7 +1183,7 @@ function GrammarSection() {
             <AccordionItem key={rule.id} value={String(rule.id)} className="border rounded-xl shadow-sm px-4">
               <AccordionTrigger className="text-right hover:no-underline">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-[#E0F6FF] text-[#0A90D4] flex items-center justify-center text-sm font-bold flex-shrink-0">
                     {rule.id}
                   </div>
                   <div>
@@ -1180,7 +1198,7 @@ function GrammarSection() {
                 {/* Pattern */}
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="text-xs font-medium text-gray-500 mb-1">الصيغة</div>
-                  <div className="text-sm font-medium text-red-700 font-chinese-sans">{rule.pattern}</div>
+                  <div className="text-sm font-medium text-[#0A90D4] font-chinese-sans">{rule.pattern}</div>
                 </div>
 
                 {/* Examples */}
@@ -1232,7 +1250,7 @@ function GrammarSection() {
                               let cls = 'border-gray-200 hover:bg-gray-50 text-gray-700'
                               if (answered) {
                                 if (oi === q.correct) cls = 'border-emerald-400 bg-emerald-50 text-emerald-800'
-                                else if (oi === selected) cls = 'border-red-400 bg-red-50 text-red-800'
+                                else if (oi === selected) cls = 'border-red-400 bg-[#FFE5E5] text-red-800'
                               }
                               return (
                                 <Button
@@ -1254,7 +1272,7 @@ function GrammarSection() {
                             })}
                           </div>
                           {answered && (
-                            <div className={`text-xs font-medium ${isCorrect ? 'text-emerald-700' : 'text-red-700'}`}>
+                            <div className={`text-xs font-medium ${isCorrect ? 'text-emerald-700' : 'text-[#0A90D4]'}`}>
                               {isCorrect ? '✓ إجابة صحيحة!' : '✗ حاول مرة أخرى'}
                             </div>
                           )}
@@ -1346,7 +1364,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Target className="w-6 h-6 text-red-600" />
+          <Target className="w-6 h-6 text-[#1CB0F6]" />
           التمارين
         </h2>
       </div>
@@ -1375,13 +1393,13 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                       variant={quizDifficulty === d ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setQuizDifficulty(d)}
-                      className={quizDifficulty === d ? 'bg-red-600 hover:bg-red-700' : ''}
+                      className={quizDifficulty === d ? 'bg-[#1CB0F6] hover:bg-[#0A90D4]' : ''}
                     >
                       {d === 'easy' ? 'سهل (تلميح)' : d === 'medium' ? 'متوسط' : 'صعب (مؤقت)'}
                     </Button>
                   ))}
                 </div>
-                <Button onClick={() => { generateQuiz(); incrementStreak() }} className="bg-red-600 hover:bg-red-700">
+                <Button onClick={() => { generateQuiz(); incrementStreak() }} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">
                   ابدأ الاختبار
                 </Button>
               </CardContent>
@@ -1405,7 +1423,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
 
                 <div className="text-center space-y-4">
                   <div
-                    className="font-chinese-serif text-6xl text-gray-900 cursor-pointer hover:text-red-600 transition-colors"
+                    className="font-chinese-serif text-6xl text-gray-900 cursor-pointer hover:text-[#1CB0F6] transition-colors"
                     onClick={() => speak(currentQuestion.question)}
                   >
                     {currentQuestion.question}
@@ -1424,7 +1442,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                     let btnClass = 'border-gray-200 hover:bg-gray-50 text-gray-900'
                     if (quizAnswer !== null) {
                       if (i === currentQuestion.correctIndex) btnClass = 'border-emerald-500 bg-emerald-50 text-emerald-800'
-                      else if (i === quizAnswer) btnClass = 'border-red-500 bg-red-50 text-red-800'
+                      else if (i === quizAnswer) btnClass = 'border-red-500 bg-[#FFE5E5] text-red-800'
                     }
                     return (
                       <Button
@@ -1460,9 +1478,9 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                 <h3 className="text-2xl font-bold text-gray-900">
                   {getScoreMessage(quizScore, quizTotal)}
                 </h3>
-                <div className="text-4xl font-bold text-red-600">{quizScore} / {quizTotal}</div>
+                <div className="text-4xl font-bold text-[#1CB0F6]">{quizScore} / {quizTotal}</div>
                 <Progress value={(quizScore / quizTotal) * 100} className="w-64 h-3" />
-                <Button onClick={() => { resetQuiz(); setQuizFinished(false); generateQuiz() }} className="bg-red-600 hover:bg-red-700">
+                <Button onClick={() => { resetQuiz(); setQuizFinished(false); generateQuiz() }} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">
                   <RotateCcw className="w-4 h-4 ml-2" /> حاول مرة أخرى
                 </Button>
               </CardContent>
@@ -1480,7 +1498,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                 <p className="text-sm text-gray-500 text-center max-w-md">
                   سيظهر لك المعنى بالعربية والجملة المثال. اكتب الكلمة الصينية أو البينيين.
                 </p>
-                <Button onClick={() => { startFillBlank(); incrementStreak() }} className="bg-red-600 hover:bg-red-700">
+                <Button onClick={() => { startFillBlank(); incrementStreak() }} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">
                   ابدأ التمرين
                 </Button>
               </CardContent>
@@ -1504,11 +1522,11 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                     onKeyDown={(e) => e.key === 'Enter' && checkFillAnswer()}
                     className="text-lg font-chinese-serif"
                   />
-                  <Button onClick={checkFillAnswer} className="bg-red-600 hover:bg-red-700">تحقق</Button>
+                  <Button onClick={checkFillAnswer} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">تحقق</Button>
                 </div>
                 {fillResult && (
-                  <div className={`p-3 rounded-lg text-center font-medium ${fillResult === 'correct' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-800'}`}>
-                    {fillResult === 'correct' ? '✓ إجابة صحيحة!' : `✗ الإجابة الصحيحة: ${fillBlankWord.zh}`}
+                  <div className={`p-3 rounded-lg text-center font-medium ${fillResult === 'correct' ? 'bg-emerald-50 text-emerald-800' : 'bg-[#FFE5E5] text-red-800'`}>
+                    {fillResult === 'correct' ? '✓ إجابة صحيحة!' : '✗ الإجابة الصحيحة: ' + fillBlankWord.zh}
                   </div>
                 )}
                 <div className="text-center">
@@ -1531,7 +1549,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                 <p className="text-sm text-gray-500 text-center max-w-md">
                   اختر الكلمة الصينية ثم اختر ترجمتها العربية لإنشاء الأزواج المتطابقة.
                 </p>
-                <Button onClick={() => { startMatchGame(); incrementStreak() }} className="bg-red-600 hover:bg-red-700">
+                <Button onClick={() => { startMatchGame(); incrementStreak() }} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">
                   ابدأ اللعبة
                 </Button>
               </CardContent>
@@ -1624,7 +1642,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Gamepad2 className="w-6 h-6 text-red-600" />
+          <Gamepad2 className="w-6 h-6 text-[#1CB0F6]" />
           الألعاب التعليمية
         </h2>
       </div>
@@ -1652,13 +1670,13 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
                       variant={selectedMemoryLevel === l.level ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setSelectedMemoryLevel(l.level)}
-                      className={selectedMemoryLevel === l.level ? 'bg-red-600 hover:bg-red-700' : ''}
+                      className={selectedMemoryLevel === l.level ? 'bg-[#1CB0F6] hover:bg-[#0A90D4]' : ''}
                     >
                       {l.label}
                     </Button>
                   ))}
                 </div>
-                <Button onClick={() => { startMemoryGame(selectedMemoryLevel); incrementStreak() }} className="bg-red-600 hover:bg-red-700">
+                <Button onClick={() => { startMemoryGame(selectedMemoryLevel); incrementStreak() }} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">
                   ابدأ اللعبة
                 </Button>
               </CardContent>
@@ -1681,7 +1699,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
                         isFlipped
                           ? card.matched
                             ? 'border-emerald-300 bg-emerald-50'
-                            : 'border-red-300 bg-red-50'
+                            : 'border-red-300 bg-[#FFE5E5]'
                           : 'border-gray-200 bg-white hover:bg-gray-50 cursor-pointer'
                       }`}
                     >
@@ -1723,8 +1741,8 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
               <CardContent className="flex flex-col items-center justify-center py-12 gap-4">
                 <Trophy className={`w-16 h-16 ${toneScore >= Math.floor(tonePairs.length * 0.8) ? 'text-yellow-500' : 'text-gray-400'}`} />
                 <h3 className="text-xl font-bold text-gray-900">انتهت اللعبة!</h3>
-                <div className="text-3xl font-bold text-red-600">{toneScore}/{tonePairs.length}</div>
-                <Button onClick={startToneGame} className="bg-red-600 hover:bg-red-700">
+                <div className="text-3xl font-bold text-[#1CB0F6]">{toneScore}/{tonePairs.length}</div>
+                <Button onClick={startToneGame} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">
                   <RotateCcw className="w-4 h-4 ml-2" /> العب مرة أخرى
                 </Button>
               </CardContent>
@@ -1739,7 +1757,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
 
                 <div className="text-center space-y-2">
                   <div className="text-sm text-gray-500">اختر النبرة الصحيحة للكلمة:</div>
-                  <div className="font-chinese-sans text-lg text-red-600">[{currentToneSet.syllable}]</div>
+                  <div className="font-chinese-sans text-lg text-[#1CB0F6]">[{currentToneSet.syllable}]</div>
                   <Button variant="ghost" size="sm" onClick={() => speak(currentToneSet.tones[0].char)}>
                     <Volume2 className="w-4 h-4 ml-1" /> استمع للنبرة الأولى
                   </Button>
@@ -1752,7 +1770,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
                       variant="outline"
                       className={`h-auto py-4 flex flex-col items-center gap-1 transition-all ${
                         toneAnswer === i
-                          ? i === 0 ? 'border-emerald-500 bg-emerald-50' : 'border-red-500 bg-red-50'
+                          ? i === 0 ? 'border-emerald-500 bg-emerald-50' : 'border-red-500 bg-[#FFE5E5]'
                           : 'hover:bg-gray-50'
                       }`}
                       onClick={() => {
@@ -1783,7 +1801,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
                 <p className="text-sm text-gray-500 text-center max-w-md">
                   اختبر قدرتك على تمييز النبرات في اللغة الصينية. {tonePairs.length} مجموعات نبرية للتدرب!
                 </p>
-                <Button onClick={() => { startToneGame(); incrementStreak() }} className="bg-red-600 hover:bg-red-700">
+                <Button onClick={() => { startToneGame(); incrementStreak() }} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">
                   ابدأ اللعبة
                 </Button>
               </CardContent>
@@ -1831,7 +1849,7 @@ function SentencesSection({ sentenceFlipped, setSentenceFlipped, sentenceIndex, 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <MessageCircle className="w-6 h-6 text-red-600" />
+          <MessageCircle className="w-6 h-6 text-[#1CB0F6]" />
           إتقان الجمل
         </h2>
         <Badge variant="secondary">{allSentences.length} جملة</Badge>
@@ -1847,11 +1865,11 @@ function SentencesSection({ sentenceFlipped, setSentenceFlipped, sentenceIndex, 
         >
           {/* Front - Chinese text */}
           <div className="absolute inset-0 backface-hidden">
-            <Card className="h-full border-0 shadow-lg bg-gradient-to-br from-white to-red-50">
+            <Card className="h-full border-0 shadow-lg bg-gradient-to-br from-white to-[#E0F6FF]">
               <CardContent className="flex flex-col items-center justify-center h-full p-8 text-center">
                 <div className="text-sm text-gray-400 mb-4">اقرأ الجملة:</div>
                 <div
-                  className="font-chinese-serif text-3xl mb-4 text-gray-900 cursor-pointer hover:text-red-600 transition-colors leading-relaxed"
+                  className="font-chinese-serif text-3xl mb-4 text-gray-900 cursor-pointer hover:text-[#1CB0F6] transition-colors leading-relaxed"
                   onClick={(e) => { e.stopPropagation(); speak(sentence.zh) }}
                 >
                   {sentence.zh}
@@ -1876,7 +1894,7 @@ function SentencesSection({ sentenceFlipped, setSentenceFlipped, sentenceIndex, 
                     {wordBreakdown.map((w, i) => (
                       <div key={i} className="bg-gray-50 rounded-lg p-2 text-center min-w-[60px]"
                         onClick={(e) => { e.stopPropagation(); if (w.char) speak(w.char) }}>
-                        <div className="font-chinese-serif text-lg text-red-700">{w.char}</div>
+                        <div className="font-chinese-serif text-lg text-[#0A90D4]">{w.char}</div>
                         {w.meaning && <div className="text-[10px] text-gray-500 mt-0.5">{w.meaning}</div>}
                       </div>
                     ))}
@@ -1951,7 +1969,7 @@ function StoriesSection({ activeStory, setActiveStory, storyAnswers, setStoryAns
       return (
         <span
           key={i}
-          className="font-chinese-serif text-gray-900 cursor-pointer hover:text-red-600 hover:bg-red-50 rounded px-0.5 transition-colors"
+          className="font-chinese-serif text-gray-900 cursor-pointer hover:text-[#1CB0F6] hover:bg-[#E0F6FF] rounded px-0.5 transition-colors"
           onClick={() => speak(char)}
           title="اضغط للنطق"
         >
@@ -1965,7 +1983,7 @@ function StoriesSection({ activeStory, setActiveStory, storyAnswers, setStoryAns
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <BookMarked className="w-6 h-6 text-red-600" />
+          <BookMarked className="w-6 h-6 text-[#1CB0F6]" />
           القصص القصيرة
         </h2>
         <Badge variant="secondary">{stories.length} قصص</Badge>
@@ -1979,7 +1997,7 @@ function StoriesSection({ activeStory, setActiveStory, storyAnswers, setStoryAns
             variant={activeStory === i ? 'default' : 'outline'}
             size="sm"
             onClick={() => { setActiveStory(i); setStoryAnswers({}); store.incrementStreak() }}
-            className={activeStory === i ? 'bg-red-600 hover:bg-red-700' : ''}
+            className={activeStory === i ? 'bg-[#1CB0F6] hover:bg-[#0A90D4]' : ''}
           >
             {s.title}
           </Button>
@@ -2036,9 +2054,9 @@ function StoriesSection({ activeStory, setActiveStory, storyAnswers, setStoryAns
                   let cls = 'border-gray-200 hover:bg-gray-50 text-gray-700'
                   if (answered) {
                     if (isCorrect) cls = 'border-emerald-400 bg-emerald-50 text-emerald-800'
-                    else if (selected) cls = 'border-red-400 bg-red-50 text-red-800'
+                    else if (selected) cls = 'border-red-400 bg-[#FFE5E5] text-red-800'
                   } else if (selected) {
-                    cls = 'border-red-300 bg-red-50 text-red-700'
+                    cls = 'border-red-300 bg-[#E0F6FF] text-[#0A90D4]'
                   }
                   return (
                     <Button
@@ -2112,7 +2130,7 @@ function ChatSection() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Bot className="w-6 h-6 text-red-600" />
+          <Bot className="w-6 h-6 text-[#1CB0F6]" />
           المساعد الذكي
         </h2>
         <Button variant="ghost" size="sm" onClick={store.clearChatMessages}>
@@ -2127,8 +2145,8 @@ function ChatSection() {
           <div className="h-[400px] overflow-y-auto custom-scrollbar p-4 space-y-4" id="chat-container">
             {store.chatMessages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                  <Bot className="w-8 h-8 text-red-500" />
+                <div className="w-16 h-16 rounded-full bg-[#E0F6FF] flex items-center justify-center">
+                  <Bot className="w-8 h-8 text-[#1CB0F6]" />
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900">مرحباً! أنا مساعدك الصيني 🤖</h3>
@@ -2159,13 +2177,13 @@ function ChatSection() {
               >
                 <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                   msg.role === 'user'
-                    ? 'bg-red-600 text-white rounded-br-sm'
+                    ? 'bg-[#1CB0F6] text-white rounded-br-sm'
                     : 'bg-gray-100 text-gray-900 rounded-bl-sm'
                 }`}>
                   {msg.role === 'assistant' && (
                     <div className="flex items-center gap-1 mb-1">
-                      <Bot className="w-3 h-3 text-red-500" />
-                      <span className="text-xs font-medium text-red-600">المعلم</span>
+                      <Bot className="w-3 h-3 text-[#1CB0F6]" />
+                      <span className="text-xs font-medium text-[#1CB0F6]">المعلم</span>
                     </div>
                   )}
                   <div className="text-sm whitespace-pre-line leading-relaxed">{msg.content}</div>
@@ -2199,7 +2217,7 @@ function ChatSection() {
           className="flex-1"
           disabled={isTyping}
         />
-        <Button onClick={handleSend} className="bg-red-600 hover:bg-red-700" disabled={!input.trim() || isTyping}>
+        <Button onClick={handleSend} className="bg-[#1CB0F6] hover:bg-[#0A90D4]" disabled={!input.trim() || isTyping}>
           <Send className="w-4 h-4" />
         </Button>
       </div>
@@ -2217,7 +2235,7 @@ function RoadmapSection() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Map className="w-6 h-6 text-red-600" />
+          <Map className="w-6 h-6 text-[#1CB0F6]" />
           خريطة الطريق
         </h2>
         <Badge variant="secondary">10 ساعات</Badge>
@@ -2236,7 +2254,7 @@ function RoadmapSection() {
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                    isComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-[#E0F6FF] text-[#0A90D4]'
                   }`}>
                     {isComplete ? <Check className="w-5 h-5" /> : <span className="font-bold text-sm">{unit.id}</span>}
                   </div>
@@ -2271,7 +2289,7 @@ function RoadmapSection() {
       </div>
 
       {/* Total Time Summary */}
-      <Card className="border-0 shadow-sm bg-gradient-to-r from-red-50 to-amber-50">
+      <Card className="border-0 shadow-sm bg-gradient-to-r from-[#E0F6FF] to-[#FFF8DB]">
         <CardContent className="p-6 text-center">
           <div className="text-3xl mb-2">🎯</div>
           <h3 className="text-xl font-bold text-gray-900 mb-1">الإجمالي: 10 ساعات</h3>
@@ -2280,7 +2298,7 @@ function RoadmapSection() {
           </p>
           <div className="flex justify-center gap-6 mt-4 text-sm">
             <div className="text-center">
-              <div className="text-2xl font-bold text-red-600">{roadmapUnits.reduce((a, u) => a + u.words.length, 0)}</div>
+              <div className="text-2xl font-bold text-[#1CB0F6]">{roadmapUnits.reduce((a, u) => a + u.words.length, 0)}</div>
               <div className="text-gray-500">كلمة</div>
             </div>
             <div className="text-center">

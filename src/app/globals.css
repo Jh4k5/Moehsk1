@@ -43,39 +43,66 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Duolingo-Inspired Gamification Design Tokens
+   ═══════════════════════════════════════════════════════════ */
 :root {
   --radius: 0.75rem;
+
+  /* Primary Gamification Colors — Blue Identity */
+  --primary-blue: #1CB0F6;
+  --primary-blue-dark: #0A90D4;
+  --primary-blue-light: #E0F6FF;
+  --primary-blue-glow: rgba(28, 176, 246, 0.25);
+
+  /* Semantic Gamification Signals */
+  --gamification-success: #58CC02;
+  --gamification-success-bg: #E5F9DB;
+  --gamification-danger: #FF4B4B;
+  --gamification-danger-bg: #FFE5E5;
+  --gamification-warning: #FFC800;
+  --gamification-warning-bg: #FFF8DB;
+  --gamification-purple: #CE82FF;
+  --gamification-purple-bg: #F3E5FF;
+
+  /* Surface & Elevation */
+  --surface-page: #F7F7F7;
+  --surface-card: #FFFFFF;
+  --surface-hover: #E5E5E5;
+  --surface-active: #1CB0F6;
+
+  /* shadcn/ui compatible mappings */
   --background: oklch(0.985 0.002 60);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.577 0.245 27.325);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #1CB0F6;
+  --primary-foreground: #FFFFFF;
   --secondary: oklch(0.97 0.005 60);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0.005 60);
   --muted-foreground: oklch(0.5 0.01 60);
-  --accent: oklch(0.97 0.01 60);
+  --accent: #E0F6FF;
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: #FF4B4B;
   --border: oklch(0.92 0.005 60);
   --input: oklch(0.92 0.005 60);
-  --ring: oklch(0.577 0.245 27.325);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --ring: #1CB0F6;
+  --chart-1: #1CB0F6;
+  --chart-2: #58CC02;
+  --chart-3: #FFC800;
+  --chart-4: #FF4B4B;
+  --chart-5: #CE82FF;
   --sidebar: oklch(0.985 0.002 60);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.577 0.245 27.325);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0.01 60);
+  --sidebar-primary: #1CB0F6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E0F6FF;
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.92 0.005 60);
-  --sidebar-ring: oklch(0.577 0.245 27.325);
+  --sidebar-ring: #1CB0F6;
 }
 
 @layer base {
@@ -84,13 +111,16 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "ss03";
   }
   ::selection {
-    background: oklch(0.577 0.245 27.325 / 0.2);
+    background: rgba(28, 176, 246, 0.2);
   }
 }
 
-/* Chinese font classes */
+/* ═══════════════════════════════════════════════════════════
+   Chinese & Arabic Font Classes
+   ═══════════════════════════════════════════════════════════ */
 .font-chinese-serif {
   font-family: var(--font-noto-serif-sc), 'Noto Serif SC', serif;
 }
@@ -103,7 +133,9 @@
   font-family: var(--font-tajawal), 'Tajawal', sans-serif;
 }
 
-/* Flashcard flip animation */
+/* ═══════════════════════════════════════════════════════════
+   Flashcard Flip Animation
+   ═══════════════════════════════════════════════════════════ */
 .perspective-1000 {
   perspective: 1000px;
 }
@@ -120,7 +152,9 @@
   transform: rotateY(180deg);
 }
 
-/* Custom scrollbar */
+/* ═══════════════════════════════════════════════════════════
+   Scrollbar Styling
+   ═══════════════════════════════════════════════════════════ */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -138,7 +172,6 @@
   background: oklch(0.65 0.02 60);
 }
 
-/* Hide scrollbar utility */
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -147,7 +180,9 @@
   display: none;
 }
 
-/* Animations */
+/* ═══════════════════════════════════════════════════════════
+   Gamification Animations
+   ═══════════════════════════════════════════════════════════ */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -157,14 +192,23 @@
   animation: fadeIn 0.3s ease-out;
 }
 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out;
+}
+
 @keyframes pulse-correct {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-  50% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(88, 204, 2, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(88, 204, 2, 0); }
 }
 
 @keyframes pulse-wrong {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-  50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(255, 75, 75, 0); }
 }
 
 .animate-pulse-correct {
@@ -181,31 +225,209 @@
 }
 
 .shimmer {
-  background: linear-gradient(90deg, transparent, rgba(192, 57, 43, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(28, 176, 246, 0.08), transparent);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
 
-/* Card hover effect */
+/* XP Pop Animation */
+@keyframes xp-pop {
+  0% { transform: scale(0) translateY(0); opacity: 1; }
+  50% { transform: scale(1.2) translateY(-10px); opacity: 1; }
+  100% { transform: scale(1) translateY(-30px); opacity: 0; }
+}
+
+.animate-xp-pop {
+  animation: xp-pop 1s ease-out forwards;
+}
+
+/* Streak Fire Animation */
+@keyframes streak-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 200, 0, 0.3)); }
+  50% { filter: drop-shadow(0 0 8px rgba(255, 200, 0, 0.6)); }
+}
+
+.animate-streak-glow {
+  animation: streak-glow 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Card Hover Effects — Duolingo Style
+   ═══════════════════════════════════════════════════════════ */
 .card-hover {
   transition: all 0.2s ease;
 }
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
-/* RTL specific */
+/* Duolingo button style */
+.btn-primary-game {
+  background: #1CB0F6;
+  color: white;
+  border: none;
+  border-bottom: 4px solid #0A90D4;
+  border-radius: 16px;
+  padding: 12px 24px;
+  font-weight: 700;
+  transition: all 0.1s ease;
+  cursor: pointer;
+}
+
+.btn-primary-game:hover {
+  background: #1CB0F6;
+  border-bottom-width: 2px;
+  transform: translateY(1px);
+}
+
+.btn-primary-game:active {
+  border-bottom-width: 0;
+  transform: translateY(3px);
+}
+
+.btn-secondary-game {
+  background: white;
+  color: #1CB0F6;
+  border: 2px solid #1CB0F6;
+  border-bottom: 4px solid #1CB0F6;
+  border-radius: 16px;
+  padding: 12px 24px;
+  font-weight: 700;
+  transition: all 0.1s ease;
+  cursor: pointer;
+}
+
+.btn-secondary-game:hover {
+  background: #E0F6FF;
+  border-bottom-width: 2px;
+}
+
+.btn-success-game {
+  background: #58CC02;
+  color: white;
+  border: none;
+  border-bottom: 4px solid #46A302;
+  border-radius: 16px;
+  padding: 12px 24px;
+  font-weight: 700;
+  transition: all 0.1s ease;
+  cursor: pointer;
+}
+
+.btn-success-game:hover {
+  border-bottom-width: 2px;
+  transform: translateY(1px);
+}
+
+.btn-success-game:active {
+  border-bottom-width: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RTL Specific
+   ═══════════════════════════════════════════════════════════ */
 [dir="rtl"] .flip-card {
   transform: rotateY(180deg);
 }
 
-/* Subtle warm glow for primary buttons */
-.btn-primary-glow {
-  box-shadow: 0 2px 12px rgba(220, 38, 38, 0.25);
-  transition: box-shadow 0.2s ease;
+/* ═══════════════════════════════════════════════════════════
+   Progress Bar — Duolingo Style
+   ═══════════════════════════════════════════════════════════ */
+.progress-duo {
+  height: 20px;
+  background: #E5E5E5;
+  border-radius: 10px;
+  overflow: hidden;
 }
-.btn-primary-glow:hover {
-  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35);
+
+.progress-duo-fill {
+  height: 100%;
+  background: #58CC02;
+  border-radius: 10px;
+  border-bottom: 4px solid #46A302;
+  transition: width 0.5s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Pomodoro Timer Styles
+   ═══════════════════════════════════════════════════════════ */
+@keyframes timer-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.pomodoro-active {
+  animation: timer-pulse 2s ease-in-out infinite;
+}
+
+.pomodoro-ring {
+  transition: stroke-dashoffset 1s linear;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Swipe Gesture Flashcard Styles
+   ═══════════════════════════════════════════════════════════ */
+.flashcard-container {
+  touch-action: pan-y;
+}
+
+.flashcard-swipe-left {
+  animation: swipe-left 0.3s ease-out;
+}
+
+.flashcard-swipe-right {
+  animation: swipe-right 0.3s ease-out;
+}
+
+@keyframes swipe-left {
+  to { transform: translateX(-120%) rotate(-10deg); opacity: 0; }
+}
+
+@keyframes swipe-right {
+  to { transform: translateX(120%) rotate(10deg); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Safe Area Bottom — Mobile
+   ═══════════════════════════════════════════════════════════ */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Quizlet-Style Card Stack
+   ═══════════════════════════════════════════════════════════ */
+.quizlet-stack {
+  perspective: 1200px;
+}
+
+.quizlet-card {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.quizlet-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.quizlet-card-face {
+  backface-visibility: hidden;
+  position: absolute;
+  inset: 0;
+}
+
+.quizlet-card-back {
+  transform: rotateY(180deg);
+}
+
+/* Confetti animation */
+@keyframes confetti-fall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti-piece {
+  animation: confetti-fall 3s ease-in forwards;
 }

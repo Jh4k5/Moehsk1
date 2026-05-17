@@ -20,14 +20,13 @@ import {
   Volume2, ChevronLeft, ChevronRight, RotateCcw, Star, Check, X,
   Brain, Trophy, Target, Sparkles, Search, Filter, Eye, Heart,
   Clock, Flame, Languages, MessageCircle, ArrowLeftRight, Bot,
-  Send, MoreHorizontal, Lightbulb, PenTool, Mic, FileText, Medal,
+  Send, MoreHorizontal, Lightbulb, PenTool, FileText, Medal,
   Image, HelpCircle, GraduationCap as GradIcon, BookOpenText, MessageSquare
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // ─── Standalone Components ─────────────────────────────────
 import PinyinHub from '@/components/PinyinHub'
-import PronunciationPractice from '@/components/PronunciationPractice'
 import HanziSection from '@/components/HanziSection'
 import ExamSimulator from '@/components/ExamSimulator'
 import ConversationsSection from '@/components/ConversationsSection'
@@ -495,7 +494,7 @@ const allSentences = buildAllSentences()
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
 type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat'
-  | 'pinyin' | 'pronunciation' | 'hanzi' | 'exam' | 'conversations' | 'lessons' | 'qa' | 'visual-dict' | 'achievements'
+  | 'pinyin' | 'hanzi' | 'exam' | 'conversations' | 'lessons' | 'qa' | 'visual-dict' | 'achievements'
 
 export default function Home() {
   const store = useLearningStore()
@@ -558,7 +557,6 @@ export default function Home() {
     { id: 'vocabulary' as Section, label: 'المفردات', icon: BookOpen },
     { id: 'pinyin' as Section, label: 'البينين', icon: Languages },
     { id: 'hanzi' as Section, label: 'الحروف', icon: PenTool },
-    { id: 'pronunciation' as Section, label: 'النطق', icon: Mic },
     { id: 'grammar' as Section, label: 'القواعد', icon: GraduationCap },
     { id: 'lessons' as Section, label: 'الدروس', icon: BookOpenText },
     { id: 'conversations' as Section, label: 'المحادثات', icon: MessageSquare },
@@ -567,7 +565,7 @@ export default function Home() {
     { id: 'practice' as Section, label: 'التمارين', icon: Target },
     { id: 'games' as Section, label: 'الألعاب', icon: Gamepad2 },
     { id: 'qa' as Section, label: 'أسئلة شائعة', icon: HelpCircle },
-    { id: 'visual-dict' as Section, label: 'القاموس المرئي', icon: Image },
+    { id: 'visual-dict' as Section, label: 'القاموس والنطق', icon: Image },
     { id: 'exam' as Section, label: 'محاكي الامتحان', icon: FileText },
     { id: 'achievements' as Section, label: 'الإنجازات', icon: Medal },
     { id: 'chat' as Section, label: 'المساعد', icon: Bot },
@@ -744,7 +742,7 @@ export default function Home() {
           ))}
           <button
             onClick={() => {
-              const moreSections: Section[] = ['pinyin', 'hanzi', 'pronunciation', 'lessons', 'conversations', 'sentences', 'stories', 'grammar', 'practice', 'games', 'qa', 'visual-dict', 'exam', 'achievements', 'chat', 'roadmap']
+              const moreSections: Section[] = ['pinyin', 'hanzi', 'lessons', 'conversations', 'sentences', 'stories', 'grammar', 'practice', 'games', 'qa', 'visual-dict', 'exam', 'achievements', 'chat', 'roadmap']
               const currentIdx = moreSections.indexOf(store.currentSection as Section)
               const nextIdx = (currentIdx + 1) % moreSections.length
               setCurrentSection(moreSections[nextIdx])
@@ -823,7 +821,7 @@ export default function Home() {
               {currentSection === 'roadmap' && <RoadmapSection />}
               {/* ─── Integrated Standalone Components ─────────── */}
               {currentSection === 'pinyin' && <PinyinHub />}
-              {currentSection === 'pronunciation' && <PronunciationPractice />}
+              {/* pronunciation merged into visual-dict */}
               {currentSection === 'hanzi' && <HanziSection />}
               {currentSection === 'exam' && <ExamSimulator />}
               {currentSection === 'conversations' && <ConversationsSection />}
@@ -909,7 +907,7 @@ function DashboardSection({ stats, onNavigate }: {
           { label: 'مراجعة المفردات', desc: `${stats.total} كلمة بالبطاقات`, section: 'vocabulary' as Section, icon: BookOpen },
           { label: 'البينين', desc: 'تعلم نطق البينين', section: 'pinyin' as Section, icon: Languages },
           { label: 'كتابة الحروف', desc: 'تعلّم خط الحروف', section: 'hanzi' as Section, icon: PenTool },
-          { label: 'تدرّب على النطق', desc: 'قِس نطقك بالذكاء', section: 'pronunciation' as Section, icon: Mic },
+          { label: 'القاموس والنطق', desc: 'تعلّم الكلمات وتدرّب على النطق', section: 'visual-dict' as Section, icon: Image },
           { label: 'إتقان الجمل', desc: 'تدرب على الجمل اليومية', section: 'sentences' as Section, icon: MessageCircle },
           { label: 'المساعد الذكي', desc: 'اسأل وسأجيبك', section: 'chat' as Section, icon: Bot },
           { label: 'تمارين اليوم', desc: 'اختبر معلوماتك', section: 'practice' as Section, icon: Target },

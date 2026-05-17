@@ -113,3 +113,42 @@ Stage Summary:
 - All components compile and render: `✓ Compiled`, `GET / 200`
 - Zero lint errors in src/
 - Full section list: Dashboard, المفردات, البينين, الحروف, النطق, القواعد, الدروس, المحادثات, الجمل, القصص, التمارين, الألعاب, أسئلة شائعة, القاموس المرئي, محاكي الامتحان, الإنجازات, المساعد, خريطة الطريق
+
+---
+Task ID: 7
+Agent: Main Coordinator
+Task: Merge pronunciation with vocabulary, restore missing data, improve UI design
+
+Work Log:
+- Restored 13 missing words in visualDict.ts: 二十, 五十, 百 (numbers); 菜, 面包, 水果 (food); 病 (emotions)
+- Added new "الوقت" (Time) category with 6 words: 今天, 明天, 昨天, 早上, 晚上, 现在
+- Visual dictionary now has 62 words across 8 categories (up from 49 words / 7 categories)
+- Completely redesigned VisualDictionary.tsx with 3 integrated views:
+  1. Browse: Grid of word cards with emoji, hanzi, pinyin, arabic + always-visible TTS play button
+  2. Pronunciation Practice: Speech recognition (mic) for every word, score feedback, navigation
+  3. Quiz: Multiple choice quiz using visual dictionary words
+- Added "استمع للكل" (Listen to All) button for sequential playback of category words
+- High-quality TTS: tries to find zh-CN voice for better pronunciation accuracy
+- Merged standalone pronunciation section into visual dictionary:
+  - Removed 'pronunciation' from Section type
+  - Removed 'pronunciation' nav item
+  - Removed PronunciationPractice import
+  - Renamed 'visual-dict' nav label to 'القاموس والنطق'
+  - Updated dashboard quick actions to point to merged section
+- Improved globals.css:
+  - Warm background tint (oklch 0.985 0.002 60)
+  - Refined border/muted colors with warm hue
+  - Primary ring color matches primary
+  - Added scrollbar-none utility
+  - Added selection highlight color
+  - Added btn-primary-glow shadow utility
+  - Increased base radius to 0.75rem
+
+Stage Summary:
+- Pronunciation fully merged into Visual Dictionary with all 62 words accessible
+- 3 modes: Browse (with TTS), Practice Pronunciation (with mic), Quiz
+- Platform now has 17 sections (down from 18 after merging pronunciation)
+- Build compiles: `✓ Compiled in 401ms`, `GET / 200`
+- Lint clean for project code
+- Previous HanziWriter fixes (HW.create + setTimeout) remain intact
+- Previous paywall removal remains intact

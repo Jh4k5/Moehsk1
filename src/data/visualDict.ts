@@ -1,5 +1,6 @@
 // ─── Visual Dictionary ────────────────────────────────────────────────────────
 // Phase 3 – Emoji-annotated vocabulary organised by semantic category
+// 62 words across 8 categories
 
 export interface VisualDictWord {
   hanzi: string
@@ -11,16 +12,18 @@ export interface VisualDictWord {
 export interface VisualDictCategory {
   key: string
   label: string
+  icon: string
   words: VisualDictWord[]
 }
 
 export const VISUAL_DICT_CATEGORIES: VisualDictCategory[] = [
   // ════════════════════════════════════════════════════════════════════════════
-  // 🔢 الأرقام – Numbers
+  // 🔢 الأرقام – Numbers (14)
   // ════════════════════════════════════════════════════════════════════════════
   {
     key: "numbers",
-    label: "🔢 الأرقام",
+    label: "الأرقام",
+    icon: "🔢",
     words: [
       { hanzi: "零", pinyin: "líng", arabic: "صفر", emoji: "0️⃣" },
       { hanzi: "一", pinyin: "yī", arabic: "واحد", emoji: "1️⃣" },
@@ -33,15 +36,19 @@ export const VISUAL_DICT_CATEGORIES: VisualDictCategory[] = [
       { hanzi: "八", pinyin: "bā", arabic: "ثمانية", emoji: "8️⃣" },
       { hanzi: "九", pinyin: "jiǔ", arabic: "تسعة", emoji: "9️⃣" },
       { hanzi: "十", pinyin: "shí", arabic: "عشرة", emoji: "🔟" },
+      { hanzi: "二十", pinyin: "èrshí", arabic: "عشرون", emoji: "20️⃣" },
+      { hanzi: "五十", pinyin: "wǔshí", arabic: "خمسون", emoji: "50️⃣" },
+      { hanzi: "百", pinyin: "bǎi", arabic: "مئة", emoji: "💯" },
     ],
   },
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 🍜 الطعام – Food
+  // 🍜 الطعام – Food (13)
   // ════════════════════════════════════════════════════════════════════════════
   {
     key: "food",
-    label: "🍜 الطعام",
+    label: "الطعام",
+    icon: "🍜",
     words: [
       { hanzi: "米饭", pinyin: "mǐfàn", arabic: "أرز", emoji: "🍚" },
       { hanzi: "面条", pinyin: "miàntiáo", arabic: "معكرونة / نودلز", emoji: "🍜" },
@@ -53,15 +60,19 @@ export const VISUAL_DICT_CATEGORIES: VisualDictCategory[] = [
       { hanzi: "水", pinyin: "shuǐ", arabic: "ماء", emoji: "💧" },
       { hanzi: "牛奶", pinyin: "niúnǎi", arabic: "حليب", emoji: "🥛" },
       { hanzi: "鸡蛋", pinyin: "jīdàn", arabic: "بيضة", emoji: "🥚" },
+      { hanzi: "菜", pinyin: "cài", arabic: "خضار / طبق", emoji: "🥬" },
+      { hanzi: "面包", pinyin: "miànbāo", arabic: "خبز", emoji: "🍞" },
+      { hanzi: "水果", pinyin: "shuǐguǒ", arabic: "فواكه", emoji: "🍇" },
     ],
   },
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 👨‍👩‍👧 العائلة – Family
+  // 👨‍👩‍👧 العائلة – Family (8)
   // ════════════════════════════════════════════════════════════════════════════
   {
     key: "family",
-    label: "👨‍👩‍👧 العائلة",
+    label: "العائلة",
+    icon: "👨‍👩‍👧",
     words: [
       { hanzi: "爸爸", pinyin: "bàba", arabic: "أب / بابا", emoji: "👨" },
       { hanzi: "妈妈", pinyin: "māma", arabic: "أم / ماما", emoji: "👩" },
@@ -75,11 +86,12 @@ export const VISUAL_DICT_CATEGORIES: VisualDictCategory[] = [
   },
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 📍 الأماكن – Places
+  // 📍 الأماكن – Places (8)
   // ════════════════════════════════════════════════════════════════════════════
   {
     key: "places",
-    label: "📍 الأماكن",
+    label: "الأماكن",
+    icon: "📍",
     words: [
       { hanzi: "学校", pinyin: "xuéxiào", arabic: "مدرسة", emoji: "🏫" },
       { hanzi: "医院", pinyin: "yīyuàn", arabic: "مستشفى", emoji: "🏥" },
@@ -93,11 +105,12 @@ export const VISUAL_DICT_CATEGORIES: VisualDictCategory[] = [
   },
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 🚆 المواصلات – Transport
+  // 🚆 المواصلات – Transport (4)
   // ════════════════════════════════════════════════════════════════════════════
   {
     key: "transport",
-    label: "🚆 المواصلات",
+    label: "المواصلات",
+    icon: "🚆",
     words: [
       { hanzi: "飞机", pinyin: "fēijī", arabic: "طائرة", emoji: "✈️" },
       { hanzi: "火车", pinyin: "huǒchē", arabic: "قطار", emoji: "🚂" },
@@ -107,11 +120,12 @@ export const VISUAL_DICT_CATEGORIES: VisualDictCategory[] = [
   },
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 🌤 الطقس – Weather
+  // 🌤 الطقس – Weather (4)
   // ════════════════════════════════════════════════════════════════════════════
   {
     key: "weather",
-    label: "🌤 الطقس",
+    label: "الطقس",
+    icon: "🌤",
     words: [
       { hanzi: "下雨", pinyin: "xiàyǔ", arabic: "تمطر", emoji: "🌧️" },
       { hanzi: "下雪", pinyin: "xiàxuě", arabic: "يتساقط الثلج", emoji: "❄️" },
@@ -121,16 +135,35 @@ export const VISUAL_DICT_CATEGORIES: VisualDictCategory[] = [
   },
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 😊 المشاعر – Emotions
+  // 😊 المشاعر – Emotions (5)
   // ════════════════════════════════════════════════════════════════════════════
   {
     key: "emotions",
-    label: "😊 المشاعر",
+    label: "المشاعر",
+    icon: "😊",
     words: [
       { hanzi: "高兴", pinyin: "gāoxìng", arabic: "سعيد / مسرور", emoji: "😊" },
       { hanzi: "忙", pinyin: "máng", arabic: "مشغول", emoji: "🏃" },
       { hanzi: "累", pinyin: "lèi", arabic: "متعب", emoji: "😮‍💨" },
       { hanzi: "好", pinyin: "hǎo", arabic: "جيد / حسنًا", emoji: "👍" },
+      { hanzi: "病", pinyin: "bìng", arabic: "مريض", emoji: "🤒" },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // ⏰ الوقت – Time (6)
+  // ════════════════════════════════════════════════════════════════════════════
+  {
+    key: "time",
+    label: "الوقت",
+    icon: "⏰",
+    words: [
+      { hanzi: "今天", pinyin: "jīntiān", arabic: "اليوم", emoji: "📅" },
+      { hanzi: "明天", pinyin: "míngtiān", arabic: "غداً", emoji: "🔜" },
+      { hanzi: "昨天", pinyin: "zuótiān", arabic: "أمس / البارحة", emoji: "🔙" },
+      { hanzi: "早上", pinyin: "zǎoshang", arabic: "صباحاً", emoji: "🌅" },
+      { hanzi: "晚上", pinyin: "wǎnshang", arabic: "مساءً", emoji: "🌙" },
+      { hanzi: "现在", pinyin: "xiànzài", arabic: "الآن", emoji: "⏱️" },
     ],
   },
 ]

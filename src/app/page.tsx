@@ -710,13 +710,12 @@ export default function Home() {
             <button
               key={item.id}
               onClick={() => setCurrentSection(item.id)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                currentSection === item.id
-                  ? 'bg-[#E0F6FF] text-[#0A90D4] shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+              className={currentSection === item.id
+                ? "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-[#E0F6FF] text-[#0A90D4] shadow-sm"
+                : "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }
             >
-              <item.icon className={`w-5 h-5 ${currentSection === item.id ? 'text-[#1CB0F6]' : 'text-gray-400'}`} />
+              <item.icon className={currentSection === item.id ? "w-5 h-5 text-[#1CB0F6]" : "w-5 h-5 text-gray-400"} />
               <span>{item.label}</span>
             </button>
           ))}
@@ -735,9 +734,10 @@ export default function Home() {
             <button
               key={item.id}
               onClick={() => { setCurrentSection(item.id); incrementStreak() }}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg min-w-[50px] ${
-                currentSection === item.id ? 'text-[#1CB0F6]' : 'text-gray-400'
-              }`}
+              className={currentSection === item.id
+                ? "flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg min-w-[50px] text-[#1CB0F6]"
+                : "flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg min-w-[50px] text-gray-400"
+              }
             >
               <item.icon className="w-5 h-5" />
               <span className="text-[10px] font-medium">{item.label}</span>
@@ -875,7 +875,7 @@ function DashboardSection({ stats, onNavigate }: {
         ].map((stat, i) => (
           <Card key={i} className="card-hover border-0 shadow-sm">
             <CardContent className="p-4">
-              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-3`}>
+              <div className={"w-10 h-10 rounded-lg bg-gradient-to-br " + stat.color + " flex items-center justify-center mb-3"}>
                 <stat.icon className="w-5 h-5 text-white" />
               </div>
               <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
@@ -1029,7 +1029,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
         <div className="space-y-4">
           <div className="perspective-1000">
             <div
-              className={`relative w-full max-w-lg mx-auto cursor-pointer transition-transform duration-500 preserve-3d ${store.isFlipped ? 'rotate-y-180' : ''}`}
+              className={store.isFlipped ? "relative w-full max-w-lg mx-auto cursor-pointer transition-transform duration-500 preserve-3d rotate-y-180" : "relative w-full max-w-lg mx-auto cursor-pointer transition-transform duration-500 preserve-3d"}
               onClick={store.flip}
               style={{ minHeight: '320px' }}
             >
@@ -1138,9 +1138,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                   <button
                     key={w.id}
                     onClick={() => store.setFlashcardIndex(filteredVocab.findIndex(v => v.id === w.id))}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-right transition-colors hover:bg-gray-50 ${
-                      store.isLearned(w.id) ? 'bg-emerald-50/50' : ''
-                    }`}
+                    className={store.isLearned(w.id) ? "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-right transition-colors hover:bg-gray-50 bg-emerald-50/50" : "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-right transition-colors hover:bg-gray-50"}
                   >
                     <span className="font-chinese-serif text-lg w-20 text-gray-900">{w.zh}</span>
                     <span className="text-xs text-gray-500 font-chinese-sans w-28">{w.pinyin}</span>
@@ -1257,7 +1255,7 @@ function GrammarSection() {
                                   key={oi}
                                   variant="outline"
                                   size="sm"
-                                  className={`h-auto py-2 text-xs ${cls}`}
+                                  className={"h-auto py-2 text-xs " + cls}
                                   onClick={() => {
                                     if (answered) return
                                     setGrammarAnswers(prev => ({
@@ -1272,7 +1270,7 @@ function GrammarSection() {
                             })}
                           </div>
                           {answered && (
-                            <div className={`text-xs font-medium ${isCorrect ? 'text-emerald-700' : 'text-[#0A90D4]'}`}>
+                            <div className={isCorrect ? "text-xs font-medium text-emerald-700" : "text-xs font-medium text-[#0A90D4]"}>
                               {isCorrect ? '✓ إجابة صحيحة!' : '✗ حاول مرة أخرى'}
                             </div>
                           )}
@@ -1448,7 +1446,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                       <Button
                         key={i}
                         variant="outline"
-                        className={`h-auto py-3 text-sm ${btnClass} transition-all`}
+                        className={"h-auto py-3 text-sm " + btnClass + " transition-all"}
                         onClick={() => {
                           if (quizAnswer !== null) return
                           setQuizAnswer(i)
@@ -1474,7 +1472,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
           ) : (
             <Card className="border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-12 gap-6">
-                <Trophy className={`w-20 h-20 ${quizScore >= quizTotal * 0.8 ? 'text-yellow-500' : 'text-gray-400'}`} />
+                <Trophy className={quizScore >= quizTotal * 0.8 ? "w-20 h-20 text-yellow-500" : "w-20 h-20 text-gray-400"} />
                 <h3 className="text-2xl font-bold text-gray-900">
                   {getScoreMessage(quizScore, quizTotal)}
                 </h3>
@@ -1525,7 +1523,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                   <Button onClick={checkFillAnswer} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">تحقق</Button>
                 </div>
                 {fillResult && (
-                  <div className={`p-3 rounded-lg text-center font-medium ${fillResult === 'correct' ? 'bg-emerald-50 text-emerald-800' : 'bg-[#FFE5E5] text-red-800'`}>
+                  <div className={fillResult === 'correct' ? "p-3 rounded-lg text-center font-medium bg-emerald-50 text-emerald-800" : "p-3 rounded-lg text-center font-medium bg-[#FFE5E5] text-red-800"}>
                     {fillResult === 'correct' ? '✓ إجابة صحيحة!' : '✗ الإجابة الصحيحة: ' + fillBlankWord.zh}
                   </div>
                 )}
@@ -1567,7 +1565,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                     <Button
                       key={p.zh}
                       variant={matchedItems.has(p.zh) ? 'secondary' : selectedMatch === p.zh ? 'default' : 'outline'}
-                      className={`w-full justify-center font-chinese-serif text-lg h-12 ${matchedItems.has(p.zh) ? 'opacity-50' : ''}`}
+                      className={matchedItems.has(p.zh) ? "w-full justify-center font-chinese-serif text-lg h-12 opacity-50" : "w-full justify-center font-chinese-serif text-lg h-12"}
                       onClick={() => handleMatchClick(p.zh, 'zh')}
                       disabled={matchedItems.has(p.zh)}
                     >
@@ -1580,7 +1578,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                     <Button
                       key={p.ar}
                       variant={matchedItems.has(p.ar) ? 'secondary' : selectedMatch === p.ar ? 'default' : 'outline'}
-                      className={`w-full justify-center text-sm h-12 ${matchedItems.has(p.ar) ? 'opacity-50' : ''}`}
+                      className={matchedItems.has(p.ar) ? "w-full justify-center text-sm h-12 opacity-50" : "w-full justify-center text-sm h-12"}
                       onClick={() => handleMatchClick(p.ar, 'ar')}
                       disabled={matchedItems.has(p.ar)}
                     >
@@ -1695,13 +1693,12 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
                     <button
                       key={card.id}
                       onClick={() => handleMemoryClick(card.id)}
-                      className={`aspect-square rounded-xl border-2 flex items-center justify-center transition-all duration-300 text-center p-1 ${
-                        isFlipped
-                          ? card.matched
-                            ? 'border-emerald-300 bg-emerald-50'
-                            : 'border-red-300 bg-[#FFE5E5]'
-                          : 'border-gray-200 bg-white hover:bg-gray-50 cursor-pointer'
-                      }`}
+                      className={isFlipped
+                        ? card.matched
+                          ? "aspect-square rounded-xl border-2 flex items-center justify-center transition-all duration-300 text-center p-1 border-emerald-300 bg-emerald-50"
+                          : "aspect-square rounded-xl border-2 flex items-center justify-center transition-all duration-300 text-center p-1 border-red-300 bg-[#FFE5E5]"
+                        : "aspect-square rounded-xl border-2 flex items-center justify-center transition-all duration-300 text-center p-1 border-gray-200 bg-white hover:bg-gray-50 cursor-pointer"
+                      }
                     >
                       {isFlipped ? (
                         isHanzi ? (
@@ -1739,7 +1736,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
           {toneRound >= tonePairs.length && toneAnswer !== null ? (
             <Card className="border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-12 gap-4">
-                <Trophy className={`w-16 h-16 ${toneScore >= Math.floor(tonePairs.length * 0.8) ? 'text-yellow-500' : 'text-gray-400'}`} />
+                <Trophy className={toneScore >= Math.floor(tonePairs.length * 0.8) ? "w-16 h-16 text-yellow-500" : "w-16 h-16 text-gray-400"} />
                 <h3 className="text-xl font-bold text-gray-900">انتهت اللعبة!</h3>
                 <div className="text-3xl font-bold text-[#1CB0F6]">{toneScore}/{tonePairs.length}</div>
                 <Button onClick={startToneGame} className="bg-[#1CB0F6] hover:bg-[#0A90D4]">
@@ -1768,11 +1765,10 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
                     <Button
                       key={i}
                       variant="outline"
-                      className={`h-auto py-4 flex flex-col items-center gap-1 transition-all ${
-                        toneAnswer === i
-                          ? i === 0 ? 'border-emerald-500 bg-emerald-50' : 'border-red-500 bg-[#FFE5E5]'
-                          : 'hover:bg-gray-50'
-                      }`}
+                      className={toneAnswer === i
+                        ? (i === 0 ? "h-auto py-4 flex flex-col items-center gap-1 transition-all border-emerald-500 bg-emerald-50" : "h-auto py-4 flex flex-col items-center gap-1 transition-all border-red-500 bg-[#FFE5E5]")
+                        : "h-auto py-4 flex flex-col items-center gap-1 transition-all hover:bg-gray-50"
+                      }
                       onClick={() => {
                         if (toneAnswer !== null) return
                         setToneAnswer(i)
@@ -1859,7 +1855,7 @@ function SentencesSection({ sentenceFlipped, setSentenceFlipped, sentenceIndex, 
       {/* Sentence Flashcard */}
       <div className="perspective-1000">
         <div
-          className={`relative w-full max-w-lg mx-auto cursor-pointer transition-transform duration-500 preserve-3d ${sentenceFlipped ? 'rotate-y-180' : ''}`}
+          className={sentenceFlipped ? "relative w-full max-w-lg mx-auto cursor-pointer transition-transform duration-500 preserve-3d rotate-y-180" : "relative w-full max-w-lg mx-auto cursor-pointer transition-transform duration-500 preserve-3d"}
           onClick={() => setSentenceFlipped(!sentenceFlipped)}
           style={{ minHeight: '280px' }}
         >
@@ -2063,7 +2059,7 @@ function StoriesSection({ activeStory, setActiveStory, storyAnswers, setStoryAns
                       key={oi}
                       variant="outline"
                       size="sm"
-                      className={`h-auto py-2 text-xs ${cls}`}
+                      className={"h-auto py-2 text-xs " + cls}
                       onClick={() => {
                         if (answered) return
                         setStoryAnswers({ ...storyAnswers, [qi]: oi })
@@ -2173,13 +2169,12 @@ function ChatSection() {
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
+                className={msg.role === 'user' ? "flex justify-start" : "flex justify-end"}
               >
-                <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                  msg.role === 'user'
-                    ? 'bg-[#1CB0F6] text-white rounded-br-sm'
-                    : 'bg-gray-100 text-gray-900 rounded-bl-sm'
-                }`}>
+                <div className={msg.role === 'user'
+                    ? "max-w-[80%] rounded-2xl px-4 py-3 bg-[#1CB0F6] text-white rounded-br-sm"
+                    : "max-w-[80%] rounded-2xl px-4 py-3 bg-gray-100 text-gray-900 rounded-bl-sm"
+                }>
                   {msg.role === 'assistant' && (
                     <div className="flex items-center gap-1 mb-1">
                       <Bot className="w-3 h-3 text-[#1CB0F6]" />
@@ -2250,12 +2245,13 @@ function RoadmapSection() {
           const isComplete = progress === 100
 
           return (
-            <Card key={unit.id} className={`border-0 shadow-sm card-hover transition-all ${isComplete ? 'ring-2 ring-emerald-200' : ''}`}>
+            <Card key={unit.id} className={isComplete ? "border-0 shadow-sm card-hover transition-all ring-2 ring-emerald-200" : "border-0 shadow-sm card-hover transition-all"}>
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-[#E0F6FF] text-[#0A90D4]'
-                  }`}>
+                  <div className={isComplete
+                    ? "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-100 text-emerald-700"
+                    : "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#E0F6FF] text-[#0A90D4]"
+                  }>
                     {isComplete ? <Check className="w-5 h-5" /> : <span className="font-bold text-sm">{unit.id}</span>}
                   </div>
                   <div className="flex-1 min-w-0">

@@ -312,7 +312,7 @@ const lessons: Lesson[] = [
       { zh: '太贵了 تعني:', options: ['رخيص جداً', 'غالٍ جداً', 'معقول', 'جديد'], correct: 1 },
       { zh: '便宜 تعني:', options: ['غالٍ', 'كبير', 'رخيص', 'قديم'], correct: 2 },
       { zh: '多少 تستخدم مع:', options: ['الأشخاص', 'الأوقات', 'الأرقام والأسعار', 'الأماكن'], correct: 2 },
-      { zh: '手机 تعني:', options: 'حاسوب', 'هاتف محمول', 'تلفزيون', 'تابلت'], correct: 1 },
+      { zh: '手机 تعني:', options: ['حاسوب', 'هاتف محمول', 'تلفزيون', 'تابلت'], correct: 1 },
     ],
   },
   {
@@ -413,7 +413,7 @@ const lessons: Lesson[] = [
       { zh: '也 تعني:', options: ['كل', 'لا', 'أيضاً', 'لكن'], correct: 2 },
       { zh: '都 تعني:', options: ['أيضاً', 'كل / جميع', 'ليس', 'بعض'], correct: 1 },
       { zh: '医生 تعني:', options: ['ممرض', 'طبيب', 'معلم', 'شرطي'], correct: 1 },
-      { zh: '左边 تعني:', options: 'فوق', 'تحت', 'يسار', 'يمين'], correct: 2 },
+      { zh: '左边 تعني:', options: ['فوق', 'تحت', 'يسار', 'يمين'], correct: 2 },
     ],
   },
   {
@@ -610,7 +610,7 @@ const lessons: Lesson[] = [
     ],
     exerciseQuestions: [
       { zh: '昨天 تعني:', options: ['اليوم', 'غداً', 'أمس', 'الآن'], correct: 2 },
-      { zh: '下雪 تعني:', options: 'تمطر', 'يشرق الشمس', 'ينزل الثلج', 'تكون غائمة'], correct: 2 },
+      { zh: '下雪 تعني:', options: ['تمطر', 'يشرق الشمس', 'ينزل الثلج', 'تكون غائمة'], correct: 2 },
       { zh: '不舒服 تعني:', options: ['سعيد', 'متعب', 'غير مرتاح', 'جائع'], correct: 2 },
       { zh: '感冒 تعني:', options: ['حمى', 'زكام', 'صداع', 'ألم'], correct: 1 },
       { zh: '没 + فعل يعبر عن:', options: ['نفي الحاضر', 'نفي الماضي', 'أمر', 'اقتراح'], correct: 1 },
@@ -860,7 +860,7 @@ export default function LessonSystem() {
               transition={{ duration: 0.2 }}
             >
               {/* Lesson Header */}
-              <Card className="mb-4 border-2 border-[#1CB0F6]"
+              <Card className="mb-4 border-2 border-[#1CB0F6]">
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>

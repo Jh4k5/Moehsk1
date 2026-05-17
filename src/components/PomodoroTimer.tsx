@@ -49,6 +49,12 @@ export default function PomodoroTimer() {
     } catch { /* ignore */ }
   }, [soundEnabled])
 
+  const switchMode = useCallback((newMode: PomodoroMode) => {
+    setMode(newMode)
+    setTimeLeft(MODES[newMode].minutes * 60)
+    setIsRunning(false)
+  }, [])
+
   // Timer logic
   useEffect(() => {
     if (isRunning) {
@@ -84,13 +90,7 @@ export default function PomodoroTimer() {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isRunning, mode, sessionsCompleted, currentMode.minutes, playNotification])
-
-  const switchMode = (newMode: PomodoroMode) => {
-    setMode(newMode)
-    setTimeLeft(MODES[newMode].minutes * 60)
-    setIsRunning(false)
-  }
+  }, [isRunning, mode, sessionsCompleted, currentMode.minutes, playNotification, switchMode])
 
   const reset = () => {
     setTimeLeft(currentMode.minutes * 60)

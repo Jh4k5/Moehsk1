@@ -152,3 +152,27 @@ Stage Summary:
 - Lint clean for project code
 - Previous HanziWriter fixes (HW.create + setTimeout) remain intact
 - Previous paywall removal remains intact
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix all build errors causing the platform to crash
+
+Work Log:
+- Diagnosed dev.log showing 3 types of parsing errors
+- Fixed LessonSystem.tsx line 315: missing `[` in options array (`options: 'حاسوب'` → `options: ['حاسوب'`)
+- Fixed LessonSystem.tsx line 416: same missing `[` pattern
+- Fixed LessonSystem.tsx line 613: same missing `[` pattern
+- Fixed PomodoroTimer.tsx: moved `switchMode` before `useEffect`, wrapped in `useCallback`, added to deps array
+- Fixed page.tsx line 1570: converted template literal in className to ternary (Turbopack parser bug)
+- Fixed page.tsx line 1583: same template literal issue
+- Fixed page.tsx line 1698: multi-line template literal in className → nested ternary
+- Used subagent to fix ALL 21 remaining template literal instances in className across page.tsx
+- Fixed LessonSystem.tsx line 864: missing `>` on `<Card` tag
+- Multiple dev server restarts required due to Turbopack caching issues
+
+Stage Summary:
+- Build now compiles successfully (HTTP 200)
+- Root causes: (1) missing `[` brackets in 3 quiz option arrays, (2) Turbopack JSX parser incompatibility with template literals in className attributes, (3) function declaration order in PomodoroTimer, (4) missing JSX closing `>`
+- Lint passes clean for all source files (only script files have warnings)
+- All fixes preserve original styling and logic

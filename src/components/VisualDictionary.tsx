@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo, useRef } from 'react'
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { VISUAL_DICT_CATEGORIES } from '@/data/visualDict'
 import type { VisualDictWord } from '@/data/visualDict'
@@ -209,7 +209,7 @@ export default function VisualDictionary() {
   if (typeof window !== 'undefined' && !pronSupported) {
     // already checked
   }
-  useMemo(() => {
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
       setPronSupported(!!SR)

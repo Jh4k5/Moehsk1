@@ -15,3 +15,6 @@ export type Section =
   | 'sentences'
   | 'handwriting'
   | 'pronunciation'
+  | 'qa'
+  | 'visual-dict'
+  | 'achievements'

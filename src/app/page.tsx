@@ -789,6 +789,7 @@ export default function Home() {
                   quizDifficulty={quizDifficulty}
                   setQuizDifficulty={setQuizDifficulty}
                   hardTimer={hardTimer}
+                  setHardTimer={setHardTimer}
                 />
               )}
               {currentSection === 'games' && (
@@ -1946,7 +1947,7 @@ function GrammarSection() {
 // ═══════════════════════════════════════════════════════════
 // PRACTICE SECTION (Enhanced Quiz)
 // ═══════════════════════════════════════════════════════════
-function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinished, generateQuiz, quizDifficulty, setQuizDifficulty, hardTimer }: {
+function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinished, generateQuiz, quizDifficulty, setQuizDifficulty, hardTimer, setHardTimer }: {
   quizAnswer: number | null
   setQuizAnswer: (a: number | null) => void
   quizFinished: boolean
@@ -1955,6 +1956,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
   quizDifficulty: 'easy' | 'medium' | 'hard'
   setQuizDifficulty: (d: 'easy' | 'medium' | 'hard') => void
   hardTimer: number
+  setHardTimer: (t: number) => void
 }) {
   const store = useLearningStore()
   const { quizQuestions, quizScore, quizTotal, currentQuizQuestion, answerQuiz, nextQuizQuestion, resetQuiz, incrementStreak } = store
@@ -2280,6 +2282,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
   const store = useLearningStore()
   const { memoryCards, memoryMoves, memoryPairs, incrementStreak } = store
   const [selectedMemoryLevel, setSelectedMemoryLevel] = useState(1)
+  const [targetToneIdx, setTargetToneIdx] = useState(0)
 
   const currentPairCount = memoryLevelOptions.find(l => l.level === selectedMemoryLevel)?.pairs || 6
 
@@ -2287,9 +2290,20 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
     setToneRound(0)
     setToneScore(0)
     setToneAnswer(null)
+    setTargetToneIdx(0)
   }
 
+  // Randomize target tone when advancing rounds
+  useEffect(() => {
+    if (toneRound < tonePairs.length) {
+      const set = tonePairs[toneRound % tonePairs.length]
+      const maxIdx = set.tones.length - 1
+      setTargetToneIdx(Math.floor(Math.random() * (maxIdx + 1)))
+    }
+  }, [toneRound])
+
   const currentToneSet = tonePairs[toneRound % tonePairs.length]
+  const targetTone = currentToneSet?.tones[targetToneIdx]
 
   return (
     <div className="space-y-6">
@@ -2410,8 +2424,8 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
                 <div className="text-center space-y-2">
                   <div className="text-sm text-gray-500">اختر النبرة الصحيحة للكلمة:</div>
                   <div className="font-chinese-sans text-lg text-[#1CB0F6]">[{currentToneSet.syllable}]</div>
-                  <Button variant="ghost" size="sm" onClick={() => speak(currentToneSet.tones[0].char)}>
-                    <Volume2 className="w-4 h-4 ml-1" /> استمع للنبرة الأولى
+                  <Button variant="ghost" size="sm" onClick={() => targetTone && speak(targetTone.char)}>
+                    <Volume2 className="w-4 h-4 ml-1" /> استمع للنبرة
                   </Button>
                 </div>
 
@@ -2421,13 +2435,13 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
                       key={i}
                       variant="outline"
                       className={toneAnswer === i
-                        ? (i === 0 ? "h-auto py-4 flex flex-col items-center gap-1 transition-all border-emerald-500 bg-emerald-50" : "h-auto py-4 flex flex-col items-center gap-1 transition-all border-red-500 bg-[#FFE5E5]")
+                        ? (i === targetToneIdx ? "h-auto py-4 flex flex-col items-center gap-1 transition-all border-emerald-500 bg-emerald-50" : "h-auto py-4 flex flex-col items-center gap-1 transition-all border-red-500 bg-[#FFE5E5]")
                         : "h-auto py-4 flex flex-col items-center gap-1 transition-all hover:bg-gray-50"
                       }
                       onClick={() => {
                         if (toneAnswer !== null) return
                         setToneAnswer(i)
-                        if (i === 0) {
+                        if (i === targetToneIdx) {
                           setToneScore(s => s + 1)
                         }
                         setTimeout(() => {
@@ -2473,9 +2487,7 @@ function SentencesSection({ sentenceFlipped, setSentenceFlipped, sentenceIndex, 
   sentenceIndex: number
   setSentenceIndex: (i: number) => void
 }) {
-  const store = useLearningStore()
   const sentence = allSentences[sentenceIndex]
-  const store2 = useLearningStore()
 
   // Word breakdown from vocabulary
   const wordBreakdown = useMemo(() => {

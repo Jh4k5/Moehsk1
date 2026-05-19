@@ -216,3 +216,45 @@ Stage Summary:
 - Flashcards now match Quizlet UX with 4 study modes
 - Pronunciation covers all 410 vocabulary words (not just visual dict)
 - Learned word tracking integrated across both features
+
+---
+Task ID: 3-a
+Agent: Main Coordinator + Subagents
+Task: Comprehensive bug fix pass and data quality improvement
+
+Work Log:
+- Conducted full assessment of 2968-line page.tsx monolith and all 9 standalone components
+- Confirmed ALL sections have real content (none are empty shells)
+- Identified and fixed 6 bugs + 1 design issue + 1 data quality issue:
+
+Bug Fixes:
+1. CRITICAL: PracticeSection (line 2113) called setHardTimer() but it wasn't passed as prop → crash when answering hard-mode quiz
+   - Added setHardTimer prop to PracticeSection interface and passed it from parent
+2. VocabWord interface missing `lesson` field → TypeScript errors in components accessing word.lesson
+   - Added `lesson?: number` to VocabWord interface
+3. Section type in /src/types/index.ts missing 'qa', 'visual-dict', 'achievements' → type mismatches
+   - Added all 3 missing sections to the union type
+4. Dead code in SentencesSection: 2 unused useLearningStore() calls (store, store2)
+   - Removed both unnecessary store subscriptions
+5. VisualDictionary: useMemo() used as useEffect() for side effects (line 212)
+   - Changed to useEffect() and added missing useEffect import
+6. LessonSystem typo: '我有的استخدام' (Chinese/Arabic concatenated without space)
+   - Fixed to 'استخدام 有 للتعبير عن الملكية'
+
+Enhancement:
+7. Tone Game always played tone 1 and checked i===0 (repetitive, not challenging)
+   - Added targetToneIdx state with randomization via useEffect
+   - Updated play button to use targetTone.char
+   - Updated answer check and visual feedback to use targetToneIdx
+
+Data Quality:
+8. Fixed 51 vocabulary entries with placeholder `english: 'word'` → proper English translations
+   - Examples: 对不起→sorry, 没关系→never mind, 谁→who, etc.
+   - All 410 words now have correct English translations
+
+Stage Summary:
+- All 9 fixes applied with targeted Edit operations (no file rewrites)
+- Dev server compiles cleanly: ✓ Compiled in ~300ms
+- Lint clean for all source code (only pre-existing warnings in scripts/ and upload/)
+- All 17 sections fully functional with real content
+- Platform architecture: 2968-line page.tsx monolith + 9 standalone components + 9 data files

@@ -162,7 +162,7 @@ const lessons: Lesson[] = [
       { speaker: 'B', name: 'وانغ فانغ', hanzi: '我没有兄弟姐妹。', pinyin: 'Wǒ méiyǒu xiōngdì jiěmèi.', arabic: 'ليس لدي إخوة وأخوات.' },
     ],
     grammar: [
-      { title: 'التعبير عن الملكية', description: '我有的استخدام', pattern: '我/你/他 + 有 + عدد + كائن', example: '我有一个哥哥。', exampleAr: 'لدي أخ أكبر.' },
+      { title: 'التعبير عن الملكية', description: 'استخدام 有 للتعبير عن الملكية', pattern: '我/你/他 + 有 + عدد + كائن', example: '我有一个哥哥。', exampleAr: 'لدي أخ أكبر.' },
       { title: 'سؤال عن العائلة', description: '你家有几口人؟', pattern: '你家有几口人？', example: '你家有几个人？', exampleAr: 'كم فرداً في عائلتك؟' },
     ],
     exerciseQuestions: [

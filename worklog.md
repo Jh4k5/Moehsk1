@@ -120,3 +120,42 @@ Stage Summary:
 - ✅ e.stopPropagation() on all internal interactive elements
 - ✅ page.tsx: 3543 lines (net +70 lines from enhanced card design)
 - Pre-existing lint errors: 3 (in PronunciationSection + backup — not related to this task)
+
+---
+Task ID: 4
+Agent: Main Developer
+Task: Expand Lesson Content — 22-40 Words per Lesson with Full Data
+
+Work Log:
+- Read uploaded reference files: New-HSK-Vocabulary-Level-1.pdf, 新HSK教程1_compressed_compressed.pdf, hsk1_book_content (1).json
+- Extracted vocabulary.ts lesson assignments: found 410 words across 15 lessons
+- Identified thin lessons: L5(21), L6(13), L8(10), L9(12), L10(12), L12(8), L13(7), L14(19) — all under 22
+- Rebuilt lessons.ts (1262 lines) with expanded data:
+  - All 15 lessons now have 22-40 vocabulary IDs from vocabulary.ts
+  - Thin lessons supplemented with thematically related words from lesson 15
+  - Each lesson has: 4-7 grammar IDs, 5-8 key sentences, 2-3 conversations, 4-6 exercises
+  - Exercise types: multiple_choice, fill_blank, translate, tone
+  - Conversations use Arabic speaker names (علي, ليلى, أحمد, سارة) with scene emojis
+- Rebuilt LessonSystem.tsx (911 lines) with enhanced 5-tab UI:
+  - **View 1**: Lesson list grid (2/3/4/5 cols responsive) with colored badges, progress bars, completion states
+  - **View 2**: Lesson detail with 5 tabs:
+    1. المفردات — word grid with TTS, learned status toggle
+    2. القواعد — grammar accordion from grammarRules data
+    3. محادثة — chat-bubble conversations with TTS
+    4. الجمل — key sentences list with TTS
+    5. التمارين — interactive exercises (MCQ, fill-blank, translate, tone) with scoring
+  - Stats summary cards (total lessons, completed, words learned, remaining)
+  - Framer Motion animations, RTL layout, mobile-first responsive
+  - Integrates with useLearningStore for learned words persistence
+
+Stage Summary:
+- ✅ HTTP 200 confirmed — server compiles and serves correctly
+- ✅ lessons.ts: 1262 lines, 15 lessons, all with 22-40 vocabulary IDs
+- ✅ LessonSystem.tsx: 911 lines, 5-tab detail view, interactive exercises
+- ✅ All vocabulary IDs sourced from vocabulary.ts (no invented words)
+- ✅ Grammar IDs properly mapped to grammarRules (1-26)
+- ✅ Conversations with Arabic names and emoji scenes
+- ✅ 4 exercise types fully implemented with scoring
+- ✅ TTS on all Chinese text elements
+- ✅ Zero new lint errors introduced
+- ✅ grep vocabularyIds returns 15 matches (one per lesson)

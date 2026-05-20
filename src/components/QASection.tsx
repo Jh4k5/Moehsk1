@@ -95,6 +95,23 @@ const QA_PATTERNS: Record<string, {
       { question_zh: "这个字怎么读？", question_pinyin: "Zhège zì zěnme dú?", question_ar: "كيف يُنطق هذا الحرف؟", answer_zh: "这个字读'好'，hǎo。", answer_pinyin: "Zhège zì dú 'hǎo'.", answer_ar: "هذا الحرف يُنطق 'هاو'." },
     ]
   },
+  "حياة": {
+    label_ar: "أسئلة الحياة اليومية",
+    label_zh: "日常用语",
+    pattern: "تحيات / مطاعم / تسوق / صحة",
+    pattern_ar: "أسئلة شائعة في الحياة اليومية مع الإجابات",
+    color: "#1CB0F6",
+    examples: [
+      { question_zh: "你好吗？", question_pinyin: "Nǐ hǎo ma?", question_ar: "كيف حالك؟", answer_zh: "我很好，谢谢。你呢？", answer_pinyin: "Wǒ hěn hǎo, xièxie. Nǐ ne?", answer_ar: "أنا بخير، شكراً. وأنت؟" },
+      { question_zh: "请问，这个多少钱？", question_pinyin: "Qǐngwèn, zhège duōshao qián?", question_ar: "عفواً، بكم هذا؟", answer_zh: "这个二十块钱。", answer_pinyin: "Zhège èrshí kuài qián.", answer_ar: "هذا بعشرين يوان." },
+      { question_zh: "你想吃什么？", question_pinyin: "Nǐ xiǎng chī shénme?", question_ar: "ماذا تريد أن تأكل؟", answer_zh: "我想吃米饭和菜。", answer_pinyin: "Wǒ xiǎng chī mǐfàn hé cài.", answer_ar: "أريد أن آكل أرز وخضار." },
+      { question_zh: "请问，洗手间在哪儿？", question_pinyin: "Qǐngwèn, xǐshǒujiān zài nǎr?", question_ar: "عفواً، أين الحمام؟", answer_zh: "洗手间在那边。", answer_pinyin: "Xǐshǒujiān zài nà biān.", answer_ar: "الحمام هناك." },
+      { question_zh: "今天天气怎么样？", question_pinyin: "Jīntiān tiānqì zěnmeyàng?", question_ar: "كيف الطقس اليوم؟", answer_zh: "今天天气很好，不下雨。", answer_pinyin: "Jīntiān tiānqì hěn hǎo, bú xiàyǔ.", answer_ar: "الطقس اليوم جيد، لا تمطر." },
+      { question_zh: "你几点起床？", question_pinyin: "Nǐ jǐ diǎn qǐchuáng?", question_ar: "متى تستيقظ؟", answer_zh: "我早上七点起床。", answer_pinyin: "Wǒ zǎoshang qī diǎn qǐchuáng.", answer_ar: "أستيقظ السابعة صباحاً." },
+      { question_zh: "这件衣服有没有大号的？", question_pinyin: "Zhè jiàn yīfu yǒu méiyǒu dà hào de?", question_ar: "هل هذا الملابس متوفر بمقاس كبير؟", answer_zh: "有，这件有大号的。", answer_pinyin: "Yǒu, zhè jiàn yǒu dà hào de.", answer_ar: "نعم، هذا متوفر بمقاس كبير." },
+      { question_zh: "对不起，我迟到了。", question_pinyin: "Duìbuqǐ, wǒ chídào le.", question_ar: "آسف، أنا متأخر.", answer_zh: "没关系，请坐。", answer_pinyin: "Méi guānxi, qǐng zuò.", answer_ar: "لا بأس، تفضل بالجلوس." },
+    ]
+  },
 }
 
 // ─── Pattern keys for iteration ───────────────────────────────

@@ -35,10 +35,6 @@ import QASection from '@/components/QASection'
 import VisualDictionary from '@/components/VisualDictionary'
 import AchievementsSection from '@/components/AchievementsSection'
 import PomodoroTimer from '@/components/PomodoroTimer'
-import LoginScreen from '@/components/LoginScreen'
-
-// ─── SRS Helper
-import { isDueForReview, getDifficultyLabel } from '@/lib/srs'
 
 // ─── TTS Helper ─────────────────────────────────────────────
 const speak = (text: string, lang = 'zh-CN') => {
@@ -519,13 +515,6 @@ export default function Home() {
   const [activeStory, setActiveStory] = useState(0)
   const [sentenceFlipped, setSentenceFlipped] = useState(false)
   const [sentenceIndex, setSentenceIndex] = useState(0)
-  const [currentUser, setCurrentUser] = useState<{ name: string; isGuest: boolean } | null>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('mudann_currentUser')
-      return saved ? JSON.parse(saved) : null
-    }
-    return null
-  })
 
   // Hard mode timer
   useEffect(() => {
@@ -583,10 +572,6 @@ export default function Home() {
     { id: 'chat' as Section, label: 'المساعد', icon: Bot },
     { id: 'roadmap' as Section, label: 'خريطة الطريق', icon: Map },
   ]
-
-  // ─── Lesson names for sidebar dropdown
-  const lessonNames = ['التحيات والتعارف', 'المعلومات الشخصية', 'العائلة والأصدقاء', 'الوقت والأرقام', 'الطعام والشراب', 'التسوق', 'المكان والاتجاهات', 'المواصلات', 'الحياة اليومية', 'الصحة', 'العمل والدراسة', 'الهوايات', 'الطقس والمواسم', 'السفر', 'مراجعة شاملة']
-  const [lessonsOpen, setLessonsOpen] = useState(false)
 
   // ─── Filtered Vocab ────────────────────────────────────────
   // Check if a word is mastered (SRS reviewCount >= 3)
@@ -689,13 +674,6 @@ export default function Home() {
   }, [learnedWords])
 
   // ═══════════════════════════════════════════════════════════
-  // AUTH GUARD
-  // ═══════════════════════════════════════════════════════════
-  if (!currentUser) {
-    return <LoginScreen onLogin={(user) => setCurrentUser(user)} />
-  }
-
-  // ═══════════════════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════════════════
   return (
@@ -728,59 +706,19 @@ export default function Home() {
       <div className="flex-1 flex max-w-7xl mx-auto w-full">
         {/* ─── Sidebar Navigation (Desktop) ──────────────── */}
         <nav className="hidden lg:flex flex-col w-56 border-l border-gray-100 p-3 gap-1 sticky top-[60px] self-start max-h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar bg-white/50">
-          {/* User info */}
-          <div className="flex items-center gap-3 p-3 mb-2 rounded-xl bg-gradient-to-l from-[#E0F6FF] to-white">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm shrink-0" style={{ background: 'linear-gradient(135deg, #1CB0F6, #0A90D4)' }}>
-              {currentUser?.isGuest ? '👋' : currentUser?.name?.charAt(0) || '?'}
-            </div>
-            <div className="min-w-0">
-              <div className="text-sm font-bold text-gray-900 truncate">{currentUser?.name || 'زائر'}</div>
-              <div className="text-[10px] text-gray-500">{currentUser?.isGuest ? 'زائر' : 'مستخدم'} • {learnedWords.length} محفوظة</div>
-            </div>
-          </div>
-          <div className="h-px bg-gray-100 mb-2" />
-          {navItems.map(item => {
-            if (item.id === 'lessons') {
-              return (
-                <div key={item.id}>
-                  <button
-                    onClick={() => { setCurrentSection(item.id); setLessonsOpen(!lessonsOpen) }}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  >
-                    <item.icon className="w-5 h-5 text-gray-400" />
-                    <span className="flex-1 text-right">{item.label}</span>
-                    <span className="text-[10px] text-gray-400 transition-transform" style={{ transform: lessonsOpen ? 'rotate(90deg)' : 'rotate(0)' }}>▸</span>
-                  </button>
-                  {lessonsOpen && (
-                    <div className="mr-8 mb-1 space-y-0.5 max-h-48 overflow-y-auto custom-scrollbar">
-                      {lessonNames.map((ln, i) => (
-                        <button
-                          key={i}
-                          onClick={(e) => { e.stopPropagation(); setCurrentSection('lessons'); if (store.setCurrentLesson) store.setCurrentLesson(i + 1); }}
-                          className="w-full text-right text-xs text-gray-500 hover:text-[#0A90D4] hover:bg-[#F0FAFF] py-1.5 px-3 rounded-lg transition-all truncate"
-                        >
-                          {i + 1}. {ln}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )
-            }
-            return (
-              <button
-                key={item.id}
-                onClick={() => setCurrentSection(item.id)}
-                className={currentSection === item.id
-                  ? "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-[#E0F6FF] text-[#0A90D4] shadow-sm"
-                  : "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }
-              >
-                <item.icon className={currentSection === item.id ? "w-5 h-5 text-[#1CB0F6]" : "w-5 h-5 text-gray-400"} />
-                <span>{item.label}</span>
-              </button>
-            )
-          })}
+          {navItems.map(item => (
+            <button
+              key={item.id}
+              onClick={() => setCurrentSection(item.id)}
+              className={currentSection === item.id
+                ? "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-[#E0F6FF] text-[#0A90D4] shadow-sm"
+                : "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }
+            >
+              <item.icon className={currentSection === item.id ? "w-5 h-5 text-[#1CB0F6]" : "w-5 h-5 text-gray-400"} />
+              <span>{item.label}</span>
+            </button>
+          ))}
           <div className="mt-4 p-4 rounded-xl bg-gradient-to-b from-[#E0F6FF] to-[#F0FAFF]">
             <div className="text-xs text-gray-600 mb-2 font-medium">التقدم العام</div>
             <div className="progress-duo mb-1">
@@ -1069,18 +1007,8 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
   const swipeEndX = useRef(0)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  // ── Pronunciation state ──
-  const [isRecording, setIsRecording] = useState(false)
-  const [pronResult, setPronResult] = useState<{ score: number; spoken: string; color: string; msg: string } | null>(null)
-  const pronRecRef = useRef<any>(null)
-
-  // SRS: Build deck with due cards first, then new cards
-  const dueCardIds = store.getDueCardIds()
-  const dueCards = filteredVocab.filter(w => dueCardIds.includes(w.id))
-  const newCards = filteredVocab.filter(w => !dueCardIds.includes(w.id))
-  const srsDeck = [...dueCards, ...newCards]
-  const deck = shuffledVocab.length > 0 ? shuffledVocab : srsDeck
-  const dueCount = dueCards.length
+  // Build shuffled deck
+  const deck = shuffledVocab.length > 0 ? shuffledVocab : filteredVocab
   const word = deck[store.flashcardIndex] || deck[0]
 
   const wordSentences = useMemo(() => {
@@ -1099,63 +1027,6 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
     setShuffledVocab(s)
     store.setFlashcardIndex(0)
   }, [filteredVocab, store])
-
-  // ── Pronunciation helper ──
-  const pronSimilarity = (spoken: string, expected: string): number => {
-    if (!spoken || !expected) return 0
-    const s = spoken.trim().toLowerCase()
-    const e = expected.trim().toLowerCase()
-    if (s === e) return 100
-    let d = 0
-    const sl = s.length, el = e.length
-    const matrix: number[][] = Array.from({ length: el + 1 }, (_, i) => [i])
-    for (let j = 1; j <= sl; j++) matrix[0][j] = j
-    for (let i = 1; i <= el; i++) {
-      for (let j = 1; j <= sl; j++) {
-        if (e.charAt(i - 1) === s.charAt(j - 1)) matrix[i][j] = matrix[i - 1][j - 1]
-        else matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
-      }
-    }
-    d = matrix[el][sl]
-    return Math.round(((Math.max(sl, el) - d) / Math.max(sl, el)) * 100)
-  }
-
-  const startPronRecording = () => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SR) return
-    setPronResult(null)
-    setIsRecording(true)
-    const recognition = new SR()
-    recognition.lang = 'zh-CN'
-    recognition.interimResults = false
-    recognition.maxAlternatives = 5
-    recognition.continuous = false
-    recognition.onresult = (event: any) => {
-      let bestSim = 0
-      let bestSpoken = ''
-      for (let i = 0; i < event.results[0].length; i++) {
-        const alt = event.results[0][i]
-        const sim = pronSimilarity(alt.transcript, word?.zh || '')
-        if (sim > bestSim) { bestSim = sim; bestSpoken = alt.transcript }
-      }
-      setPronResult({
-        score: bestSim,
-        spoken: bestSpoken,
-        color: bestSim >= 70 ? '#22c55e' : '#ef4444',
-        msg: bestSim >= 70 ? 'نطق ممتاز! 🎉' : 'حاول مرة أخرى 🎧',
-      })
-      setIsRecording(false)
-    }
-    recognition.onerror = () => setIsRecording(false)
-    recognition.onend = () => setIsRecording(false)
-    pronRecRef.current = recognition
-    recognition.start()
-  }
-
-  const stopPronRecording = () => {
-    if (pronRecRef.current) pronRecRef.current.stop()
-    setIsRecording(false)
-  }
 
   // Reset all progress
   const doReset = useCallback(() => {
@@ -1549,14 +1420,6 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     <Button size="sm" variant="ghost" onClick={() => speak(word.zh)}>
                       <Volume2 className="w-4 h-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className={isRecording ? 'bg-red-100 text-red-600 animate-pulse' : 'hover:bg-blue-50'}
-                      onClick={isRecording ? stopPronRecording : startPronRecording}
-                    >
-                      <span className="text-base">{isRecording ? '⏹' : '🎤'}</span>
-                    </Button>
                   </div>
                   <Button
                     variant="outline"
@@ -1566,52 +1429,6 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                   >
                     التالي
                     <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                </div>
-                {pronResult && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="max-w-lg mx-auto text-center text-sm py-2 px-4 rounded-xl"
-                    style={{ background: pronResult.color + '15', color: pronResult.color, border: '1px solid ' + pronResult.color + '30' }}
-                  >
-                    <div className="font-bold">{pronResult.msg}</div>
-                    <div className="text-xs mt-0.5 opacity-75">قلت: {pronResult.spoken} • دقة: {pronResult.score}%</div>
-                  </motion.div>
-                )}
-
-                {/* SRS Buttons */}
-                <div className="flex items-center justify-center gap-3 max-w-lg mx-auto mt-2">
-                  {dueCount > 0 && (
-                    <span className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                      {dueCount} كلمة مستحقة اليوم
-                    </span>
-                  )}
-                  <Button
-                    size="sm"
-                    className="gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0"
-                    onClick={() => {
-                      store.rateWord(word.id, 4)
-                      incrementStreak()
-                      if (store.flashcardIndex < deck.length - 1) {
-                        store.setFlashcardIndex(store.flashcardIndex + 1)
-                      }
-                    }}
-                  >
-                    <Check className="w-3.5 h-3.5" /> أعرفها
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="gap-1 text-xs text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => {
-                      store.rateWord(word.id, 1)
-                      if (store.flashcardIndex < deck.length - 1) {
-                        store.setFlashcardIndex(store.flashcardIndex + 1)
-                      }
-                    }}
-                  >
-                    <X className="w-3.5 h-3.5" /> لا أعرفها
                   </Button>
                 </div>
 
@@ -2437,102 +2254,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
             </div>
           )}
         </TabsContent>
-      <TabsContent value="tf" className="space-y-4">
-          <Card className="border-0 shadow-sm">
-            <CardContent className="flex flex-col items-center justify-center py-10 gap-4">
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-emerald-500" />
-                <X className="w-5 h-5 text-red-500" />
-                <span className="font-bold text-gray-700">صواب أم خطأ؟</span>
-              </div>
-              {tfQuestion ? (
-                <div className="w-full max-w-md space-y-4 text-center">
-                  <p className="font-chinese-serif text-2xl font-bold text-gray-900">{tfQuestion.zh.split(' — ')[0]}</p>
-                  <p className="text-sm text-gray-500 font-chinese-sans">{tfQuestion.zh.split(' — ')[1] || ''}</p>
-                  <div className="h-px bg-gray-200 my-2" />
-                  <p className="text-lg font-bold" style={{ color: '#1CB0F6' }}>{tfQuestion.ar}</p>
-                  <p className="text-xs text-gray-400">هل هذه الترجمة صحيحة؟</p>
-                  {tfAnswer === null ? (
-                    <div className="flex gap-4 justify-center mt-4">
-                      <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white border-0" onClick={() => { setTfAnswer(true); setTfTotal(t => t + 1); if (tfQuestion.isCorrect) setTfScore(s => s + 1) }}>
-                        <Check className="w-4 h-4" /> صحيح
-                      </Button>
-                      <Button className="gap-2 bg-red-600 hover:bg-red-700 text-white border-0" onClick={() => { setTfAnswer(false); setTfTotal(t => t + 1); if (!tfQuestion.isCorrect) setTfScore(s => s + 1) }}>
-                        <X className="w-4 h-4" /> خطأ
-                      </Button>
-                    </div>
-                  ) : (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-                      <div className="text-lg font-bold" style={{ color: tfAnswer === tfQuestion.isCorrect ? '#22c55e' : '#ef4444' }}>
-                        {tfAnswer === tfQuestion.isCorrect ? '✅ إجابة صحيحة!' : '❌ إجابة خاطئة!'}
-                      </div>
-                      <div className="flex items-center justify-between gap-3 px-4">
-                        <span className="text-sm text-gray-500">النتيجة: {tfScore}/{tfTotal}</span>
-                        <Button size="sm" onClick={startTFQuestion}>السؤال التالي</Button>
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-500 max-w-sm text-center">سيظهر لك كلمة صينية مع ترجمتها. حدد هل الترجمة صحيحة أم لا.</p>
-                  <Button onClick={startTFQuestion} className="gap-2" style={{ backgroundColor: '#1CB0F6', border: 'none' }}>
-                    ابدأ اللعب
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-<TabsContent value="speed" className="space-y-4">
-          <Card className="border-0 shadow-sm">
-            <CardContent className="py-8 space-y-4">
-              {speedActive ? (
-                <div className="text-center space-y-4">
-                  <div className="flex justify-center gap-6">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold" style={{ color: speedTime <= 10 ? '#ef4444' : '#1CB0F6' }}>{speedTime}</div>
-                      <div className="text-xs text-gray-500">ثانية</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-emerald-600">{speedScore}</div>
-                      <div className="text-xs text-gray-500">صحيح</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-amber-500">🔥 {speedStreak}</div>
-                      <div className="text-xs text-gray-500">متتالية</div>
-                    </div>
-                  </div>
-                  {speedWord && (
-                    <motion.div key={speedWord.word.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.15 }}>
-                      <p className="text-xl font-bold text-gray-900 mb-4">{speedWord.word.meaning}</p>
-                      <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
-                        {speedWord.options.map(opt => (
-                          <button key={opt} onClick={() => handleSpeedAnswer(opt)}
-                            className="py-4 rounded-xl text-xl font-chinese-serif border-2 border-gray-200 hover:border-[#1CB0F6] hover:bg-[#E0F6FF] transition-all active:scale-95">
-                            {opt}
-                          </button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center space-y-4">
-                  <div className="text-4xl mb-2">⚡</div>
-                  <h3 className="text-xl font-bold text-gray-700">لعبة السرعة</h3>
-                  <p className="text-sm text-gray-500 max-w-sm mx-auto">30 ثانية! اختر الترجمة الصينية الصحيحة للكلمة العربية. كم كلمة تستطيع؟</p>
-                  {speedBest > 0 && <p className="text-sm text-amber-600 font-bold">🏆 أعلى نتيجة: {speedBest}</p>}
-                  {speedScore > 0 && <p className="text-sm text-gray-600">آخر نتيجة: {speedScore}</p>}
-                  <Button onClick={startSpeedGame} className="gap-2 text-base" style={{ backgroundColor: '#1CB0F6', border: 'none' }}>
-                    ابدأ اللعبة
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-</Tabs>
+      </Tabs>
     </div>
   )
 }
@@ -2561,51 +2283,6 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
   const { memoryCards, memoryMoves, memoryPairs, incrementStreak } = store
   const [selectedMemoryLevel, setSelectedMemoryLevel] = useState(1)
   const [targetToneIdx, setTargetToneIdx] = useState(0)
-
-  // Speed game state
-  const [speedActive, setSpeedActive] = useState(false)
-  const [speedTime, setSpeedTime] = useState(30)
-  const [speedScore, setSpeedScore] = useState(0)
-  const [speedStreak, setSpeedStreak] = useState(0)
-  const [speedBest, setSpeedBest] = useState(0)
-  const [speedWord, setSpeedWord] = useState<{ word: any; options: string[]; correct: string } | null>(null)
-  const speedTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  const startSpeedGame = () => {
-    setSpeedActive(true)
-    setSpeedTime(30)
-    setSpeedScore(0)
-    setSpeedStreak(0)
-    nextSpeedWord()
-    speedTimerRef.current = setInterval(() => {
-      setSpeedTime(t => {
-        if (t <= 1) {
-          if (speedTimerRef.current) clearInterval(speedTimerRef.current)
-          setSpeedActive(false)
-          setSpeedBest(prev => Math.max(prev, speedScore))
-          return 0
-        }
-        return t - 1
-      })
-    }, 1000)
-  }
-
-  const nextSpeedWord = () => {
-    const w = vocabulary[Math.floor(Math.random() * vocabulary.length)]
-    const wrongs = vocabulary.filter(v => v.id !== w.id).sort(() => Math.random() - 0.5).slice(0, 3).map(v => v.zh)
-    const options = [...wrongs, w.zh].sort(() => Math.random() - 0.5)
-    setSpeedWord({ word: w, options, correct: w.zh })
-  }
-
-  const handleSpeedAnswer = (ans: string) => {
-    if (ans === speedWord?.correct) {
-      setSpeedScore(s => s + 1)
-      setSpeedStreak(s => s + 1)
-    } else {
-      setSpeedStreak(0)
-    }
-    nextSpeedWord()
-  }
 
   const currentPairCount = memoryLevelOptions.find(l => l.level === selectedMemoryLevel)?.pairs || 6
 
@@ -2638,10 +2315,9 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
       </div>
 
       <Tabs defaultValue="memory" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="memory">لعبة الذاكرة</TabsTrigger>
           <TabsTrigger value="tone">تمييز النبرات</TabsTrigger>
-          <TabsTrigger value="speed">لعبة السرعة ⚡</TabsTrigger>
         </TabsList>
 
         {/* Memory Game (Fixed) */}

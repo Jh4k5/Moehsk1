@@ -102,11 +102,15 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2, type: 'spring' }}
                   className="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg"
-                  style={{ background: 'linear-gradient(135deg, #1CB0F6, #0A90D4)' }}>
-                  <span className="font-chinese-serif text-white text-3xl font-bold">汉</span>
+                  style={{ background: 'linear-gradient(135deg, #1A5FA8, #0D4E82)' }}>
+                  <span className="font-chinese-serif text-white text-3xl font-bold">桥</span>
                 </motion.div>
-                <h1 className="text-2xl font-bold text-white mb-1">穆安 — مُضَّن</h1>
-                <p className="text-sm text-blue-200">منصة تعلم اللغة الصينية HSK 1</p>
+                <div className="flex flex-col items-center">
+                  <span className="font-chinese-serif text-3xl font-bold text-white">桥</span>
+                  <span className="font-arabic text-2xl font-bold text-white mt-1">جِسر</span>
+                  <span className="text-xs text-blue-200 tracking-widest mt-0.5">JISR</span>
+                </div>
+                <p className="text-sm text-blue-200 mt-3">منصة تعلم اللغة الصينية HSK 1</p>
               </div>
 
               {/* Buttons */}
@@ -116,7 +120,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => { setView('login'); setError('') }}
                   className="w-full py-3 rounded-xl font-bold text-white flex items-center justify-center gap-3 text-sm transition-all shadow-lg"
-                  style={{ background: 'linear-gradient(135deg, #1CB0F6, #0A90D4)' }}>
+                  style={{ background: 'linear-gradient(135deg, #1A5FA8, #0D4E82)' }}>
                   <LogIn className="w-5 h-5" />
                   سجّل الدخول
                 </motion.button>
@@ -181,7 +185,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               {/* Title */}
               <div className="text-center mb-6">
                 <div className="w-14 h-14 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #1CB0F6, #0A90D4)' }}>
+                  style={{ background: 'linear-gradient(135deg, #1A5FA8, #0D4E82)' }}>
                   {view === 'login' ? <LogIn className="w-6 h-6 text-white" /> : <UserPlus className="w-6 h-6 text-white" />}
                 </div>
                 <h2 className="text-xl font-bold text-white">
@@ -269,7 +273,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   onClick={view === 'login' ? handleLogin : handleRegister}
                   disabled={isLoading}
                   className="w-full py-3 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm transition-all shadow-lg disabled:opacity-60"
-                  style={{ background: view === 'login' ? 'linear-gradient(135deg, #1CB0F6, #0A90D4)' : 'linear-gradient(135deg, #58CC02, #46a302)' }}>
+                  style={{ background: view === 'login' ? 'linear-gradient(135deg, #1A5FA8, #0D4E82)' : 'linear-gradient(135deg, #58CC02, #46a302)' }}>
                   {isLoading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (

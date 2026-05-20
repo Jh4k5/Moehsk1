@@ -20,8 +20,8 @@ const notoSerifSC = Noto_Serif_SC({
 });
 
 export const metadata: Metadata = {
-  title: "HSK 1 — تعلم اللغة الصينية",
-  description: "منصة شاملة لتعلم اللغة الصينية للمستوى الأول (HSK 1) للمتحدثين بالعربية",
+  title: "Jisr — تعلم اللغة الصينية",
+  description: "منصة جِسر لتعلم اللغة الصينية للمستوى الأول (HSK 1) للمتحدثين بالعربية",
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },

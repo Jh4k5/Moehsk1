@@ -50,10 +50,10 @@
   --radius: 0.75rem;
 
   /* Primary Gamification Colors — Blue Identity */
-  --primary-blue: #1CB0F6;
-  --primary-blue-dark: #0A90D4;
-  --primary-blue-light: #E0F6FF;
-  --primary-blue-glow: rgba(28, 176, 246, 0.25);
+  --primary-blue: #1A5FA8;
+  --primary-blue-dark: #0D4E82;
+  --primary-blue-light: #E8F0FA;
+  --primary-blue-glow: rgba(26, 95, 168, 0.25);
 
   /* Semantic Gamification Signals */
   --gamification-success: #58CC02;
@@ -69,7 +69,7 @@
   --surface-page: #F7F7F7;
   --surface-card: #FFFFFF;
   --surface-hover: #E5E5E5;
-  --surface-active: #1CB0F6;
+  --surface-active: #1A5FA8;
 
   /* shadcn/ui compatible mappings */
   --background: oklch(0.985 0.002 60);
@@ -78,31 +78,31 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #1CB0F6;
+  --primary: #1A5FA8;
   --primary-foreground: #FFFFFF;
   --secondary: oklch(0.97 0.005 60);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0.005 60);
   --muted-foreground: oklch(0.5 0.01 60);
-  --accent: #E0F6FF;
+  --accent: #E8F0FA;
   --accent-foreground: oklch(0.205 0 0);
   --destructive: #FF4B4B;
   --border: oklch(0.92 0.005 60);
   --input: oklch(0.92 0.005 60);
-  --ring: #1CB0F6;
-  --chart-1: #1CB0F6;
+  --ring: #1A5FA8;
+  --chart-1: #1A5FA8;
   --chart-2: #58CC02;
   --chart-3: #FFC800;
   --chart-4: #FF4B4B;
   --chart-5: #CE82FF;
   --sidebar: oklch(0.985 0.002 60);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #1CB0F6;
+  --sidebar-primary: #1A5FA8;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E0F6FF;
+  --sidebar-accent: #E8F0FA;
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.92 0.005 60);
-  --sidebar-ring: #1CB0F6;
+  --sidebar-ring: #1A5FA8;
 }
 
 @layer base {
@@ -225,7 +225,7 @@
 }
 
 .shimmer {
-  background: linear-gradient(90deg, transparent, rgba(28, 176, 246, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(26, 95, 168, 0.08), transparent);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -265,10 +265,10 @@
 
 /* Duolingo button style */
 .btn-primary-game {
-  background: #1CB0F6;
+  background: #1A5FA8;
   color: white;
   border: none;
-  border-bottom: 4px solid #0A90D4;
+  border-bottom: 4px solid #0D4E82;
   border-radius: 16px;
   padding: 12px 24px;
   font-weight: 700;
@@ -277,7 +277,7 @@
 }
 
 .btn-primary-game:hover {
-  background: #1CB0F6;
+  background: #1A5FA8;
   border-bottom-width: 2px;
   transform: translateY(1px);
 }
@@ -289,9 +289,9 @@
 
 .btn-secondary-game {
   background: white;
-  color: #1CB0F6;
-  border: 2px solid #1CB0F6;
-  border-bottom: 4px solid #1CB0F6;
+  color: #1A5FA8;
+  border: 2px solid #1A5FA8;
+  border-bottom: 4px solid #1A5FA8;
   border-radius: 16px;
   padding: 12px 24px;
   font-weight: 700;
@@ -300,7 +300,7 @@
 }
 
 .btn-secondary-game:hover {
-  background: #E0F6FF;
+  background: #E8F0FA;
   border-bottom-width: 2px;
 }
 

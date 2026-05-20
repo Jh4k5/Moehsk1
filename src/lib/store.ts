@@ -15,6 +15,7 @@ type Section =
   | 'vocabulary'
   | 'pinyin'
   | 'hanzi'
+  | 'pronunciation'
   | 'lessons'
   | 'grammar'
   | 'conversations'
@@ -23,7 +24,11 @@ type Section =
   | 'stories'
   | 'exam'
   | 'chat'
-  | 'roadmap';
+  | 'roadmap'
+  | 'sentences'
+  | 'qa'
+  | 'visual-dict'
+  | 'achievements';
 
 // ── Existing interfaces ───────────────────────────────────────────────────
 interface QuizQuestion {
@@ -47,6 +52,20 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
+
+// ── Activity / Progress tracking types ─────────────────────────────────
+type DailyActivityEntry = {
+  wordsLearned: number;
+  questionsAnswered: number;
+};
+
+type QuizHistoryEntry = {
+  date: string;
+  score: number;
+  total: number;
+  difficulty: string;
+  type: string;
+};
 
 // ── SRS State ─────────────────────────────────────────────────────────────
 interface SRSState {
@@ -132,6 +151,28 @@ interface LearningStore
   dailyStreak: number;
   lastStudyDate: string;
   incrementStreak: () => void;
+
+  // Daily Activity
+  dailyActivity: Record<string, DailyActivityEntry>;
+  recordDailyActivity: (date: string, wordsLearned: number, questionsAnswered: number, storiesRead: number) => void;
+
+  // Quiz History
+  quizHistory: QuizHistoryEntry[];
+  addQuizHistory: (entry: QuizHistoryEntry) => void;
+
+  // High Scores
+  highScores: Record<string, number>;
+  updateHighScore: (gameType: string, score: number) => void;
+
+  // Stories
+  completedStories: number[];
+  isStoryCompleted: (storyIndex: number) => boolean;
+  toggleStoryCompleted: (storyIndex: number) => void;
+
+  // Bookmarks
+  bookmarkedWords: number[];
+  isBookmarked: (wordId: number) => boolean;
+  toggleBookmark: (wordId: number) => void;
 }
 
 export type { Section, QuizQuestion, MemoryCard, ChatMessage };
@@ -301,6 +342,58 @@ export const useLearningStore = create<LearningStore>()(
       gameStreak: 0,
       setGameStreak: (s: number) => set({ gameStreak: s }),
 
+      // ── Daily Activity ───────────────────────────────────────────────
+      dailyActivity: {},
+      recordDailyActivity: (date, wordsLearned, questionsAnswered, storiesRead) =>
+        set((state) => {
+          const existing = state.dailyActivity[date] || { wordsLearned: 0, questionsAnswered: 0 };
+          return {
+            dailyActivity: {
+              ...state.dailyActivity,
+              [date]: {
+                wordsLearned: existing.wordsLearned + wordsLearned,
+                questionsAnswered: existing.questionsAnswered + questionsAnswered,
+              },
+            },
+          };
+        }),
+
+      // ── Quiz History ───────────────────────────────────────────────────
+      quizHistory: [],
+      addQuizHistory: (entry) =>
+        set((state) => ({ quizHistory: [...state.quizHistory, entry] })),
+
+      // ── High Scores ────────────────────────────────────────────────────
+      highScores: {},
+      updateHighScore: (gameType, score) =>
+        set((state) => {
+          const current = state.highScores[gameType] || 0;
+          if (score > current) {
+            return { highScores: { ...state.highScores, [gameType]: score } };
+          }
+          return {};
+        }),
+
+      // ── Stories ────────────────────────────────────────────────────────
+      completedStories: [],
+      isStoryCompleted: (storyIndex) => get().completedStories.includes(storyIndex),
+      toggleStoryCompleted: (storyIndex) =>
+        set((state) => ({
+          completedStories: state.completedStories.includes(storyIndex)
+            ? state.completedStories.filter((s) => s !== storyIndex)
+            : [...state.completedStories, storyIndex],
+        })),
+
+      // ── Bookmarks ──────────────────────────────────────────────────────
+      bookmarkedWords: [],
+      isBookmarked: (wordId) => get().bookmarkedWords.includes(wordId),
+      toggleBookmark: (wordId) =>
+        set((state) => ({
+          bookmarkedWords: state.bookmarkedWords.includes(wordId)
+            ? state.bookmarkedWords.filter((w) => w !== wordId)
+            : [...state.bookmarkedWords, wordId],
+        })),
+
       // ── Exam ──────────────────────────────────────────────────────────
       examStarted: false,
       examType: null,
@@ -324,6 +417,11 @@ export const useLearningStore = create<LearningStore>()(
         dailyStreak: state.dailyStreak,
         lastStudyDate: state.lastStudyDate,
         srsCards: state.srsCards,
+        dailyActivity: state.dailyActivity,
+        quizHistory: state.quizHistory,
+        highScores: state.highScores,
+        completedStories: state.completedStories,
+        bookmarkedWords: state.bookmarkedWords,
       }),
     },
   ),

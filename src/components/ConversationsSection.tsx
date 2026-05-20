@@ -10,7 +10,7 @@ import {
   Volume2, MessageCircle, Play, Eye, EyeOff, Check, X,
   RotateCcw, ChevronLeft, ChevronRight, Headphones,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, type Variants } from 'framer-motion'
 
 // ─── TTS Helper ─────────────────────────────────────────────
 const speak = (text: string, lang = 'zh-CN') => {
@@ -27,9 +27,9 @@ const speak = (text: string, lang = 'zh-CN') => {
 
 /** Get a difficulty label + color for a lesson number */
 function getDifficulty(lesson: number) {
-  if (lesson <= 5) return { label: 'مبتدئ', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' }
-  if (lesson <= 10) return { label: 'متوسط', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' }
-  return { label: 'متقدم', cls: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300' }
+  if (lesson <= 5) return { label: 'مبتدئ', cls: 'bg-[var(--clr-success-bg)] text-[var(--clr-success)] dark:bg-[var(--clr-success-bg)]/40 dark:text-[var(--clr-success)]' }
+  if (lesson <= 10) return { label: 'متوسط', cls: 'bg-[var(--clr-warning-bg)] text-[var(--clr-warning)] dark:bg-[var(--clr-warning-bg)]/40 dark:text-[var(--clr-warning)]' }
+  return { label: 'متقدم', cls: 'bg-[var(--clr-danger-bg)] text-[var(--clr-danger)] dark:bg-[var(--clr-danger-bg)]/40 dark:text-[var(--clr-danger)]' }
 }
 
 /** Shuffle array in-place (Fisher-Yates) */
@@ -111,7 +111,7 @@ const fadeInUp = {
   }),
 }
 
-const bubblePop = {
+const bubblePop: Variants = {
   hidden: { opacity: 0, scale: 0.85 },
   visible: (i: number) => ({
     opacity: 1,
@@ -120,7 +120,7 @@ const bubblePop = {
   }),
 }
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 12 },
   visible: (i: number) => ({
     opacity: 1,
@@ -442,7 +442,7 @@ export default function ConversationsSection() {
                 transition={{ duration: 0.3 }}
                 className="mb-5"
               >
-                <Card className={`border-2 ${quiz.score === quiz.total ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/30' : quiz.score >= quiz.total / 2 ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/30' : 'border-rose-400 bg-rose-50 dark:bg-rose-950/30'}`}>
+                <Card className={`border-2 ${quiz.score === quiz.total ? 'border-[var(--clr-success)] bg-[var(--clr-success-bg)] dark:bg-[var(--clr-success-bg)]/30' : quiz.score >= quiz.total / 2 ? 'border-[var(--clr-warning)] bg-[var(--clr-warning-bg)] dark:bg-[var(--clr-warning-bg)]/30' : 'border-[var(--clr-danger)]/50 bg-[var(--clr-danger-bg)] dark:bg-[var(--clr-danger-bg)]/30'}`}>
                   <CardContent className="p-5 text-center">
                     <motion.div
                       initial={{ scale: 0 }}
@@ -450,11 +450,11 @@ export default function ConversationsSection() {
                       transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
                     >
                       {quiz.score === quiz.total ? (
-                        <Check className="w-10 h-10 mx-auto mb-2 text-emerald-500" />
+                        <Check className="w-10 h-10 mx-auto mb-2 text-[var(--clr-success)]" />
                       ) : quiz.score >= quiz.total / 2 ? (
-                        <Volume2 className="w-10 h-10 mx-auto mb-2 text-amber-500" />
+                        <Volume2 className="w-10 h-10 mx-auto mb-2 text-[var(--clr-warning)]" />
                       ) : (
-                        <RotateCcw className="w-10 h-10 mx-auto mb-2 text-rose-500" />
+                        <RotateCcw className="w-10 h-10 mx-auto mb-2 text-[var(--clr-danger)]" />
                       )}
                     </motion.div>
                     <p className="text-lg font-bold font-arabic">
@@ -506,8 +506,8 @@ export default function ConversationsSection() {
               <div
                 className={`relative max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 shadow-sm border transition-colors ${
                   isA
-                    ? 'bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800/50 rounded-br-sm'
-                    : 'bg-sky-50 border-sky-200 dark:bg-sky-950/30 dark:border-sky-800/50 rounded-bl-sm'
+                    ? 'bg-[var(--clr-danger-bg)] border-[var(--clr-danger)]/30 dark:bg-[var(--clr-danger-bg)]/30 dark:border-[var(--clr-danger)]/50 rounded-br-sm'
+                    : 'bg-[var(--clr-info-bg)] border-[var(--clr-info)]/30 dark:bg-[var(--clr-info-bg)]/30 dark:border-[var(--clr-info)]/50 rounded-bl-sm'
                 } ${playingTurnIdx === i ? 'ring-2 ring-primary/50' : ''}`}
               >
                 {/* Speaker label */}
@@ -515,8 +515,8 @@ export default function ConversationsSection() {
                   <span
                     className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
                       isA
-                        ? 'bg-rose-200 text-rose-700 dark:bg-rose-800/60 dark:text-rose-200'
-                        : 'bg-sky-200 text-sky-700 dark:bg-sky-800/60 dark:text-sky-200'
+                        ? 'bg-[var(--clr-danger)]/20 text-[var(--clr-danger)] dark:bg-[var(--clr-danger)]/60/60 dark:text-[var(--clr-danger)]'
+                        : 'bg-[var(--clr-info)]/20 text-[var(--clr-info)] dark:bg-[var(--clr-info)]/60 dark:text-[var(--clr-info)]'
                     }`}
                   >
                     المتحدث {turn.speaker}
@@ -562,9 +562,9 @@ export default function ConversationsSection() {
                       className={`text-base sm:text-lg font-bold leading-relaxed font-chinese-serif ${
                         isQuizTurn && isRevealed
                           ? isCorrectAnswer
-                            ? 'text-emerald-600 dark:text-emerald-400'
+                            ? 'text-[var(--clr-success)] dark:text-[var(--clr-success)]'
                             : selectedOption !== null
-                            ? 'text-rose-600 dark:text-rose-400'
+                            ? 'text-[var(--clr-danger)] dark:text-[var(--clr-danger)]'
                             : 'text-foreground'
                           : 'text-foreground'
                       }`}
@@ -577,15 +577,15 @@ export default function ConversationsSection() {
                       <div className="flex items-center gap-1 mt-1">
                         {isCorrectAnswer ? (
                           <>
-                            <Check className="w-4 h-4 text-emerald-500" />
-                            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-arabic">
+                            <Check className="w-4 h-4 text-[var(--clr-success)]" />
+                            <span className="text-[11px] text-[var(--clr-success)] dark:text-[var(--clr-success)] font-arabic">
                               صحيح!
                             </span>
                           </>
                         ) : (
                           <>
-                            <X className="w-4 h-4 text-rose-500" />
-                            <span className="text-[11px] text-rose-600 dark:text-rose-400 font-arabic">
+                            <X className="w-4 h-4 text-[var(--clr-danger)]" />
+                            <span className="text-[11px] text-[var(--clr-danger)] dark:text-[var(--clr-danger)] font-arabic">
                               خطأ — الإجابة الصحيحة: {turn.hanzi}
                             </span>
                           </>
@@ -620,10 +620,10 @@ export default function ConversationsSection() {
           variant="outline"
           size="sm"
           className="gap-1.5 text-xs"
-          disabled={selectedId <= 1}
+          disabled={!selectedId || selectedId <= 1}
           onClick={() => {
             handleBack()
-            setTimeout(() => setSelectedId(selectedId - 1), 0)
+            setTimeout(() => selectedId && setSelectedId(selectedId - 1), 0)
           }}
         >
           <ChevronRight className="w-4 h-4" />
@@ -636,10 +636,10 @@ export default function ConversationsSection() {
           variant="outline"
           size="sm"
           className="gap-1.5 text-xs"
-          disabled={selectedId >= conversations.length}
+          disabled={!selectedId || selectedId >= conversations.length}
           onClick={() => {
             handleBack()
-            setTimeout(() => setSelectedId(selectedId + 1), 0)
+            setTimeout(() => selectedId && setSelectedId(selectedId + 1), 0)
           }}
         >
           التالي

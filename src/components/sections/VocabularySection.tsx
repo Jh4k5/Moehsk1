@@ -102,7 +102,7 @@ export default function VocabularySection({ filteredVocab, searchQuery, setSearc
       {vocabTab === 'favorites' && (
         <div className="space-y-3">
           {bookmarkedVocab.length === 0 ? (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-12 gap-3">
                 <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
                   <BookmarkPlus className="w-7 h-7 text-gray-400" />
@@ -228,7 +228,7 @@ export default function VocabularySection({ filteredVocab, searchQuery, setSearc
           </div>
           {/* Character Decomposition / Radicals */}
           {word && word.radicals && word.radicals.length > 0 && (
-            <Card className="border-0 shadow-sm bg-gradient-to-l from-purple-50 to-indigo-50/50">
+            <Card className="j-card border-0 shadow-sm bg-gradient-to-l from-purple-50 to-indigo-50/50">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Zap className="w-4 h-4 text-purple-500" />
@@ -266,7 +266,7 @@ export default function VocabularySection({ filteredVocab, searchQuery, setSearc
       )}
       {/* Word List (List Tab) */}
       {vocabTab === 'list' && (
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <div className="max-h-[500px] overflow-y-auto custom-scrollbar space-y-1 p-2">
           {filteredVocab.map((w) => (
             <button

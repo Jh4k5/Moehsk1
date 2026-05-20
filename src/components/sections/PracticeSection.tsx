@@ -106,7 +106,7 @@ function ListeningQuizTab() {
 
   if (!lqActive) {
     return (
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
           <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-950 dark:to-blue-950 flex items-center justify-center">
             <Headphones className="w-8 h-8 text-cyan-600 dark:text-cyan-400" />
@@ -127,7 +127,7 @@ function ListeningQuizTab() {
   if (lqFinished) {
     const pct = Math.round((lqScore / LISTEN_TOTAL) * 100)
     return (
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardContent className="flex flex-col items-center justify-center py-12 gap-6">
           <Trophy className={`w-20 h-20 ${lqScore >= LISTEN_TOTAL * 0.7 ? 'text-yellow-500' : 'text-gray-400 dark:text-gray-500'}`} />
           <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getListeningScoreMessage(lqScore, LISTEN_TOTAL)}</h3>
@@ -153,7 +153,7 @@ function ListeningQuizTab() {
       <Progress value={(lqRound / LISTEN_TOTAL) * 100} className="h-2" />
       {lqWord && (
         <>
-          <Card className="border-0 shadow-sm bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-950/50 dark:to-blue-950/50">
+          <Card className="j-card border-0 shadow-sm bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-950/50 dark:to-blue-950/50">
             <CardContent className="p-6 text-center space-y-4">
               <div className="text-xs text-cyan-600 dark:text-cyan-400 font-medium">ما معنى ما تسمعه؟</div>
               <button
@@ -298,7 +298,7 @@ function PinyinQuizTab() {
 
   if (!pyActive) {
     return (
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
           <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-red-100 to-orange-100 flex items-center justify-center">
             <Type className="w-8 h-8 text-red-500" />
@@ -318,7 +318,7 @@ function PinyinQuizTab() {
 
   if (pyFinished) {
     return (
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardContent className="flex flex-col items-center justify-center py-12 gap-6">
           <Trophy className={`w-20 h-20 ${pyScore >= PINYIN_TOTAL * 0.7 ? 'text-yellow-500' : 'text-gray-400'}`} />
           <h3 className="text-2xl font-bold text-gray-900">{getPinyinScoreMessage(pyScore, PINYIN_TOTAL)}</h3>
@@ -343,7 +343,7 @@ function PinyinQuizTab() {
       <Progress value={(pyRound / PINYIN_TOTAL) * 100} className="h-2" />
       {pyWord && (
         <>
-          <Card className="border-0 shadow-sm bg-gradient-to-br from-red-50 to-orange-50">
+          <Card className="j-card border-0 shadow-sm bg-gradient-to-br from-red-50 to-orange-50">
             <CardContent className="p-6 text-center space-y-3">
               <div className="text-xs text-red-500 font-medium">ما هو نطق هذا الحرف؟</div>
               <div
@@ -539,7 +539,7 @@ export function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQu
         {/* Quiz Tab */}
         <TabsContent value="quiz" className="space-y-4">
           {!quizQuestions.length ? (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
                 <Brain className="w-16 h-16 text-gray-300" />
                 <h3 className="text-lg font-bold text-gray-700">اختبار المفردات</h3>
@@ -564,7 +564,7 @@ export function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQu
               </CardContent>
             </Card>
           ) : !quizFinished ? (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="p-6 space-y-6">
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>السؤال {currentQuizQuestion + 1} من {quizTotal}</span>
@@ -636,7 +636,7 @@ export function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQu
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-12 gap-6">
                 <Trophy className={`w-20 h-20 ${quizScore >= quizTotal * 0.8 ? 'text-yellow-500' : 'text-gray-400'}`} />
                 <h3 className="text-2xl font-bold text-gray-900">
@@ -654,7 +654,7 @@ export function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQu
         {/* Fill Blank Tab */}
         <TabsContent value="fill" className="space-y-4">
           {!fillBlankWord ? (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
                 <Languages className="w-16 h-16 text-gray-300" />
                 <h3 className="text-lg font-bold text-gray-700">اكتب الكلمة الصينية</h3>
@@ -667,7 +667,7 @@ export function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQu
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="p-6 space-y-6">
                 <div className="text-center space-y-2">
                   <div className="text-xl font-bold text-gray-900">{fillBlankWord.meaning}</div>
@@ -704,7 +704,7 @@ export function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQu
         {/* Match Tab */}
         <TabsContent value="match" className="space-y-4">
           {!matchPairs.length ? (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
                 <ArrowLeftRight className="w-16 h-16 text-gray-300" />
                 <h3 className="text-lg font-bold text-gray-700">طابق الأزواج</h3>

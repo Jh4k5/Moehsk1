@@ -23,9 +23,9 @@ export function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame
   toneAnswer: number | null
   setToneAnswer: (a: number | null) => void
   toneScore: number
-  setToneScore: (s: number) => void
+  setToneScore: React.Dispatch<React.SetStateAction<number>>
   toneRound: number
-  setToneRound: (r: number) => void
+  setToneRound: React.Dispatch<React.SetStateAction<number>>
 }) {
   const store = useLearningStore()
   const { memoryCards, memoryMoves, memoryPairs, incrementStreak } = store
@@ -139,7 +139,7 @@ export function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame
         {/* Memory Game (Fixed) */}
         <TabsContent value="memory" className="space-y-4">
           {!memoryCards.length ? (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
                 <div className="text-6xl">🧠</div>
                 <h3 className="text-lg font-bold text-gray-700">لعبة الذاكرة</h3>
@@ -222,7 +222,7 @@ export function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame
         {/* Tone Game (Enhanced) */}
         <TabsContent value="tone" className="space-y-4">
           {toneRound >= tonePairs.length && toneAnswer !== null ? (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-12 gap-4">
                 <Trophy className={`w-16 h-16 ${toneScore >= Math.floor(tonePairs.length * 0.8) ? 'text-yellow-500' : 'text-gray-400'}`} />
                 <h3 className="text-xl font-bold text-gray-900">انتهت اللعبة!</h3>
@@ -233,7 +233,7 @@ export function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame
               </CardContent>
             </Card>
           ) : toneRound < tonePairs.length ? (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="p-6 space-y-6">
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>الجولة {toneRound + 1}/{tonePairs.length}</span>
@@ -277,7 +277,7 @@ export function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-0 shadow-sm">
+            <Card className="j-card border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
                 <div className="text-6xl">🎵</div>
                 <h3 className="text-lg font-bold text-gray-700">لعبة تمييز النبرات</h3>
@@ -352,7 +352,7 @@ export function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame
                 </div>
               </div>
               {/* Word Card */}
-              <Card className="border-0 shadow-lg overflow-hidden">
+              <Card className="j-card border-0 shadow-lg overflow-hidden">
                 <CardContent className="p-8 text-center bg-gradient-to-br from-white to-amber-50">
                   {speedGameOver ? (
                     <div>

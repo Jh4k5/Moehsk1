@@ -32,7 +32,7 @@ export function PronunciationSection() {
         </div>
       </div>
       {/* Tone Chart */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">\uD83C\uDFB5 النبرات الأربع</CardTitle>
         </CardHeader>
@@ -74,7 +74,7 @@ export function PronunciationSection() {
         </CardContent>
       </Card>
       {/* Tone Rules */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Lightbulb className="w-4 h-4 text-amber-500" />
@@ -106,7 +106,7 @@ export function PronunciationSection() {
         </CardContent>
       </Card>
       {/* Tone Practice with ma syllable */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Brain className="w-4 h-4 text-purple-500" />

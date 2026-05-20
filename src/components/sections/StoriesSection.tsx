@@ -99,7 +99,7 @@ export function StoriesSection({ activeStory, setActiveStory, storyAnswers, setS
         <span className="text-sm font-medium text-gray-600">{Object.keys(storyAnswers).length}/{stories[activeStory].questions.length}</span>
       </div>
       {/* Story Content */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between">
             <div>
@@ -130,7 +130,7 @@ export function StoriesSection({ activeStory, setActiveStory, storyAnswers, setS
       {/* Gradient Divider */}
       <hr className="gradient-divider" />
       {/* Comprehension Questions */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Brain className="w-5 h-5 text-amber-500" />

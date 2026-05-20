@@ -50,7 +50,7 @@ const tones: ToneData[] = [
     example: '麻',
     pinyin: 'má',
     meaning: 'قنب / خدر',
-    color: '#22c55e',
+    color: 'var(--clr-success)',
   },
   {
     number: 3,
@@ -70,7 +70,7 @@ const tones: ToneData[] = [
     example: '骂',
     pinyin: 'mà',
     meaning: 'يشتم',
-    color: '#ef4444',
+    color: 'var(--clr-danger)',
   },
   {
     number: 0,
@@ -87,9 +87,9 @@ const tones: ToneData[] = [
 // ─── Ma Comparison ──────────────────────────────────────────
 const maComparison = [
   { char: '妈', pinyin: 'mā', meaning: 'أم', tone: 1, color: '#3b82f6' },
-  { char: '麻', pinyin: 'má', meaning: 'قنب', tone: 2, color: '#22c55e' },
+  { char: '麻', pinyin: 'má', meaning: 'قنب', tone: 2, color: 'var(--clr-success)' },
   { char: '马', pinyin: 'mǎ', meaning: 'حصان', tone: 3, color: '#f97316' },
-  { char: '骂', pinyin: 'mà', meaning: 'يشتم', tone: 4, color: '#ef4444' },
+  { char: '骂', pinyin: 'mà', meaning: 'يشتم', tone: 4, color: 'var(--clr-danger)' },
 ]
 
 // ─── Initials Data ──────────────────────────────────────────
@@ -405,28 +405,28 @@ export default function PinyinHub() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h2 className="text-3xl font-bold text-red-700 flex items-center justify-center gap-3">
+        <h2 className="text-3xl font-bold text-[var(--clr-danger)] flex items-center justify-center gap-3">
           <Headphones className="w-8 h-8" />
           مركز تعلّم البينيين
         </h2>
-        <p className="text-gray-500 text-sm">تعلّم أصوات ونبرات اللغة الصينية بطريقة تفاعلية ومرئية</p>
+        <p className="text-[var(--text-muted)] text-sm">تعلّم أصوات ونبرات اللغة الصينية بطريقة تفاعلية ومرئية</p>
       </motion.div>
 
       <Tabs defaultValue="tones" className="w-full" dir="rtl">
-        <TabsList className="grid grid-cols-4 gap-1 h-auto p-1 bg-red-50">
-          <TabsTrigger value="tones" className="text-xs sm:text-sm data-[state=active]:bg-red-600 data-[state=active]:text-white">
+        <TabsList className="grid grid-cols-4 gap-1 h-auto p-1 bg-[var(--clr-danger-bg)]">
+          <TabsTrigger value="tones" className="text-xs sm:text-sm data-[state=active]:bg-[var(--clr-danger)] data-[state=active]:text-white">
             <span className="hidden sm:inline ml-1">🎵</span>
             النبرات
           </TabsTrigger>
-          <TabsTrigger value="initials" className="text-xs sm:text-sm data-[state=active]:bg-red-600 data-[state=active]:text-white">
+          <TabsTrigger value="initials" className="text-xs sm:text-sm data-[state=active]:bg-[var(--clr-danger)] data-[state=active]:text-white">
             <span className="hidden sm:inline ml-1">🔤</span>
             الحروف الأولية
           </TabsTrigger>
-          <TabsTrigger value="finals" className="text-xs sm:text-sm data-[state=active]:bg-red-600 data-[state=active]:text-white">
+          <TabsTrigger value="finals" className="text-xs sm:text-sm data-[state=active]:bg-[var(--clr-danger)] data-[state=active]:text-white">
             <span className="hidden sm:inline ml-1">🔠</span>
             الحروف الأخيرة
           </TabsTrigger>
-          <TabsTrigger value="rules" className="text-xs sm:text-sm data-[state=active]:bg-red-600 data-[state=active]:text-white">
+          <TabsTrigger value="rules" className="text-xs sm:text-sm data-[state=active]:bg-[var(--clr-danger)] data-[state=active]:text-white">
             <span className="hidden sm:inline ml-1">📖</span>
             قواعد خاصة
           </TabsTrigger>
@@ -457,7 +457,7 @@ export default function PinyinHub() {
                       >
                         {tone.label}
                       </div>
-                      <h3 className="font-bold text-sm text-gray-800">{tone.nameAr}</h3>
+                      <h3 className="font-bold text-sm text-[var(--text-primary)]">{tone.nameAr}</h3>
                     </div>
 
                     {/* SVG Tone Curve */}
@@ -466,15 +466,15 @@ export default function PinyinHub() {
                     </div>
 
                     {/* Description */}
-                    <p className="text-xs text-gray-500 leading-relaxed">{tone.description}</p>
+                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">{tone.description}</p>
 
                     {/* Example */}
-                    <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3">
+                    <div className="flex items-center justify-between bg-[var(--surface-card-h)] rounded-xl p-3">
                       <div className="flex items-center gap-3">
                         <span className="font-chinese-serif text-3xl">{tone.example}</span>
                         <div>
-                          <span className="text-sm font-chinese-sans text-gray-700 block">{tone.pinyin}</span>
-                          <span className="text-xs text-gray-400">{tone.meaning}</span>
+                          <span className="text-sm font-chinese-sans text-[var(--text-secondary)] block">{tone.pinyin}</span>
+                          <span className="text-xs text-[var(--text-muted)]">{tone.meaning}</span>
                         </div>
                       </div>
                       <SpeakButton text={tone.example} size="md" />
@@ -493,22 +493,22 @@ export default function PinyinHub() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <Card className="border-2 border-red-200 overflow-hidden">
-              <CardHeader className="pb-3 bg-red-50">
-                <CardTitle className="flex items-center gap-2 text-lg text-red-700">
+            <Card className="border-2 border-[var(--clr-danger)]/30 overflow-hidden">
+              <CardHeader className="pb-3 bg-[var(--clr-danger-bg)]">
+                <CardTitle className="flex items-center gap-2 text-lg text-[var(--clr-danger)]">
                   <BookOpen className="w-5 h-5" />
                   مقارنة النبرات الكلاسيكية — ma
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-[var(--text-muted)] mb-4">
                   الكلمة نفسها &quot;ma&quot; تغيّر معناها بالكامل حسب النبرة! هذه أشهر أمثلة أهمية النبرات في الصينية:
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {maComparison.map((m) => (
                     <motion.div
                       key={m.tone}
-                      className="text-center cursor-pointer p-4 rounded-xl hover:shadow-md transition-all bg-white border"
+                      className="text-center cursor-pointer p-4 rounded-xl hover:shadow-md transition-all bg-[var(--surface-card)] border"
                       style={{ borderBottom: '4px solid ' + m.color }}
                       onClick={() => speak(m.char)}
                       whileHover={{ scale: 1.03 }}
@@ -516,7 +516,7 @@ export default function PinyinHub() {
                     >
                       <div className="font-chinese-serif text-4xl mb-2">{m.char}</div>
                       <div className="font-chinese-sans text-sm font-semibold mb-1">{m.pinyin}</div>
-                      <div className="text-xs text-gray-500">{m.meaning}</div>
+                      <div className="text-xs text-[var(--text-muted)]">{m.meaning}</div>
                       <div className="mt-2 flex justify-center">
                         <ToneCurveSVG toneNumber={m.tone} color={m.color} size="sm" />
                       </div>
@@ -535,10 +535,10 @@ export default function PinyinHub() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="border-blue-100 bg-blue-50">
+            <Card className="border-[var(--clr-info)]/20 bg-[var(--clr-info-bg)]">
               <CardContent className="p-4 flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
-                <div className="text-sm text-blue-800">
+                <Info className="w-5 h-5 text-[var(--clr-info)] mt-0.5 shrink-0" />
+                <div className="text-sm text-[var(--clr-info)]">
                   <p className="font-semibold mb-1">الحروف الأولية (声母) — 23 حرفاً</p>
                   <p>هذه هي الأصوات التي تبدأ بها المقاطع الصينية. بعضها يشبه أصوات العربية الموجودة، والبعض الآخر جديد تماماً ويتطلب تدريباً خاصاً.</p>
                 </div>
@@ -557,27 +557,27 @@ export default function PinyinHub() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b bg-red-50">
-                        <th className="p-3 text-right font-semibold text-red-700 rounded-tr-lg">الحرف</th>
-                        <th className="p-3 text-right font-semibold text-red-700">مثال</th>
-                        <th className="p-3 text-right font-semibold text-red-700">المعنى</th>
-                        <th className="p-3 text-right font-semibold text-red-700">IPA</th>
-                        <th className="p-3 text-right font-semibold text-red-700">الشرح بالعربية</th>
-                        <th className="p-3 text-center font-semibold text-red-700 rounded-tl-lg">🔊</th>
+                      <tr className="border-b bg-[var(--clr-danger-bg)]">
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)] rounded-tr-lg">الحرف</th>
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)]">مثال</th>
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)]">المعنى</th>
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)]">IPA</th>
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)]">الشرح بالعربية</th>
+                        <th className="p-3 text-center font-semibold text-[var(--clr-danger)] rounded-tl-lg">🔊</th>
                       </tr>
                     </thead>
                     <tbody>
                       {initials.map((item, idx) => (
                         <motion.tr
                           key={item.letter}
-                          className="border-b hover:bg-red-50 transition-colors"
+                          className="border-b hover:bg-[var(--clr-danger-bg)] transition-colors"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: idx * 0.03 }}
                         >
                           <td className="p-3">
                             <div className="flex items-center gap-2">
-                              <span className="text-2xl font-bold text-red-700 font-mono">{item.letter}</span>
+                              <span className="text-2xl font-bold text-[var(--clr-danger)] font-mono">{item.letter}</span>
                               <Badge
                                 variant={item.similarToArabic ? 'default' : 'destructive'}
                                 className="text-[10px] px-1.5 py-0"
@@ -589,9 +589,9 @@ export default function PinyinHub() {
                           <td className="p-3">
                             <span className="font-chinese-serif text-lg">{item.example}</span>
                           </td>
-                          <td className="p-3 text-gray-600">{item.exampleMeaning}</td>
-                          <td className="p-3 font-mono text-xs text-gray-500">{item.ipa}</td>
-                          <td className="p-3 text-xs text-gray-600 max-w-[200px]">{item.arabicExplanation}</td>
+                          <td className="p-3 text-[var(--text-tertiary)]">{item.exampleMeaning}</td>
+                          <td className="p-3 font-mono text-xs text-[var(--text-muted)]">{item.ipa}</td>
+                          <td className="p-3 text-xs text-[var(--text-tertiary)] max-w-[200px]">{item.arabicExplanation}</td>
                           <td className="p-3 text-center">
                             <SpeakButton text={item.exampleChar} />
                           </td>
@@ -605,10 +605,10 @@ export default function PinyinHub() {
           </motion.div>
 
           {/* Summary note */}
-          <Card className="border-amber-200 bg-amber-50">
+          <Card className="border-[var(--clr-warning)]/30 bg-[var(--clr-warning-bg)]">
             <CardContent className="p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
-              <div className="text-sm text-amber-800">
+              <AlertCircle className="w-5 h-5 text-[var(--clr-warning)] mt-0.5 shrink-0" />
+              <div className="text-sm text-[var(--clr-warning)]">
                 <p className="font-semibold mb-1">ملاحظة عن التشابه مع العربية</p>
                 <p>
                   الأصوات المألوفة: b, p, m, f, d, t, n, l, g, k, s, w — لها نظائر في العربية.
@@ -626,10 +626,10 @@ export default function PinyinHub() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="border-green-100 bg-green-50">
+            <Card className="border-[var(--clr-success)]/20 bg-[var(--clr-success-bg)]">
               <CardContent className="p-4 flex items-start gap-3">
-                <Info className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />
-                <div className="text-sm text-green-800">
+                <Info className="w-5 h-5 text-[var(--clr-success)] mt-0.5 shrink-0" />
+                <div className="text-sm text-[var(--clr-success)]">
                   <p className="font-semibold mb-1">الحروف الأخيرة (韵母) — 24 حرفاً</p>
                   <p>هذه هي الأصوات التي تنتهي بها المقاطع الصينية. تُنطق مع الحروف الأولية لتكوين المقاطع الكاملة مثل &quot;ma&quot; (م + ا).</p>
                 </div>
@@ -648,27 +648,27 @@ export default function PinyinHub() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b bg-red-50">
-                        <th className="p-3 text-right font-semibold text-red-700 rounded-tr-lg">الحرف الأخير</th>
-                        <th className="p-3 text-right font-semibold text-red-700">مثال</th>
-                        <th className="p-3 text-right font-semibold text-red-700">المعنى</th>
-                        <th className="p-3 text-right font-semibold text-red-700">IPA</th>
-                        <th className="p-3 text-right font-semibold text-red-700">الشرح بالعربية</th>
-                        <th className="p-3 text-center font-semibold text-red-700 rounded-tl-lg">🔊</th>
+                      <tr className="border-b bg-[var(--clr-danger-bg)]">
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)] rounded-tr-lg">الحرف الأخير</th>
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)]">مثال</th>
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)]">المعنى</th>
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)]">IPA</th>
+                        <th className="p-3 text-right font-semibold text-[var(--clr-danger)]">الشرح بالعربية</th>
+                        <th className="p-3 text-center font-semibold text-[var(--clr-danger)] rounded-tl-lg">🔊</th>
                       </tr>
                     </thead>
                     <tbody>
                       {finals.map((item, idx) => (
                         <motion.tr
                           key={item.final}
-                          className="border-b hover:bg-red-50 transition-colors"
+                          className="border-b hover:bg-[var(--clr-danger-bg)] transition-colors"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: idx * 0.03 }}
                         >
                           <td className="p-3">
                             <div className="flex items-center gap-2">
-                              <span className="text-2xl font-bold text-red-700 font-mono">{item.final}</span>
+                              <span className="text-2xl font-bold text-[var(--clr-danger)] font-mono">{item.final}</span>
                               <Badge
                                 variant={item.similarToArabic ? 'default' : 'destructive'}
                                 className="text-[10px] px-1.5 py-0"
@@ -680,9 +680,9 @@ export default function PinyinHub() {
                           <td className="p-3">
                             <span className="font-chinese-serif text-lg">{item.example}</span>
                           </td>
-                          <td className="p-3 text-gray-600">{item.exampleMeaning}</td>
-                          <td className="p-3 font-mono text-xs text-gray-500">{item.ipa}</td>
-                          <td className="p-3 text-xs text-gray-600 max-w-[200px]">{item.arabicExplanation}</td>
+                          <td className="p-3 text-[var(--text-tertiary)]">{item.exampleMeaning}</td>
+                          <td className="p-3 font-mono text-xs text-[var(--text-muted)]">{item.ipa}</td>
+                          <td className="p-3 text-xs text-[var(--text-tertiary)] max-w-[200px]">{item.arabicExplanation}</td>
                           <td className="p-3 text-center">
                             <SpeakButton text={item.exampleChar} />
                           </td>
@@ -703,10 +703,10 @@ export default function PinyinHub() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="border-purple-100 bg-purple-50">
+            <Card className="border-[var(--clr-primary)]/20 bg-[var(--clr-primary)]/10">
               <CardContent className="p-4 flex items-start gap-3">
-                <BookOpen className="w-5 h-5 text-purple-600 mt-0.5 shrink-0" />
-                <div className="text-sm text-purple-800">
+                <BookOpen className="w-5 h-5 text-[var(--clr-primary)] mt-0.5 shrink-0" />
+                <div className="text-sm text-[var(--clr-primary)]">
                   <p className="font-semibold mb-1">قواعد خاصة في البينيين</p>
                   <p>هذه القواعد الاستثنائية مهمة جداً للنطق الصحيح. ركّز عليها لأنها تُحدث فرقاً كبيراً في فهمك وواضحية نطقك.</p>
                 </div>
@@ -723,9 +723,9 @@ export default function PinyinHub() {
               transition={{ delay: ruleIdx * 0.15 }}
             >
               <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3 bg-red-50 border-b border-red-100">
-                  <CardTitle className="flex items-center gap-2 text-lg text-red-700">
-                    <span className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-sm font-bold">
+                <CardHeader className="pb-3 bg-[var(--clr-danger-bg)] border-b border-[var(--clr-danger)]/20">
+                  <CardTitle className="flex items-center gap-2 text-lg text-[var(--clr-danger)]">
+                    <span className="w-8 h-8 rounded-full bg-[var(--clr-danger)] text-white flex items-center justify-center text-sm font-bold">
                       {ruleIdx + 1}
                     </span>
                     {rule.titleAr}
@@ -733,14 +733,14 @@ export default function PinyinHub() {
                 </CardHeader>
                 <CardContent className="p-5 space-y-4">
                   {/* Description */}
-                  <p className="text-sm text-gray-600 leading-relaxed">{rule.description}</p>
+                  <p className="text-sm text-[var(--text-tertiary)] leading-relaxed">{rule.description}</p>
 
                   {/* Examples */}
                   <div className="space-y-3">
                     {rule.examples.map((ex, exIdx) => (
                       <motion.div
                         key={exIdx}
-                        className="flex flex-col sm:flex-row sm:items-center gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100"
+                        className="flex flex-col sm:flex-row sm:items-center gap-3 bg-[var(--surface-card-h)] rounded-xl p-4 border border-[var(--line-subtle)]"
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: ruleIdx * 0.15 + exIdx * 0.1 }}
@@ -748,7 +748,7 @@ export default function PinyinHub() {
                         {/* Chinese characters */}
                         <div className="flex items-center gap-3 shrink-0">
                           <span
-                            className="font-chinese-serif text-3xl cursor-pointer hover:text-red-600 transition-colors"
+                            className="font-chinese-serif text-3xl cursor-pointer hover:text-[var(--clr-danger)] transition-colors"
                             onClick={() => speak(ex.chars)}
                           >
                             {ex.chars}
@@ -759,13 +759,13 @@ export default function PinyinHub() {
                         {/* Pinyin + meaning */}
                         <div className="flex-1 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-chinese-sans text-sm font-semibold text-red-700">{ex.pinyin}</span>
-                            <span className="text-gray-400">→</span>
-                            <span className="font-chinese-sans text-sm font-mono text-gray-500">{ex.pinyinModified}</span>
+                            <span className="font-chinese-sans text-sm font-semibold text-[var(--clr-danger)]">{ex.pinyin}</span>
+                            <span className="text-[var(--text-muted)]">→</span>
+                            <span className="font-chinese-sans text-sm font-mono text-[var(--text-muted)]">{ex.pinyinModified}</span>
                           </div>
-                          <div className="text-xs text-gray-600">
+                          <div className="text-xs text-[var(--text-tertiary)]">
                             <span className="font-semibold">{ex.meaning}</span>
-                            <span className="mx-2 text-gray-300">|</span>
+                            <span className="mx-2 text-[var(--text-muted)]">|</span>
                             {ex.explanation}
                           </div>
                         </div>
@@ -774,9 +774,9 @@ export default function PinyinHub() {
                   </div>
 
                   {/* Tip */}
-                  <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-3 border border-amber-200">
-                    <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-                    <p className="text-xs text-amber-700">{rule.tip}</p>
+                  <div className="flex items-start gap-2 bg-[var(--clr-warning-bg)] rounded-lg p-3 border border-[var(--clr-warning)]/30">
+                    <AlertCircle className="w-4 h-4 text-[var(--clr-warning)] mt-0.5 shrink-0" />
+                    <p className="text-xs text-[var(--clr-warning)]">{rule.tip}</p>
                   </div>
                 </CardContent>
               </Card>

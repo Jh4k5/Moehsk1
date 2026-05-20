@@ -39,16 +39,16 @@ function saveUnlockedIds(ids: string[]) {
 
 // ─── Icon map for achievements ────────────────────────────────────────
 const achievementIcons: Record<string, React.ReactNode> = {
-  first_word: <Star className="h-5 w-5 text-amber-400" />,
-  fifty_words: <Star className="h-5 w-5 text-amber-400" />,
-  hundred_words: <Star className="h-5 w-5 text-amber-300" />,
-  all_words: <Trophy className="h-5 w-5 text-amber-300" />,
-  streak_7: <Flame className="h-5 w-5 text-orange-400" />,
-  streak_30: <Flame className="h-5 w-5 text-red-400" />,
-  perfect_pron: <Mic className="h-5 w-5 text-amber-400" />,
-  first_exam_pass: <Scroll className="h-5 w-5 text-amber-400" />,
-  hanzi_writer: <PenTool className="h-5 w-5 text-amber-400" />,
-  conv_master: <MessageCircle className="h-5 w-5 text-amber-400" />,
+  first_word: <Star className="h-5 w-5 text-[var(--clr-warning)]" />,
+  fifty_words: <Star className="h-5 w-5 text-[var(--clr-warning)]" />,
+  hundred_words: <Star className="h-5 w-5 text-[var(--clr-warning)]" />,
+  all_words: <Trophy className="h-5 w-5 text-[var(--clr-warning)]" />,
+  streak_7: <Flame className="h-5 w-5 text-[var(--clr-energy)]" />,
+  streak_30: <Flame className="h-5 w-5 text-[var(--clr-danger)]" />,
+  perfect_pron: <Mic className="h-5 w-5 text-[var(--clr-warning)]" />,
+  first_exam_pass: <Scroll className="h-5 w-5 text-[var(--clr-warning)]" />,
+  hanzi_writer: <PenTool className="h-5 w-5 text-[var(--clr-warning)]" />,
+  conv_master: <MessageCircle className="h-5 w-5 text-[var(--clr-warning)]" />,
 }
 
 // ─── Component ────────────────────────────────────────────────────────
@@ -140,8 +140,8 @@ export default function AchievementsSection() {
       {/* ── Header ─────────────────────────────────────────────── */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-700/20 border border-amber-600/30">
-            <Trophy className="h-6 w-6 text-amber-400" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--clr-warning)]/20 to-amber-700/20 border border-[var(--clr-warning)]/30">
+            <Trophy className="h-6 w-6 text-[var(--clr-warning)]" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-foreground sm:text-2xl">
@@ -152,12 +152,12 @@ export default function AchievementsSection() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-900/20 to-amber-950/10 border border-amber-600/20 px-4 py-2">
-          <Star className="h-5 w-5 text-amber-400" />
-          <span className="text-2xl font-bold text-amber-400 sm:text-3xl">
+        <div className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[var(--clr-warning)]/20 to-amber-950/10 border border-[var(--clr-warning)]/20 px-4 py-2">
+          <Star className="h-5 w-5 text-[var(--clr-warning)]" />
+          <span className="text-2xl font-bold text-[var(--clr-warning)] sm:text-3xl">
             {totalPoints}
           </span>
-          <span className="text-sm text-amber-400/70">نقطة</span>
+          <span className="text-sm text-[var(--clr-warning)]/70">نقطة</span>
         </div>
       </div>
 
@@ -169,14 +169,14 @@ export default function AchievementsSection() {
           </span>
           <Badge
             variant="outline"
-            className="border-amber-600/30 text-amber-400 text-xs"
+            className="border-[var(--clr-warning)]/30 text-[var(--clr-warning)] text-xs"
           >
             {progressPercent}%
           </Badge>
         </div>
-        <div className="h-3 w-full overflow-hidden rounded-full bg-gray-800/50 border border-gray-700/50">
+        <div className="h-3 w-full overflow-hidden rounded-full bg-[var(--surface-card)]/50 border border-[var(--line-medium)]/50">
           <motion.div
-            className="h-full rounded-full bg-gradient-to-l from-amber-500 to-amber-600"
+            className="h-full rounded-full bg-gradient-to-l from-[var(--clr-warning)] to-[var(--clr-warning)]"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -200,29 +200,29 @@ export default function AchievementsSection() {
               <div
                 className={`rounded-xl p-4 text-center transition-all duration-300 border ${
                   isUnlocked
-                    ? 'bg-gradient-to-b from-amber-900/30 to-amber-950/20 border-amber-600/50 hover:shadow-lg hover:shadow-amber-500/10 cursor-default'
-                    : 'bg-gray-900/50 border-gray-800 opacity-50 cursor-default'
+                    ? 'bg-gradient-to-b from-[var(--clr-warning)]/30 to-amber-950/20 border-[var(--clr-warning)]/50 hover:shadow-lg hover:shadow-amber-500/10 cursor-default'
+                    : 'bg-[var(--surface-card)]/50 border-[var(--line-medium)] opacity-50 cursor-default'
                 }`}
               >
                 {/* Emoji / Lock Icon */}
                 <div
                   className={`mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full ${
                     isUnlocked
-                      ? 'bg-gradient-to-br from-amber-500/20 to-amber-700/10'
-                      : 'bg-gray-800/80'
+                      ? 'bg-gradient-to-br from-[var(--clr-warning)]/20 to-amber-700/10'
+                      : 'bg-[var(--surface-card)]/80'
                   }`}
                 >
                   {isUnlocked ? (
                     <span className="text-3xl">{achievement.emoji}</span>
                   ) : (
-                    <Lock className="h-5 w-5 text-gray-500" />
+                    <Lock className="h-5 w-5 text-[var(--text-muted)]" />
                   )}
                 </div>
 
                 {/* Title */}
                 <h3
                   className={`mb-1 text-sm font-semibold leading-tight ${
-                    isUnlocked ? 'text-amber-100' : 'text-gray-500'
+                    isUnlocked ? 'text-[var(--clr-warning)]' : 'text-[var(--text-muted)]'
                   }`}
                 >
                   {isUnlocked ? achievement.titleAr : '???'}
@@ -230,7 +230,7 @@ export default function AchievementsSection() {
 
                 {/* Description (only for unlocked) */}
                 {isUnlocked && (
-                  <p className="mb-2 text-xs text-gray-400 leading-relaxed line-clamp-2">
+                  <p className="mb-2 text-xs text-[var(--text-muted)] leading-relaxed line-clamp-2">
                     {achievement.descAr}
                   </p>
                 )}
@@ -239,14 +239,14 @@ export default function AchievementsSection() {
                 {isUnlocked ? (
                   <Badge
                     variant="secondary"
-                    className="mt-2 bg-amber-500/10 border border-amber-600/20"
+                    className="mt-2 bg-[var(--clr-warning)]/10 border border-[var(--clr-warning)]/20"
                   >
-                    <span className="text-amber-400 font-bold text-sm">
+                    <span className="text-[var(--clr-warning)] font-bold text-sm">
                       +{achievement.points} نقطة
                     </span>
                   </Badge>
                 ) : (
-                  <div className="mt-2 text-xs text-gray-600">
+                  <div className="mt-2 text-xs text-[var(--text-tertiary)]">
                     <Star className="inline h-3 w-3 ml-1" />
                     {achievement.points} نقطة
                   </div>
@@ -279,24 +279,24 @@ export default function AchievementsSection() {
             }}
             className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2"
           >
-            <div className="flex items-center gap-3 rounded-xl border-2 border-amber-500/60 bg-gradient-to-r from-amber-950/90 via-gray-900/95 to-amber-950/90 px-5 py-4 shadow-2xl shadow-amber-500/10 backdrop-blur-sm min-w-[280px] sm:min-w-[340px]">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500/30 to-amber-700/20 border border-amber-500/30">
+            <div className="flex items-center gap-3 rounded-xl border-2 border-[var(--clr-warning)]/60 bg-gradient-to-r from-amber-950/90 via-gray-900/95 to-amber-950/90 px-5 py-4 shadow-2xl shadow-amber-500/10 backdrop-blur-sm min-w-[280px] sm:min-w-[340px]">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--clr-warning)]/30 to-amber-700/20 border border-[var(--clr-warning)]/30">
                 <span className="text-2xl">{achievement.emoji}</span>
               </div>
               <div className="flex-1 text-right min-w-0">
-                <p className="text-xs font-medium text-amber-300/70 mb-0.5">
+                <p className="text-xs font-medium text-[var(--clr-warning)]/70 mb-0.5">
                   🎉 إنجاز جديد!
                 </p>
-                <p className="text-sm font-bold text-amber-100 truncate">
+                <p className="text-sm font-bold text-[var(--clr-warning)] truncate">
                   {achievement.titleAr}
                 </p>
-                <p className="text-amber-400 font-bold text-sm mt-0.5">
+                <p className="text-[var(--clr-warning)] font-bold text-sm mt-0.5">
                   +{achievement.points} نقطة
                 </p>
               </div>
               <button
                 onClick={() => dismissToast(achievement.id)}
-                className="flex-shrink-0 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-800 hover:text-gray-200"
+                className="flex-shrink-0 rounded-full p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-card)] hover:text-[var(--text-primary)]"
                 aria-label="إغلاق"
               >
                 <svg

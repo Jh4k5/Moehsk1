@@ -183,6 +183,17 @@ export default function HanziSection() {
     }
   }, [hanziWriterLoaded, selectedChar, createWriter])
 
+  // Cleanup HanziWriter on unmount
+  useEffect(() => {
+    return () => {
+      if (writerRef.current) {
+        writerRef.current.cancelQuiz?.()
+        writerRef.current = null
+        if (containerRef.current) containerRef.current.innerHTML = ''
+      }
+    }
+  }, [])
+
   // Auto-animate character
   const animateCharacter = useCallback(() => {
     if (!writerRef.current || isAnimating) return
@@ -233,11 +244,11 @@ export default function HanziSection() {
     <div dir="rtl" className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold text-red-700 flex items-center justify-center gap-3">
+        <h2 className="text-3xl font-bold text-[var(--clr-danger)] flex items-center justify-center gap-3">
           <BookOpen className="w-8 h-8" />
           إتقان الحروف الصينية
         </h2>
-        <p className="text-gray-600">تعلّم كتابة الحروف الصينية خطوة بخطوة</p>
+        <p className="text-[var(--text-tertiary)]">تعلّم كتابة الحروف الصينية خطوة بخطوة</p>
         <Badge variant="outline" className="text-sm">
           {HSK1_CHARS.length} حرف من HSK1
         </Badge>
@@ -247,7 +258,7 @@ export default function HanziSection() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT: Character Grid */}
         <div className="lg:col-span-7 xl:col-span-8">
-          <Card className="border-red-200">
+          <Card className="border-[var(--clr-danger)]/30">
             <CardContent className="p-4">
               <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2 max-h-[520px] overflow-y-auto">
                 {shuffledChars.map((char, idx) => {
@@ -265,22 +276,22 @@ export default function HanziSection() {
                       className={
                         'relative flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-colors cursor-pointer ' +
                         (isSelected
-                          ? 'bg-red-50 border-red-500 shadow-md'
-                          : 'bg-white border-gray-200 hover:border-red-300 hover:bg-red-50/50')
+                          ? 'bg-[var(--clr-danger-bg)] border-[var(--clr-danger)] shadow-md'
+                          : 'bg-[var(--surface-card)] border-[var(--line-default)] hover:border-[var(--clr-danger)]/40 hover:bg-[var(--clr-danger-bg)]/50')
                       }
                     >
-                      <span className={'font-chinese-serif text-2xl ' + (isSelected ? 'text-red-700' : 'text-gray-800')}>
+                      <span className={'font-chinese-serif text-2xl ' + (isSelected ? 'text-[var(--clr-danger)]' : 'text-[var(--text-primary)]')}>
                         {char}
                       </span>
                       {info && (
-                        <span className="text-[9px] text-gray-400 mt-0.5 font-chinese-sans leading-tight">
+                        <span className="text-[9px] text-[var(--text-muted)] mt-0.5 font-chinese-sans leading-tight">
                           {info.pinyin}
                         </span>
                       )}
                       {isSelected && (
                         <motion.div
                           layoutId="char-selected-indicator"
-                          className="absolute -top-1 -left-1 w-3 h-3 bg-red-500 rounded-full"
+                          className="absolute -top-1 -left-1 w-3 h-3 bg-[var(--clr-danger)] rounded-full"
                           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                         />
                       )}
@@ -303,25 +314,25 @@ export default function HanziSection() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <Card className="border-red-200 bg-gradient-to-br from-red-50 to-white">
+              <Card className="border-[var(--clr-danger)]/30 bg-gradient-to-br from-[var(--clr-danger-bg)] to-white">
                 <CardContent className="p-4 flex items-center gap-4">
-                  <div className="flex flex-col items-center justify-center w-20 h-20 bg-white rounded-xl border-2 border-red-200 shadow-sm">
-                    <span className="font-chinese-serif text-4xl text-red-700">{selectedChar}</span>
+                  <div className="flex flex-col items-center justify-center w-20 h-20 bg-[var(--surface-card)] rounded-xl border-2 border-[var(--clr-danger)]/30 shadow-sm">
+                    <span className="font-chinese-serif text-4xl text-[var(--clr-danger)]">{selectedChar}</span>
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-chinese-sans text-xl font-bold text-gray-800">
+                      <span className="font-chinese-sans text-xl font-bold text-[var(--text-primary)]">
                         {charInfo?.pinyin || ''}
                       </span>
                       <button
                         onClick={() => speak(selectedChar)}
-                        className="p-1.5 rounded-full bg-red-100 hover:bg-red-200 transition-colors text-red-600"
+                        className="p-1.5 rounded-full bg-[var(--clr-danger-bg)] hover:bg-[var(--clr-danger-bg)] transition-colors text-[var(--clr-danger)]"
                         aria-label="استمع للنطق"
                       >
                         <Volume2 className="w-4 h-4" />
                       </button>
                     </div>
-                    <p className="text-gray-600 text-lg">{charInfo?.meaning || ''}</p>
+                    <p className="text-[var(--text-tertiary)] text-lg">{charInfo?.meaning || ''}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -329,14 +340,14 @@ export default function HanziSection() {
           </AnimatePresence>
 
           {/* Drawing Area */}
-          <Card className="border-red-200 overflow-hidden">
+          <Card className="border-[var(--clr-danger)]/30 overflow-hidden">
             <CardContent className="p-4 flex flex-col items-center">
               <div
                 ref={containerRef}
-                className="w-[300px] h-[300px] bg-white rounded-xl border-2 border-red-100 flex items-center justify-center relative"
+                className="w-[300px] h-[300px] bg-[var(--surface-card)] rounded-xl border-2 border-[var(--clr-danger)]/20 flex items-center justify-center relative"
               >
                 {!hanziWriterLoaded && (
-                  <div className="text-gray-400 text-sm flex flex-col items-center gap-2">
+                  <div className="text-[var(--text-muted)] text-sm flex flex-col items-center gap-2">
                     <RotateCcw className="w-6 h-6 animate-spin" />
                     جاري التحميل...
                   </div>
@@ -349,10 +360,10 @@ export default function HanziSection() {
                     className={
                       'absolute inset-0 rounded-xl flex flex-col items-center justify-center gap-2 backdrop-blur-sm ' +
                       (quizResult.totalMistakes === 0
-                        ? 'bg-green-50/90'
+                        ? 'bg-[var(--clr-success-bg)]/90'
                         : quizResult.totalMistakes <= 2
-                          ? 'bg-amber-50/90'
-                          : 'bg-red-50/90')
+                          ? 'bg-[var(--clr-warning-bg)]/90'
+                          : 'bg-[var(--clr-danger-bg)]/90')
                     }
                   >
                     <span className="text-5xl">
@@ -365,7 +376,7 @@ export default function HanziSection() {
                           ? 'جيد!'
                           : 'حاول مرة أخرى'}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-[var(--text-tertiary)]">
                       أخطاء: {quizResult.totalMistakes} من {quizResult.totalStrokes} خطوط
                     </p>
                   </motion.div>
@@ -377,7 +388,7 @@ export default function HanziSection() {
                 <Button
                   onClick={animateCharacter}
                   disabled={!hanziWriterLoaded || isAnimating}
-                  className="bg-red-600 hover:bg-red-700 text-white gap-1.5"
+                  className="bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80 text-white gap-1.5"
                 >
                   <Play className="w-4 h-4" />
                   <span className="text-sm">رسم تلقائي</span>
@@ -388,8 +399,8 @@ export default function HanziSection() {
                   variant={isQuizMode ? 'default' : 'outline'}
                   className={
                     isQuizMode
-                      ? 'bg-red-600 hover:bg-red-700 text-white gap-1.5'
-                      : 'border-red-300 text-red-700 hover:bg-red-50 gap-1.5'
+                      ? 'bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80 text-white gap-1.5'
+                      : 'border-[var(--clr-danger)]/40 text-[var(--clr-danger)] hover:bg-[var(--clr-danger-bg)] gap-1.5'
                   }
                 >
                   <PenLine className="w-4 h-4" />
@@ -399,7 +410,7 @@ export default function HanziSection() {
                   onClick={resetCharacter}
                   disabled={!hanziWriterLoaded}
                   variant="outline"
-                  className="border-red-300 text-red-700 hover:bg-red-50 gap-1.5"
+                  className="border-[var(--clr-danger)]/40 text-[var(--clr-danger)] hover:bg-[var(--clr-danger-bg)] gap-1.5"
                 >
                   <RotateCcw className="w-4 h-4" />
                   <span className="text-sm">إعادة</span>
@@ -411,7 +422,7 @@ export default function HanziSection() {
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-sm text-red-600 mt-3 text-center bg-red-50 px-3 py-1.5 rounded-lg"
+                  className="text-sm text-[var(--clr-danger)] mt-3 text-center bg-[var(--clr-danger-bg)] px-3 py-1.5 rounded-lg"
                 >
                   ارسم الحرف على المنطقة أعلاه
                 </motion.p>
@@ -420,14 +431,14 @@ export default function HanziSection() {
           </Card>
 
           {/* Tips */}
-          <Card className="border-red-100 bg-red-50/50">
+          <Card className="border-[var(--clr-danger)]/20 bg-[var(--clr-danger-bg)]/50">
             <CardContent className="p-3">
               <div className="flex items-start gap-2">
                 <span className="text-lg">💡</span>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <p><strong className="text-red-700">رسم تلقائي:</strong> شاهد كيف يُكتب الحرف خطوة بخطوة</p>
-                  <p><strong className="text-red-700">وضع الاختبار:</strong> ارسم الحرف بنفسك وتحقق من صحتك</p>
-                  <p><strong className="text-red-700">إعادة:</strong> أعد تهيئة منطقة الرسم</p>
+                <div className="text-xs text-[var(--text-tertiary)] space-y-1">
+                  <p><strong className="text-[var(--clr-danger)]">رسم تلقائي:</strong> شاهد كيف يُكتب الحرف خطوة بخطوة</p>
+                  <p><strong className="text-[var(--clr-danger)]">وضع الاختبار:</strong> ارسم الحرف بنفسك وتحقق من صحتك</p>
+                  <p><strong className="text-[var(--clr-danger)]">إعادة:</strong> أعد تهيئة منطقة الرسم</p>
                 </div>
               </div>
             </CardContent>

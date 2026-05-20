@@ -16,7 +16,7 @@ export default function QuickReviewWidget() {
   const dailySeed = new Date().getDate()
   const quickWord = unlearned[dailySeed % unlearned.length]
   return (
-    <Card className="border-0 shadow-sm card-glass-light">
+    <Card className="j-card border-0 shadow-sm card-glass-light">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
           <Zap className="w-4 h-4 text-amber-500" />

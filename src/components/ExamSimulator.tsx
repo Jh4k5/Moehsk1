@@ -317,11 +317,11 @@ export default function ExamSimulator() {
     <div dir="rtl" className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold text-red-700 flex items-center justify-center gap-3">
+        <h2 className="text-3xl font-bold text-[var(--clr-danger)] flex items-center justify-center gap-3">
           <Trophy className="w-8 h-8" />
           محاكي امتحان HSK 1
         </h2>
-        <p className="text-gray-600">تدرّب على امتحان HSK المستوى الأول</p>
+        <p className="text-[var(--text-tertiary)]">تدرّب على امتحان HSK المستوى الأول</p>
       </div>
 
       {/* ─── Start Screen ──────────────────────────────────── */}
@@ -333,14 +333,14 @@ export default function ExamSimulator() {
             </CardHeader>
             <CardContent className="space-y-4">
               {([
-                { type: 'listening' as ExamType, icon: Headphones, label: 'قسم الاستماع', time: '20 دقيقة', desc: '20 سؤال استماع', color: 'text-red-600' },
-                { type: 'reading' as ExamType, icon: BookOpen, label: 'قسم القراءة', time: '17 دقيقة', desc: '20 سؤال قراءة', color: 'text-orange-600' },
-                { type: 'full' as ExamType, icon: Trophy, label: 'الامتحان الكامل', time: '37 دقيقة', desc: '45 سؤال (استماع + قراءة)', color: 'text-red-700' },
+                { type: 'listening' as ExamType, icon: Headphones, label: 'قسم الاستماع', time: '20 دقيقة', desc: '20 سؤال استماع', color: 'text-[var(--clr-danger)]' },
+                { type: 'reading' as ExamType, icon: BookOpen, label: 'قسم القراءة', time: '17 دقيقة', desc: '20 سؤال قراءة', color: 'text-[var(--clr-energy)]' },
+                { type: 'full' as ExamType, icon: Trophy, label: 'الامتحان الكامل', time: '37 دقيقة', desc: '45 سؤال (استماع + قراءة)', color: 'text-[var(--clr-danger)]' },
               ]).map(opt => (
                 <Card
                   key={opt.type}
                   className={`cursor-pointer hover:shadow-lg transition-all ${
-                    examType === opt.type ? 'border-2 border-red-500 bg-red-50' : 'border hover:border-red-200'
+                    examType === opt.type ? 'border-2 border-[var(--clr-danger)] bg-[var(--clr-danger-bg)]' : 'border hover:border-[var(--clr-danger)]/30'
                   }`}
                   onClick={() => setExamType(opt.type)}
                 >
@@ -348,17 +348,17 @@ export default function ExamSimulator() {
                     <opt.icon className={`w-8 h-8 ${opt.color} shrink-0`} />
                     <div className="flex-1">
                       <div className="font-bold">{opt.label}</div>
-                      <div className="text-sm text-gray-500">{opt.desc}</div>
+                      <div className="text-sm text-[var(--text-muted)]">{opt.desc}</div>
                     </div>
-                    <div className="text-sm text-gray-400">{opt.time}</div>
+                    <div className="text-sm text-[var(--text-muted)]">{opt.time}</div>
                   </CardContent>
                 </Card>
               ))}
 
-              <Card className="bg-amber-50 border-amber-200">
+              <Card className="bg-[var(--clr-warning-bg)] border-[var(--clr-warning)]/30">
                 <CardContent className="p-4 flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                  <div className="text-sm text-amber-800">
+                  <AlertTriangle className="w-5 h-5 text-[var(--clr-warning)] shrink-0 mt-0.5" />
+                  <div className="text-sm text-[var(--clr-warning)]">
                     <p className="font-bold mb-1">ملاحظات مهمة:</p>
                     <ul className="list-disc list-inside space-y-1">
                       <li>درجة النجاح: 120 من 200 (60%)</li>
@@ -372,7 +372,7 @@ export default function ExamSimulator() {
 
               <Button
                 onClick={startExam}
-                className="w-full bg-red-600 hover:bg-red-700 text-lg h-14"
+                className="w-full bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80 text-lg h-14"
               >
                 <Play className="w-5 h-5 ml-2" />
                 ابدأ الامتحان: {examConfig.label}
@@ -387,12 +387,12 @@ export default function ExamSimulator() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {/* Timer & Progress */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            <Card className={`${timeLeft <= 60 ? 'border-red-500 bg-red-50 animate-pulse' : ''}`}>
+            <Card className={`${timeLeft <= 60 ? 'border-[var(--clr-danger)] bg-[var(--clr-danger-bg)] animate-pulse' : ''}`}>
               <CardContent className="p-3 flex items-center gap-3">
-                <Clock className={`w-6 h-6 ${timeLeft <= 60 ? 'text-red-600' : 'text-gray-600'}`} />
+                <Clock className={`w-6 h-6 ${timeLeft <= 60 ? 'text-[var(--clr-danger)]' : 'text-[var(--text-tertiary)]'}`} />
                 <div>
-                  <div className="text-xs text-gray-500">الوقت المتبقي</div>
-                  <div className={`text-xl font-bold font-mono ${timeLeft <= 60 ? 'text-red-600' : ''}`}>
+                  <div className="text-xs text-[var(--text-muted)]">الوقت المتبقي</div>
+                  <div className={`text-xl font-bold font-mono ${timeLeft <= 60 ? 'text-[var(--clr-danger)]' : ''}`}>
                     {formatTime(timeLeft)}
                   </div>
                 </div>
@@ -404,14 +404,14 @@ export default function ExamSimulator() {
                   {currentQ.type === 'listening' ? 'استماع' : 'قراءة'}
                 </Badge>
                 <div>
-                  <div className="text-xs text-gray-500">السؤال</div>
+                  <div className="text-xs text-[var(--text-muted)]">السؤال</div>
                   <div className="text-xl font-bold">{currentQuestion + 1}/{questions.length}</div>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3">
-                <div className="text-xs text-gray-500 mb-1">التقدم</div>
+                <div className="text-xs text-[var(--text-muted)] mb-1">التقدم</div>
                 <Progress value={((currentQuestion + 1) / questions.length) * 100} className="h-2" />
               </CardContent>
             </Card>
@@ -422,18 +422,18 @@ export default function ExamSimulator() {
             <CardContent className="p-6 space-y-6">
               {/* Listening audio section */}
               {currentQ.type === 'listening' && currentQ.audioText && (
-                <div className="flex flex-col items-center gap-4 bg-red-50 rounded-xl p-6">
+                <div className="flex flex-col items-center gap-4 bg-[var(--clr-danger-bg)] rounded-xl p-6">
                   <Button
                     variant="outline"
                     size="lg"
                     className="rounded-full w-20 h-20"
                     onClick={() => speak(currentQ.audioText || '')}
                   >
-                    <Volume2 className="w-8 h-8 text-red-600" />
+                    <Volume2 className="w-8 h-8 text-[var(--clr-danger)]" />
                   </Button>
-                  <p className="text-sm text-gray-500">اضغط للاستماع</p>
+                  <p className="text-sm text-[var(--text-muted)]">اضغط للاستماع</p>
                   {currentQ.pinyin && (
-                    <p className="text-xs text-gray-400 font-chinese-sans">({currentQ.pinyin})</p>
+                    <p className="text-xs text-[var(--text-muted)] font-chinese-sans">({currentQ.pinyin})</p>
                   )}
                 </div>
               )}
@@ -442,7 +442,7 @@ export default function ExamSimulator() {
               <div className="text-center">
                 <h3 className="text-lg font-medium">{currentQ.question}</h3>
                 {currentQ.type === 'reading' && currentQ.pinyin && (
-                  <p className="text-sm text-gray-400 font-chinese-sans mt-1">({currentQ.pinyin})</p>
+                  <p className="text-sm text-[var(--text-muted)] font-chinese-sans mt-1">({currentQ.pinyin})</p>
                 )}
               </div>
 
@@ -466,7 +466,7 @@ export default function ExamSimulator() {
                             : isSelected ? 'default' : 'outline'
                         }
                         className={`w-full h-14 text-right justify-start text-base ${
-                          showFeedback && isCorrect ? 'bg-green-600 hover:bg-green-600' : ''
+                          showFeedback && isCorrect ? 'bg-[var(--clr-success)] hover:bg-[var(--clr-success)]' : ''
                         }`}
                         onClick={() => answerQuestion(idx)}
                         disabled={answers[currentQuestion] !== null && showAnswerFeedback}
@@ -490,8 +490,8 @@ export default function ExamSimulator() {
                     exit={{ opacity: 0 }}
                     className={`text-center p-3 rounded-lg flex items-center justify-center gap-2 ${
                       answers[currentQuestion] === currentQ.correctIndex
-                        ? 'bg-green-50 text-green-700'
-                        : 'bg-red-50 text-red-700'
+                        ? 'bg-[var(--clr-success-bg)] text-[var(--clr-success)]'
+                        : 'bg-[var(--clr-danger-bg)] text-[var(--clr-danger)]'
                     }`}
                   >
                     {answers[currentQuestion] === currentQ.correctIndex ? (
@@ -515,8 +515,8 @@ export default function ExamSimulator() {
                     <button
                       key={idx}
                       className={`w-2 h-2 rounded-full transition-colors ${
-                        idx === currentQuestion ? 'bg-red-600' :
-                        answers[idx] !== null ? 'bg-gray-400' : 'bg-gray-200'
+                        idx === currentQuestion ? 'bg-[var(--clr-danger)]' :
+                        answers[idx] !== null ? 'bg-[var(--text-muted)]' : 'bg-[var(--surface-card)]'
                       }`}
                       onClick={() => { setCurrentQuestion(idx); setShowAnswerFeedback(answers[idx] !== null) }}
                     />
@@ -526,7 +526,7 @@ export default function ExamSimulator() {
                 <Button
                   onClick={nextQuestion}
                   disabled={answers[currentQuestion] === null}
-                  className="bg-red-600 hover:bg-red-700"
+                  className="bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80"
                 >
                   {currentQuestion === questions.length - 1 ? 'إنهاء' : 'التالي'}
                   <ChevronLeft className="w-4 h-4 mr-1" />
@@ -549,51 +549,51 @@ export default function ExamSimulator() {
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
           <div className="max-w-2xl mx-auto space-y-6">
             {/* Score Card */}
-            <Card className={`border-2 ${scores.pass ? 'border-green-500' : 'border-red-500'}`}>
+            <Card className={`border-2 ${scores.pass ? 'border-[var(--clr-success)]' : 'border-[var(--clr-danger)]'}`}>
               <CardContent className="p-8 text-center space-y-6">
                 <div className="text-6xl">{scores.pass ? '🎉' : '💪'}</div>
-                <h3 className={`text-2xl font-bold ${scores.pass ? 'text-green-700' : 'text-red-700'}`}>
+                <h3 className={`text-2xl font-bold ${scores.pass ? 'text-[var(--clr-success)]' : 'text-[var(--clr-danger)]'}`}>
                   {scores.pass ? 'مبروك! نجحت في الامتحان!' : 'لم تنجح هذه المرة. واصل التعلم!'}
                 </h3>
 
                 {/* Total Score */}
                 <div className={`inline-flex items-center justify-center w-32 h-32 rounded-full border-4 ${
-                  scores.pass ? 'border-green-500' : 'border-red-500'
+                  scores.pass ? 'border-[var(--clr-success)]' : 'border-[var(--clr-danger)]'
                 }`}>
                   <div>
-                    <div className={`text-3xl font-bold ${scores.pass ? 'text-green-700' : 'text-red-700'}`}>
+                    <div className={`text-3xl font-bold ${scores.pass ? 'text-[var(--clr-success)]' : 'text-[var(--clr-danger)]'}`}>
                       {scores.total}
                     </div>
-                    <div className="text-sm text-gray-500">من 200</div>
+                    <div className="text-sm text-[var(--text-muted)]">من 200</div>
                   </div>
                 </div>
 
                 {/* Section Scores */}
                 <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
-                  <Card className={scores.listening >= 60 ? 'border-green-200' : 'border-red-200'}>
+                  <Card className={scores.listening >= 60 ? 'border-[var(--clr-success)]/30' : 'border-[var(--clr-danger)]/30'}>
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Headphones className="w-5 h-5 text-red-600" />
-                        <span className="text-sm text-gray-500">الاستماع</span>
+                        <Headphones className="w-5 h-5 text-[var(--clr-danger)]" />
+                        <span className="text-sm text-[var(--text-muted)]">الاستماع</span>
                       </div>
                       <div className="text-2xl font-bold">{scores.listening}</div>
-                      <div className="text-xs text-gray-400">من 100</div>
+                      <div className="text-xs text-[var(--text-muted)]">من 100</div>
                     </CardContent>
                   </Card>
-                  <Card className={scores.reading >= 60 ? 'border-green-200' : 'border-red-200'}>
+                  <Card className={scores.reading >= 60 ? 'border-[var(--clr-success)]/30' : 'border-[var(--clr-danger)]/30'}>
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <BookOpen className="w-5 h-5 text-red-600" />
-                        <span className="text-sm text-gray-500">القراءة</span>
+                        <BookOpen className="w-5 h-5 text-[var(--clr-danger)]" />
+                        <span className="text-sm text-[var(--text-muted)]">القراءة</span>
                       </div>
                       <div className="text-2xl font-bold">{scores.reading}</div>
-                      <div className="text-xs text-gray-400">من 100</div>
+                      <div className="text-xs text-[var(--text-muted)]">من 100</div>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* Pass/Fail threshold */}
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-[var(--text-muted)]">
                   درجة النجاح: 120/200 (60%)
                 </div>
               </CardContent>
@@ -601,10 +601,10 @@ export default function ExamSimulator() {
 
             {/* Weak Areas */}
             {scores.weakAreas.length > 0 && (
-              <Card className="border-amber-200">
+              <Card className="border-[var(--clr-warning)]/30">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-amber-600" />
+                    <AlertTriangle className="w-5 h-5 text-[var(--clr-warning)]" />
                     المجالات الضعيفة
                   </CardTitle>
                 </CardHeader>
@@ -616,7 +616,7 @@ export default function ExamSimulator() {
                       </Badge>
                     ))}
                   </div>
-                  <p className="text-sm text-gray-500 mt-3">
+                  <p className="text-sm text-[var(--text-muted)] mt-3">
                     راجع هذه الكلمات والجمل في قسم المفردات وحاول مرة أخرى.
                   </p>
                 </CardContent>
@@ -629,7 +629,7 @@ export default function ExamSimulator() {
                 <RotateCcw className="w-4 h-4 ml-1" />
                 امتحان جديد
               </Button>
-              <Button className="bg-red-600 hover:bg-red-700" onClick={startExam}>
+              <Button className="bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80" onClick={startExam}>
                 <Play className="w-4 h-4 ml-1" />
                 أعد المحاولة
               </Button>

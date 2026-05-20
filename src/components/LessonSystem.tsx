@@ -209,7 +209,7 @@ export default function LessonSystem() {
             variant="ghost"
             size="sm"
             onClick={() => { setSelectedLesson(null); resetExercise() }}
-            className="hover:bg-gray-100"
+            className="hover:bg-[var(--surface-card-a)]"
           >
             <ArrowLeft className="h-5 w-5 ml-1" />
             العودة
@@ -225,15 +225,15 @@ export default function LessonSystem() {
               {currentLesson.id}
             </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+              <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                 {currentLesson.title}
               </h2>
-              <p className="text-sm text-gray-500 font-chinese-sans">
+              <p className="text-sm text-[var(--text-muted)] font-chinese-sans">
                 {currentLesson.titleZh}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3 text-sm text-gray-600">
+          <div className="flex items-center gap-3 text-sm text-[var(--text-tertiary)]">
             <Badge variant="outline" className="gap-1">
               <BookOpen className="h-3 w-3" />
               {totalWords} كلمة
@@ -250,38 +250,38 @@ export default function LessonSystem() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); if (v === 'exercises') resetExercise() }}>
-          <TabsList className="w-full flex h-auto flex-wrap gap-1 bg-gray-50 p-1 rounded-xl">
+          <TabsList className="w-full flex h-auto flex-wrap gap-1 bg-[var(--surface-card-h)] p-1 rounded-xl">
             <TabsTrigger
               value="vocab"
-              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'vocab' ? "bg-white shadow-sm" : "")}
+              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'vocab' ? "bg-[var(--surface-card)] shadow-sm" : "")}
             >
               <BookOpen className="h-4 w-4" />
               المفردات
             </TabsTrigger>
             <TabsTrigger
               value="grammar"
-              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'grammar' ? "bg-white shadow-sm" : "")}
+              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'grammar' ? "bg-[var(--surface-card)] shadow-sm" : "")}
             >
               <GraduationCap className="h-4 w-4" />
               القواعد
             </TabsTrigger>
             <TabsTrigger
               value="conversation"
-              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'conversation' ? "bg-white shadow-sm" : "")}
+              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'conversation' ? "bg-[var(--surface-card)] shadow-sm" : "")}
             >
               <MessageCircle className="h-4 w-4" />
               محادثة
             </TabsTrigger>
             <TabsTrigger
               value="sentences"
-              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'sentences' ? "bg-white shadow-sm" : "")}
+              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'sentences' ? "bg-[var(--surface-card)] shadow-sm" : "")}
             >
               <Sparkles className="h-4 w-4" />
               الجمل
             </TabsTrigger>
             <TabsTrigger
               value="exercises"
-              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'exercises' ? "bg-white shadow-sm" : "")}
+              className={"flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 text-xs sm:text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm " + (activeTab === 'exercises' ? "bg-[var(--surface-card)] shadow-sm" : "")}
             >
               <Target className="h-4 w-4" />
               التمارين
@@ -302,27 +302,27 @@ export default function LessonSystem() {
                     animate="visible"
                   >
                     <Card
-                      className={"cursor-pointer transition-all duration-200 hover:shadow-md border-2 relative overflow-hidden " + (isLearned ? "border-green-300 bg-green-50/50" : "border-gray-100 hover:border-blue-200")}
+                      className={"cursor-pointer transition-all duration-200 hover:shadow-md border-2 relative overflow-hidden " + (isLearned ? "border-[var(--clr-success)]/40 bg-[var(--clr-success-bg)]/50" : "border-[var(--line-subtle)] hover:border-[var(--clr-info)]/30")}
                       onClick={() => speak(word.zh)}
                     >
                       {isLearned && (
                         <div className="absolute top-2 left-2 z-10">
-                          <CheckCircle className="h-5 w-5 text-green-500" />
+                          <CheckCircle className="h-5 w-5 text-[var(--clr-success)]" />
                         </div>
                       )}
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
                             <div
-                              className="text-3xl font-bold mb-1 font-chinese-serif cursor-pointer hover:text-blue-600 transition-colors"
+                              className="text-3xl font-bold mb-1 font-chinese-serif cursor-pointer hover:text-[var(--clr-info)] transition-colors"
                               onClick={(e) => { e.stopPropagation(); speak(word.zh) }}
                             >
                               {word.zh}
                             </div>
-                            <div className="text-sm text-gray-500 font-chinese-sans mb-1">
+                            <div className="text-sm text-[var(--text-muted)] font-chinese-sans mb-1">
                               {word.pinyin}
                             </div>
-                            <div className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                            <div className="text-sm font-medium text-[var(--text-secondary)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                               {word.meaning}
                             </div>
                             {word.pos && word.pos !== 'fixed' && (
@@ -332,17 +332,17 @@ export default function LessonSystem() {
                             )}
                           </div>
                           <button
-                            className="p-2 rounded-full hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+                            className="p-2 rounded-full hover:bg-[var(--clr-primary)]/10 text-[var(--text-muted)] hover:text-[var(--clr-info)] transition-colors flex-shrink-0"
                             onClick={(e) => { e.stopPropagation(); speak(word.zh) }}
                           >
                             <Volume2 className="h-4 w-4" />
                           </button>
                         </div>
-                        <div className="mt-3 pt-3 border-t border-gray-100 flex justify-end">
+                        <div className="mt-3 pt-3 border-t border-[var(--line-subtle)] flex justify-end">
                           <Button
                             size="sm"
                             variant={isLearned ? "outline" : "default"}
-                            className={"text-xs " + (isLearned ? "text-green-600 border-green-300 hover:bg-green-50" : "")}
+                            className={"text-xs " + (isLearned ? "text-[var(--clr-success)] border-[var(--clr-success)]/40 hover:bg-[var(--clr-success-bg)]" : "")}
                             onClick={(e) => { e.stopPropagation(); toggleLearned(word.id) }}
                           >
                             {isLearned ? (
@@ -370,7 +370,7 @@ export default function LessonSystem() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className="border-0 shadow-sm">
+                  <Card className="j-card border-0 shadow-sm">
                     <AccordionItem value={"gr-" + rule.id} className="border-0">
                       <AccordionTrigger className="px-5 py-4 hover:no-underline">
                         <div className="flex items-center gap-3 text-right">
@@ -381,10 +381,10 @@ export default function LessonSystem() {
                             {idx + 1}
                           </div>
                           <div className="text-right">
-                            <div className="font-semibold text-gray-800 text-sm" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                            <div className="font-semibold text-[var(--text-primary)] text-sm" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                               {rule.titleAr}
                             </div>
-                            <div className="text-xs text-gray-400 font-chinese-sans">
+                            <div className="text-xs text-[var(--text-muted)] font-chinese-sans">
                               {rule.title}
                             </div>
                           </div>
@@ -392,36 +392,36 @@ export default function LessonSystem() {
                       </AccordionTrigger>
                       <AccordionContent className="px-5 pb-4">
                         <div className="space-y-4">
-                          <p className="text-sm text-gray-600 leading-relaxed" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                          <p className="text-sm text-[var(--text-tertiary)] leading-relaxed" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                             {rule.description}
                           </p>
-                          <div className="bg-blue-50 rounded-lg p-3">
-                            <div className="text-xs font-semibold text-blue-600 mb-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                          <div className="bg-[var(--clr-info-bg)] rounded-lg p-3">
+                            <div className="text-xs font-semibold text-[var(--clr-info)] mb-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                               النمط:
                             </div>
-                            <div className="text-sm font-medium text-blue-800 font-chinese-sans">
+                            <div className="text-sm font-medium text-[var(--clr-info)] font-chinese-sans">
                               {rule.pattern}
                             </div>
                           </div>
                           <div className="space-y-2">
-                            <div className="text-xs font-semibold text-gray-500" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                            <div className="text-xs font-semibold text-[var(--text-muted)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                               أمثلة:
                             </div>
                             {rule.examples.map((ex, exIdx) => (
                               <div
                                 key={exIdx}
-                                className="bg-gray-50 rounded-lg p-3 flex items-start gap-2 cursor-pointer hover:bg-gray-100 transition-colors"
+                                className="bg-[var(--surface-card-h)] rounded-lg p-3 flex items-start gap-2 cursor-pointer hover:bg-[var(--surface-card-a)] transition-colors"
                                 onClick={() => speak(ex.zh)}
                               >
-                                <Volume2 className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                                <Volume2 className="h-4 w-4 text-[var(--text-muted)] mt-0.5 flex-shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                  <div className="font-chinese-serif font-semibold text-gray-800">
+                                  <div className="font-chinese-serif font-semibold text-[var(--text-primary)]">
                                     {ex.zh}
                                   </div>
-                                  <div className="text-xs text-gray-400 font-chinese-sans">
+                                  <div className="text-xs text-[var(--text-muted)] font-chinese-sans">
                                     {ex.pinyin}
                                   </div>
-                                  <div className="text-xs text-gray-600 mt-0.5" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                                  <div className="text-xs text-[var(--text-tertiary)] mt-0.5" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                                     {ex.ar}
                                   </div>
                                 </div>
@@ -429,9 +429,9 @@ export default function LessonSystem() {
                             ))}
                           </div>
                           {rule.tips && (
-                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
-                              <Sparkles className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                              <div className="text-xs text-amber-700" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                            <div className="bg-[var(--clr-warning-bg)] border border-[var(--clr-warning)]/30 rounded-lg p-3 flex items-start gap-2">
+                              <Sparkles className="h-4 w-4 text-[var(--clr-warning)] mt-0.5 flex-shrink-0" />
+                              <div className="text-xs text-[var(--clr-warning)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                                 {rule.tips}
                               </div>
                             </div>
@@ -461,7 +461,7 @@ export default function LessonSystem() {
                         <MessageCircle className="h-5 w-5" style={{ color }} />
                         {conv.title}
                       </CardTitle>
-                      <div className="text-sm text-gray-500 flex items-center gap-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                      <div className="text-sm text-[var(--text-muted)] flex items-center gap-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                         {conv.scene}
                       </div>
                     </CardHeader>
@@ -477,30 +477,30 @@ export default function LessonSystem() {
                             className={"flex gap-2 " + (isA ? "flex-row-reverse" : "")}
                           >
                             <div
-                              className={"flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold " + (isA ? "bg-blue-500" : "bg-emerald-500")}
+                              className={"flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold " + (isA ? "bg-[var(--clr-info)]" : "bg-[var(--clr-success)]")}
                             >
                               {turn.name.charAt(0)}
                             </div>
                             <div className={"flex-1 max-w-[85%] " + (isA ? "text-left" : "text-right")}>
-                              <div className={"text-xs font-semibold mb-1 " + (isA ? "text-blue-600" : "text-emerald-600")} style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                              <div className={"text-xs font-semibold mb-1 " + (isA ? "text-[var(--clr-info)]" : "text-[var(--clr-success)]")} style={{ fontFamily: 'Tajawal, sans-serif' }}>
                                 {turn.name}
                               </div>
-                              <div className={"rounded-2xl px-4 py-2.5 cursor-pointer transition-colors hover:opacity-90 " + (isA ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-800")}
+                              <div className={"rounded-2xl px-4 py-2.5 cursor-pointer transition-colors hover:opacity-90 " + (isA ? "bg-[var(--clr-info)] text-white" : "bg-[var(--surface-card-h)] text-[var(--text-primary)]")}
                                 onClick={() => speak(turn.zh)}
                               >
                                 <div className="font-chinese-serif text-base font-medium">
                                   {turn.zh}
                                 </div>
-                                <div className={"text-xs mt-1 opacity-75 font-chinese-sans " + (isA ? "text-blue-100" : "text-gray-400")}>
+                                <div className={"text-xs mt-1 opacity-75 font-chinese-sans " + (isA ? "text-[var(--clr-info)]" : "text-[var(--text-muted)]")}>
                                   {turn.pinyin}
                                 </div>
-                                <div className={"text-xs mt-1 font-chinese-sans " + (isA ? "text-blue-100" : "text-gray-500")} style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                                <div className={"text-xs mt-1 font-chinese-sans " + (isA ? "text-[var(--clr-info)]" : "text-[var(--text-muted)]")} style={{ fontFamily: 'Tajawal, sans-serif' }}>
                                   {turn.arabic}
                                 </div>
                               </div>
                               <div className={"flex gap-1 mt-1 " + (isA ? "justify-start" : "justify-end")}>
                                 <button
-                                  className="p-1 rounded-full hover:bg-gray-100 text-gray-300 hover:text-blue-400 transition-colors"
+                                  className="p-1 rounded-full hover:bg-[var(--surface-card-a)] text-[var(--text-muted)] hover:text-[var(--clr-info)] transition-colors"
                                   onClick={() => speak(turn.zh)}
                                 >
                                   <Volume2 className="h-3 w-3" />
@@ -527,24 +527,24 @@ export default function LessonSystem() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.08 }}
                 >
-                  <Card className="cursor-pointer hover:shadow-md transition-shadow border-gray-100 hover:border-blue-200"
+                  <Card className="cursor-pointer hover:shadow-md transition-shadow border-[var(--line-subtle)] hover:border-[var(--clr-info)]/30"
                     onClick={() => speak(sentence.zh)}
                   >
                     <CardContent className="p-4 flex items-center gap-4">
                       <button
-                        className="p-2.5 rounded-full bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors flex-shrink-0"
+                        className="p-2.5 rounded-full bg-[var(--clr-info-bg)] text-[var(--clr-info)] hover:bg-[var(--clr-info)]/20 transition-colors flex-shrink-0"
                         onClick={(e) => { e.stopPropagation(); speak(sentence.zh) }}
                       >
                         <Volume2 className="h-4 w-4" />
                       </button>
                       <div className="flex-1 min-w-0">
-                        <div className="font-chinese-serif text-lg font-semibold text-gray-800">
+                        <div className="font-chinese-serif text-lg font-semibold text-[var(--text-primary)]">
                           {sentence.zh}
                         </div>
-                        <div className="text-sm text-gray-400 font-chinese-sans mt-0.5">
+                        <div className="text-sm text-[var(--text-muted)] font-chinese-sans mt-0.5">
                           {sentence.pinyin}
                         </div>
-                        <div className="text-sm text-gray-600 mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                        <div className="text-sm text-[var(--text-tertiary)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                           {sentence.arabic}
                         </div>
                       </div>
@@ -564,7 +564,7 @@ export default function LessonSystem() {
           {/* ─── Tab 5: Exercises ──────────────────────────── */}
           <TabsContent value="exercises" className="mt-6">
             {currentLesson.exercises.length === 0 ? (
-              <div className="text-center py-12 text-gray-400" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+              <div className="text-center py-12 text-[var(--text-muted)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                 لا توجد تمارين لهذا الدرس بعد
               </div>
             ) : exFinished ? (
@@ -575,13 +575,13 @@ export default function LessonSystem() {
                 className="text-center space-y-6 py-8"
               >
                 <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: exScore >= currentLesson.exercises.length * 0.7 ? '#DCFCE7' : '#FEF3C7' }}>
-                  <Trophy className={"h-10 w-10 " + (exScore >= currentLesson.exercises.length * 0.7 ? "text-green-500" : "text-amber-500")} />
+                  <Trophy className={"h-10 w-10 " + (exScore >= currentLesson.exercises.length * 0.7 ? "text-[var(--clr-success)]" : "text-[var(--clr-warning)]")} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-800" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                  <h3 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                     {exScore >= currentLesson.exercises.length * 0.7 ? "ممتاز! 🎉" : "استمر بالتدريب 💪"}
                   </h3>
-                  <p className="text-gray-500 mt-2 text-lg" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                  <p className="text-[var(--text-muted)] mt-2 text-lg" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                     نتيجتك: <span className="font-bold" style={{ color }}>{exScore}</span> / {currentLesson.exercises.length}
                   </p>
                   <Progress value={(exScore / currentLesson.exercises.length) * 100} className="h-3 mt-4 max-w-xs mx-auto" />
@@ -607,7 +607,7 @@ export default function LessonSystem() {
                 className="space-y-6"
               >
                 {/* Progress bar */}
-                <div className="flex items-center gap-3 text-sm text-gray-500" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                <div className="flex items-center gap-3 text-sm text-[var(--text-muted)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                   <span>السؤال {exIdx + 1} من {currentLesson.exercises.length}</span>
                   <div className="flex-1">
                     <Progress value={((exIdx) / currentLesson.exercises.length) * 100} className="h-2" />
@@ -627,7 +627,7 @@ export default function LessonSystem() {
                         {currentLesson.exercises[exIdx].type === 'translate' && "ترجم"}
                         {currentLesson.exercises[exIdx].type === 'tone' && "النبرات"}
                       </Badge>
-                      <h3 className="text-xl font-bold text-gray-800 font-chinese-serif leading-relaxed">
+                      <h3 className="text-xl font-bold text-[var(--text-primary)] font-chinese-serif leading-relaxed">
                         {currentLesson.exercises[exIdx].q}
                       </h3>
                     </div>
@@ -642,20 +642,20 @@ export default function LessonSystem() {
 
                           let btnClass = "w-full p-4 rounded-xl text-right transition-all duration-200 border-2 text-sm font-medium "
                           if (isCorrectOpt) {
-                            btnClass = btnClass + "bg-green-50 border-green-400 text-green-700"
+                            btnClass = btnClass + "bg-[var(--clr-success-bg)] border-[var(--clr-success)] text-[var(--clr-success)]"
                           } else if (isWrongOpt) {
-                            btnClass = btnClass + "bg-red-50 border-red-400 text-red-700"
+                            btnClass = btnClass + "bg-[var(--clr-danger-bg)] border-[var(--clr-danger)]/50 text-[var(--clr-danger)]"
                           } else if (isSelected) {
-                            btnClass = btnClass + "bg-blue-50 border-blue-400 text-blue-700"
+                            btnClass = btnClass + "bg-[var(--clr-info-bg)] border-[var(--clr-info)]/50 text-[var(--clr-info)]"
                           } else {
-                            btnClass = btnClass + "bg-white border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-blue-50"
+                            btnClass = btnClass + "bg-[var(--surface-card)] border-[var(--line-default)] text-[var(--text-tertiary)] hover:border-[var(--clr-info)]/40 hover:bg-[var(--clr-primary)]/10"
                           }
 
                           let circleClass = "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold "
-                          if (isCorrectOpt) circleClass = circleClass + "bg-green-500 text-white"
-                          else if (isWrongOpt) circleClass = circleClass + "bg-red-500 text-white"
-                          else if (isSelected) circleClass = circleClass + "bg-blue-500 text-white"
-                          else circleClass = circleClass + "bg-gray-200 text-gray-500"
+                          if (isCorrectOpt) circleClass = circleClass + "bg-[var(--clr-success)] text-white"
+                          else if (isWrongOpt) circleClass = circleClass + "bg-[var(--clr-danger)] text-white"
+                          else if (isSelected) circleClass = circleClass + "bg-[var(--clr-info)] text-white"
+                          else circleClass = circleClass + "bg-[var(--surface-card)] text-[var(--text-muted)]"
 
                           let circleContent: React.ReactNode = String.fromCharCode(1571 + optIdx)
                           if (isCorrectOpt) circleContent = <Check className="h-3 w-3" />
@@ -687,14 +687,14 @@ export default function LessonSystem() {
                           onChange={(e) => { setExInput(e.target.value); setExAnswer(e.target.value) }}
                           placeholder="اكتب إجابتك هنا..."
                           disabled={exChecked}
-                          className={"text-lg text-center font-chinese-sans " + (exChecked ? (exCorrect ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50") : "")}
+                          className={"text-lg text-center font-chinese-sans " + (exChecked ? (exCorrect ? "border-[var(--clr-success)] bg-[var(--clr-success-bg)]" : "border-[var(--clr-danger)]/50 bg-[var(--clr-danger-bg)]") : "")}
                           onKeyDown={(e) => { if (e.key === 'Enter' && !exChecked && exInput.trim()) checkAnswer() }}
                         />
                         {exChecked && (
                           <motion.div
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className={"text-sm text-center p-2 rounded-lg " + (exCorrect ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600")}
+                            className={"text-sm text-center p-2 rounded-lg " + (exCorrect ? "bg-[var(--clr-success-bg)] text-[var(--clr-success)]" : "bg-[var(--clr-danger-bg)] text-[var(--clr-danger)]")}
                             style={{ fontFamily: 'Tajawal, sans-serif' }}
                           >
                             {exCorrect ? "إجابة صحيحة! ✓" : ("الإجابة الصحيحة: " + currentLesson.exercises[exIdx].answer)}
@@ -762,14 +762,14 @@ export default function LessonSystem() {
     >
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600 text-white">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--clr-info)] text-white">
           <BookOpen className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-800" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+          <h2 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
             الدروس
           </h2>
-          <p className="text-sm text-gray-500" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+          <p className="text-sm text-[var(--text-muted)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
             {lessons.length} درس — {completedCount} مكتمل
           </p>
         </div>
@@ -777,28 +777,28 @@ export default function LessonSystem() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="border-0 shadow-sm">
+        <Card className="j-card border-0 shadow-sm">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{lessons.length}</div>
-            <div className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>إجمالي الدروس</div>
+            <div className="text-2xl font-bold text-[var(--clr-info)]">{lessons.length}</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>إجمالي الدروس</div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="j-card border-0 shadow-sm">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">{completedCount}</div>
-            <div className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>دروس مكتملة</div>
+            <div className="text-2xl font-bold text-[var(--clr-success)]">{completedCount}</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>دروس مكتملة</div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="j-card border-0 shadow-sm">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-amber-600">{totalVocabLearned}</div>
-            <div className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>كلمة تم حفظها</div>
+            <div className="text-2xl font-bold text-[var(--clr-warning)]">{totalVocabLearned}</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>كلمة تم حفظها</div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="j-card border-0 shadow-sm">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">{totalVocab - totalVocabLearned}</div>
-            <div className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>كلمة متبقية</div>
+            <div className="text-2xl font-bold text-[var(--clr-primary)]">{totalVocab - totalVocabLearned}</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>كلمة متبقية</div>
           </CardContent>
         </Card>
       </div>
@@ -812,9 +812,9 @@ export default function LessonSystem() {
           const active = isLessonActive(lesson.id)
           const wordCount = lesson.vocabularyIds.length
 
-          let cardBorder = "border-gray-200 hover:border-blue-200"
-          if (completed) cardBorder = "border-green-300 hover:border-green-400"
-          if (active) cardBorder = "border-blue-400 shadow-md shadow-blue-100"
+          let cardBorder = "border-[var(--line-default)] hover:border-[var(--clr-info)]/30"
+          if (completed) cardBorder = "border-[var(--clr-success)]/40 hover:border-[var(--clr-success)]"
+          if (active) cardBorder = "border-[var(--clr-info)]/50 shadow-md shadow-[var(--clr-info)]/20"
 
           return (
             <motion.div
@@ -843,26 +843,26 @@ export default function LessonSystem() {
                       {lesson.id}
                     </div>
                     {completed && (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-[var(--clr-success)]" />
                     )}
                     {active && (
                       <div className="relative">
-                        <div className="w-3 h-3 rounded-full bg-blue-500" />
-                        <div className="absolute inset-0 w-3 h-3 rounded-full bg-blue-400 animate-ping" />
+                        <div className="w-3 h-3 rounded-full bg-[var(--clr-info)]" />
+                        <div className="absolute inset-0 w-3 h-3 rounded-full bg-[var(--clr-info)] animate-ping" />
                       </div>
                     )}
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-sm font-bold text-gray-800 mb-1 line-clamp-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1 line-clamp-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                     {lesson.title}
                   </h3>
-                  <p className="text-xs text-gray-400 font-chinese-sans line-clamp-1">
+                  <p className="text-xs text-[var(--text-muted)] font-chinese-sans line-clamp-1">
                     {lesson.titleZh}
                   </p>
 
                   {/* Word count */}
-                  <div className="mt-3 flex items-center gap-1 text-xs text-gray-500">
+                  <div className="mt-3 flex items-center gap-1 text-xs text-[var(--text-muted)]">
                     <BookOpen className="h-3 w-3" />
                     <span>{wordCount} كلمة</span>
                   </div>
@@ -870,16 +870,16 @@ export default function LessonSystem() {
                   {/* Progress bar */}
                   <div className="mt-2">
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-gray-400" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                      <span className="text-[var(--text-muted)]" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                         {progress}%
                       </span>
                       {completed && (
-                        <span className="text-green-500 font-semibold" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+                        <span className="text-[var(--clr-success)] font-semibold" style={{ fontFamily: 'Tajawal, sans-serif' }}>
                           مكتمل ✓
                         </span>
                       )}
                     </div>
-                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-[var(--surface-card-h)] rounded-full overflow-hidden">
                       <motion.div
                         className="h-full rounded-full"
                         style={{ backgroundColor: completed ? '#22C55E' : color }}

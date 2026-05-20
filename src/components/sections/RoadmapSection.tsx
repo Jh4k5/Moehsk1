@@ -87,7 +87,7 @@ export function RoadmapSection({ onNavigate }: { onNavigate: (s: Section) => voi
         </div>
       </div>
       {/* Total Time Summary */}
-      <Card className="border-0 shadow-sm bg-gradient-to-r from-red-50 to-amber-50">
+      <Card className="j-card border-0 shadow-sm bg-gradient-to-r from-red-50 to-amber-50">
         <CardContent className="p-6 text-center">
           <div className="text-3xl mb-2">🎯</div>
           <h3 className="text-xl font-bold text-gray-900 mb-1">الإجمالي: 10 ساعات</h3>

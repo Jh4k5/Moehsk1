@@ -78,7 +78,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         const dueCards = store.getDueCardIds()
         const reviewCount = dueCards.length
         return (
-          <Card className="border-0 shadow-sm bg-gradient-to-l from-red-50 via-orange-50/50 to-amber-50 dark:from-red-950/30 dark:via-orange-950/20 dark:to-amber-950/30">
+          <Card className="j-card border-0 shadow-sm bg-gradient-to-l from-red-50 via-orange-50/50 to-amber-50 dark:from-red-950/30 dark:via-orange-950/20 dark:to-amber-950/30">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Zap className="w-4 h-4 text-red-600" />
@@ -152,7 +152,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         const weakVocab = weakWords.slice(0, 5).map(id => vocabulary.find(w => w.id === id)).filter(Boolean) as VocabWord[]
         if (dueWords.length === 0 && weakVocab.length === 0) return null
         return (
-          <Card className="border-0 shadow-sm bg-gradient-to-l from-purple-50 to-indigo-50/50">
+          <Card className="j-card border-0 shadow-sm bg-gradient-to-l from-purple-50 to-indigo-50/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Brain className="w-4 h-4 text-purple-600" />
@@ -214,7 +214,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         ]
         const unlockedCount = achievements.filter(a => a.unlocked).length
         return (
-          <Card className="border-0 shadow-sm">
+          <Card className="j-card border-0 shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Trophy className="w-4 h-4 text-amber-500" />
@@ -242,7 +242,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         )
       })()}
       {/* Study Tip of the Day */}
-      <Card className="border-0 shadow-sm bg-gradient-to-l from-amber-50 to-orange-50">
+      <Card className="j-card border-0 shadow-sm bg-gradient-to-l from-amber-50 to-orange-50">
         <CardContent className="p-4 flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
             <Lightbulb className="w-5 h-5 text-amber-600" />
@@ -275,7 +275,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
                 <circle cx="50" cy="50" r="42" fill="none" stroke="#f3f4f6" strokeWidth="6" />
                 <circle
                   cx="50" cy="50" r="42" fill="none"
-                  stroke={timerMode === 'focus' ? '#ef4444' : '#10b981'}
+                  stroke={timerMode === 'focus' ? 'var(--clr-danger)' : '#10b981'}
                   strokeWidth="6" strokeLinecap="round"
                   strokeDasharray={String(2 * Math.PI * 42)}
                   strokeDashoffset={String(2 * Math.PI * 42 * (1 - (timerMinutes * 60 + timerSeconds) / ((timerMode === 'focus' ? 25 : 5) * 60)))}
@@ -389,7 +389,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         </CardContent>
       </Card>
       {/* Daily Activity */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Clock className="w-4 h-4 text-red-600" />
@@ -418,7 +418,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
       </Card>
 
       {/* HSK Level Ring with animation */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardContent className="p-6 flex items-center gap-6">
           <div className="relative w-24 h-24 animate-progress-ring">
             <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
@@ -434,7 +434,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
               />
               <defs>
                 <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#ef4444" />
+                  <stop offset="0%" stopColor="var(--clr-danger)" />
                   <stop offset="100%" stopColor="#f59e0b" />
                 </linearGradient>
               </defs>
@@ -458,7 +458,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         </CardContent>
       </Card>
       {/* Progress */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">التقدم حسب الفئة</CardTitle>
         </CardHeader>
@@ -475,7 +475,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         </CardContent>
       </Card>
       {/* Word Categories Overview */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Layers className="w-4 h-4 text-red-600" />
@@ -525,7 +525,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         </CardContent>
       </Card>
       {/* Weekly Activity Chart */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-amber-600" />
@@ -597,7 +597,7 @@ function DashboardSection({ stats, onNavigate, timerMinutes, timerSeconds, timer
         </CardContent>
       </Card>
       {/* Streak Calendar Heatmap */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
             <Flame className="w-4 h-4 text-orange-500" />

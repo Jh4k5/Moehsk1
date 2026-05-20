@@ -68,7 +68,7 @@ function scorePronunciation(spoken: string, expected: string, confidence: number
   if (weightedScore >= 85) {
     return {
       score: weightedScore,
-      color: '#22c55e',
+      color: 'var(--clr-success)',
       feedback: 'Excellent pronunciation!',
       feedbackAr: 'ممتاز! نطقك رائع! 🎉',
     }
@@ -89,7 +89,7 @@ function scorePronunciation(spoken: string, expected: string, confidence: number
   } else {
     return {
       score: weightedScore,
-      color: '#ef4444',
+      color: 'var(--clr-danger)',
       feedback: 'Try again, listen carefully.',
       feedbackAr: 'حاول مرة أخرى، استمع جيداً 🎧',
     }
@@ -343,21 +343,21 @@ export default function PronunciationPractice() {
     <div dir="rtl" className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold text-red-700 flex items-center justify-center gap-3">
+        <h2 className="text-3xl font-bold text-[var(--clr-danger)] flex items-center justify-center gap-3">
           <Mic className="w-8 h-8" />
           تمارين النطق
         </h2>
-        <p className="text-gray-600">تدرّب على نطق الصينية وحسّن لهجتك</p>
+        <p className="text-[var(--text-tertiary)]">تدرّب على نطق الصينية وحسّن لهجتك</p>
       </div>
 
       {/* Not supported warning */}
       {!isSupported && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-[var(--clr-danger)]/30 bg-[var(--clr-danger-bg)]">
           <CardContent className="p-4 flex items-start gap-3">
-            <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+            <XCircle className="w-5 h-5 text-[var(--clr-danger)] shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-700">المتصفح لا يدعم التعرف على الصوت</p>
-              <p className="text-xs text-red-600 mt-1">يرجى استخدام Google Chrome أو Microsoft Edge لهذه الميزة.</p>
+              <p className="text-sm font-medium text-[var(--clr-danger)]">المتصفح لا يدعم التعرف على الصوت</p>
+              <p className="text-xs text-[var(--clr-danger)] mt-1">يرجى استخدام Google Chrome أو Microsoft Edge لهذه الميزة.</p>
             </div>
           </CardContent>
         </Card>
@@ -396,7 +396,7 @@ export default function PronunciationPractice() {
           {currentWord && (
             <>
               {/* Word Display */}
-              <Card className="border-2 border-red-200">
+              <Card className="border-2 border-[var(--clr-danger)]/30">
                 <CardContent className="p-8 text-center space-y-6">
                   {/* Category & difficulty */}
                   <div className="flex items-center justify-center gap-2">
@@ -417,9 +417,9 @@ export default function PronunciationPractice() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="space-y-3"
                   >
-                    <div className="font-chinese-serif text-6xl text-red-700">{currentWord.zh}</div>
-                    <div className="font-chinese-sans text-xl text-gray-600">{currentWord.pinyin}</div>
-                    <div className="text-lg text-gray-800">{currentWord.meaning}</div>
+                    <div className="font-chinese-serif text-6xl text-[var(--clr-danger)]">{currentWord.zh}</div>
+                    <div className="font-chinese-sans text-xl text-[var(--text-tertiary)]">{currentWord.pinyin}</div>
+                    <div className="text-lg text-[var(--text-primary)]">{currentWord.meaning}</div>
                   </motion.div>
 
                   {/* Listen button */}
@@ -437,13 +437,13 @@ export default function PronunciationPractice() {
                       disabled={!isSupported}
                       className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all ${
                         isRecording
-                          ? 'bg-red-600 shadow-lg shadow-red-200'
-                          : 'bg-red-50 border-2 border-red-300 hover:border-red-500 hover:bg-red-100'
+                          ? 'bg-[var(--clr-danger)] shadow-lg shadow-[var(--clr-danger)]/30'
+                          : 'bg-[var(--clr-danger-bg)] border-2 border-[var(--clr-danger)]/40 hover:border-[var(--clr-danger)] hover:bg-[var(--clr-danger-bg)]'
                       } ${!isSupported ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {isRecording && (
                         <motion.div
-                          className="absolute inset-0 rounded-full border-4 border-red-400"
+                          className="absolute inset-0 rounded-full border-4 border-[var(--clr-danger)]/50"
                           animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
                           transition={{ duration: 1.5, repeat: Infinity }}
                         />
@@ -455,12 +455,12 @@ export default function PronunciationPractice() {
                           </motion.div>
                         ) : (
                           <motion.div key="idle" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                            <Mic className="w-10 h-10 text-red-600" />
+                            <Mic className="w-10 h-10 text-[var(--clr-danger)]" />
                           </motion.div>
                         )}
                       </AnimatePresence>
                     </motion.button>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-[var(--text-muted)]">
                       {isRecording ? 'جاري التسجيل... اضغط للإيقاف' : 'سجّل نطقك'}
                     </p>
                   </div>
@@ -471,7 +471,7 @@ export default function PronunciationPractice() {
                       {[...Array(20)].map((_, i) => (
                         <motion.div
                           key={i}
-                          className="w-1 bg-red-400 rounded-full"
+                          className="w-1 bg-[var(--clr-danger)] rounded-full"
                           animate={{
                             height: [4, Math.random() * 24 + 4, 4],
                           }}
@@ -492,7 +492,7 @@ export default function PronunciationPractice() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="bg-red-50 text-red-700 text-sm p-3 rounded-lg flex items-center gap-2"
+                        className="bg-[var(--clr-danger-bg)] text-[var(--clr-danger)] text-sm p-3 rounded-lg flex items-center gap-2"
                       >
                         <XCircle className="w-4 h-4 shrink-0" />
                         {error}
@@ -518,7 +518,7 @@ export default function PronunciationPractice() {
                             <span className="text-3xl font-bold" style={{ color: result.color }}>
                               {result.score}
                             </span>
-                            <span className="text-xs text-gray-500">/ 100</span>
+                            <span className="text-xs text-[var(--text-muted)]">/ 100</span>
                           </div>
                         </div>
 
@@ -531,23 +531,23 @@ export default function PronunciationPractice() {
                         </div>
 
                         {/* Details */}
-                        <div className="bg-gray-50 rounded-lg p-4 text-sm space-y-2">
+                        <div className="bg-[var(--surface-card-h)] rounded-lg p-4 text-sm space-y-2">
                           <div className="flex justify-between">
-                            <span className="text-gray-500">ما قلته:</span>
+                            <span className="text-[var(--text-muted)]">ما قلته:</span>
                             <span className="font-chinese-sans">{result.spoken}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-500">الصحيح:</span>
-                            <span className="font-chinese-sans font-bold text-red-700">{currentWord.zh}</span>
+                            <span className="text-[var(--text-muted)]">الصحيح:</span>
+                            <span className="font-chinese-sans font-bold text-[var(--clr-danger)]">{currentWord.zh}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-500">ثقة المحرك:</span>
+                            <span className="text-[var(--text-muted)]">ثقة المحرك:</span>
                             <span>{Math.round(result.confidence * 100)}%</span>
                           </div>
                           {wordAttempts && (
                             <div className="flex justify-between">
-                              <span className="text-gray-500">أفضل نتيجة:</span>
-                              <span style={{ color: wordAttempts.best >= 85 ? '#22c55e' : wordAttempts.best >= 60 ? '#f97316' : '#ef4444' }}>
+                              <span className="text-[var(--text-muted)]">أفضل نتيجة:</span>
+                              <span style={{ color: wordAttempts.best >= 85 ? 'var(--clr-success)' : wordAttempts.best >= 60 ? '#f97316' : 'var(--clr-danger)' }}>
                                 {wordAttempts.best}/100
                               </span>
                             </div>
@@ -563,7 +563,7 @@ export default function PronunciationPractice() {
                             <RotateCcw className="w-4 h-4 ml-1" />
                             حاول مرة أخرى
                           </Button>
-                          <Button onClick={nextWord} className="bg-red-600 hover:bg-red-700">
+                          <Button onClick={nextWord} className="bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80">
                             الكلمة التالية
                             <ChevronLeft className="w-4 h-4 mr-1" />
                           </Button>
@@ -581,7 +581,7 @@ export default function PronunciationPractice() {
                   السابق
                 </Button>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-[var(--text-muted)]">
                     {currentWordIndex + 1} / {filteredWords.length}
                   </span>
                   <Button variant="ghost" size="sm" onClick={randomWord}>
@@ -606,18 +606,18 @@ export default function PronunciationPractice() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-red-50 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold text-red-700">{overallStats.totalAttempts}</div>
-                  <div className="text-xs text-gray-500">محاولات</div>
+                <div className="bg-[var(--clr-danger-bg)] rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-[var(--clr-danger)]">{overallStats.totalAttempts}</div>
+                  <div className="text-xs text-[var(--text-muted)]">محاولات</div>
                 </div>
-                <div className="bg-green-50 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold text-green-700">{overallStats.excellent}</div>
-                  <div className="text-xs text-gray-500">ممتاز</div>
+                <div className="bg-[var(--clr-success-bg)] rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-[var(--clr-success)]">{overallStats.excellent}</div>
+                  <div className="text-xs text-[var(--text-muted)]">ممتاز</div>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-500">المتوسط العام</span>
+                  <span className="text-[var(--text-muted)]">المتوسط العام</span>
                   <span className="font-bold">{overallStats.avg}%</span>
                 </div>
                 <Progress value={overallStats.avg} className="h-2" />
@@ -629,30 +629,30 @@ export default function PronunciationPractice() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
-                <Lightbulb className="w-4 h-4 text-amber-500" />
+                <Lightbulb className="w-4 h-4 text-[var(--clr-warning)]" />
                 نصائح للنطق
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <ul className="space-y-2 text-sm text-[var(--text-tertiary)]">
                 <li className="flex items-start gap-2">
-                  <span className="text-red-500">•</span>
+                  <span className="text-[var(--clr-danger)]">•</span>
                   استمع أولاً للنطق الصحيح ثم حاكه
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-500">•</span>
+                  <span className="text-[var(--clr-danger)]">•</span>
                   انتبه للنبرات الأربع — تغيير النبرة يغير المعنى
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-500">•</span>
+                  <span className="text-[var(--clr-danger)]">•</span>
                   تحدث ببطء ووضوح في البداية
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-500">•</span>
+                  <span className="text-[var(--clr-danger)]">•</span>
                   سجّل نفسك واسمع التسجيل للمقارنة
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-500">•</span>
+                  <span className="text-[var(--clr-danger)]">•</span>
                   استخدم Chrome أو Edge لأفضل نتيجة
                 </li>
               </ul>
@@ -671,14 +671,14 @@ export default function PronunciationPractice() {
                   if (!word) return null
                   return (
                     <div key={idx} className="flex items-center gap-2 text-sm">
-                      <span className="font-chinese-serif text-red-700">{word.zh}</span>
-                      <span className="text-gray-400 flex-1 text-xs truncate">{word.meaning}</span>
+                      <span className="font-chinese-serif text-[var(--clr-danger)]">{word.zh}</span>
+                      <span className="text-[var(--text-muted)] flex-1 text-xs truncate">{word.meaning}</span>
                       <Badge
                         variant="secondary"
                         className="text-[10px]"
                         style={{
                           backgroundColor: data.best >= 85 ? '#22c55e20' : data.best >= 60 ? '#f9731620' : '#ef444420',
-                          color: data.best >= 85 ? '#22c55e' : data.best >= 60 ? '#f97316' : '#ef4444',
+                          color: data.best >= 85 ? 'var(--clr-success)' : data.best >= 60 ? '#f97316' : 'var(--clr-danger)',
                         }}
                       >
                         {data.best}
@@ -687,7 +687,7 @@ export default function PronunciationPractice() {
                   )
                 })}
                 {Object.keys(attempts).length === 0 && (
-                  <p className="text-sm text-gray-400 text-center py-4">
+                  <p className="text-sm text-[var(--text-muted)] text-center py-4">
                     لم تبدأ بعد. اضغط على زر الميكروفون!
                   </p>
                 )}

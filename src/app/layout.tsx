@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Tajawal, Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const tajawal = Tajawal({
   variable: "--font-tajawal",
@@ -34,11 +35,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var t = localStorage.getItem('theme');
+              if (t === 'light') { document.documentElement.classList.add('light'); document.documentElement.classList.remove('dark'); }
+              else { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light'); }
+            } catch(e) { document.documentElement.classList.add('dark'); }
+          })();
+        ` }} />
+      </head>
       <body
         className={`${tajawal.variable} ${notoSansSC.variable} ${notoSerifSC.variable} antialiased bg-background text-foreground font-arabic`}
         style={{ fontFamily: "'Tajawal', sans-serif" }}
       >
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

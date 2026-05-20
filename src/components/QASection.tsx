@@ -23,44 +23,44 @@ const colorMap: Record<string, {
   badgeText: string
 }> = {
   blue: {
-    border: 'border-blue-300',
-    bg: 'bg-blue-50',
-    bgLight: 'bg-blue-50',
-    text: 'text-blue-700',
-    badgeBg: 'bg-blue-100',
-    badgeText: 'text-blue-700',
+    border: 'border-[var(--clr-info)]/40',
+    bg: 'bg-[var(--clr-info-bg)]',
+    bgLight: 'bg-[var(--clr-info-bg)]',
+    text: 'text-[var(--clr-info)]',
+    badgeBg: 'bg-[var(--clr-info-bg)]',
+    badgeText: 'text-[var(--clr-info)]',
   },
   green: {
-    border: 'border-green-300',
-    bg: 'bg-green-50',
-    bgLight: 'bg-green-50',
-    text: 'text-green-700',
-    badgeBg: 'bg-green-100',
-    badgeText: 'text-green-700',
+    border: 'border-[var(--clr-success)]/40',
+    bg: 'bg-[var(--clr-success-bg)]',
+    bgLight: 'bg-[var(--clr-success-bg)]',
+    text: 'text-[var(--clr-success)]',
+    badgeBg: 'bg-[var(--clr-success-bg)]',
+    badgeText: 'text-[var(--clr-success)]',
   },
   purple: {
-    border: 'border-purple-300',
-    bg: 'bg-purple-50',
-    bgLight: 'bg-purple-50',
-    text: 'text-purple-700',
-    badgeBg: 'bg-purple-100',
-    badgeText: 'text-purple-700',
+    border: 'border-[var(--clr-primary)]/40',
+    bg: 'bg-[var(--clr-primary)]/10',
+    bgLight: 'bg-[var(--clr-primary)]/10',
+    text: 'text-[var(--clr-primary)]',
+    badgeBg: 'bg-[var(--clr-primary)]/15',
+    badgeText: 'text-[var(--clr-primary)]',
   },
   orange: {
-    border: 'border-orange-300',
-    bg: 'bg-orange-50',
-    bgLight: 'bg-orange-50',
-    text: 'text-orange-700',
-    badgeBg: 'bg-orange-100',
-    badgeText: 'text-orange-700',
+    border: 'border-[var(--clr-energy)]/40',
+    bg: 'bg-[var(--clr-energy-bg)]',
+    bgLight: 'bg-[var(--clr-energy-bg)]',
+    text: 'text-[var(--clr-energy)]',
+    badgeBg: 'bg-[var(--clr-energy-bg)]',
+    badgeText: 'text-[var(--clr-energy)]',
   },
   red: {
-    border: 'border-red-300',
-    bg: 'bg-red-50',
-    bgLight: 'bg-red-50',
-    text: 'text-red-700',
-    badgeBg: 'bg-red-100',
-    badgeText: 'text-red-700',
+    border: 'border-[var(--clr-danger)]/40',
+    bg: 'bg-[var(--clr-danger-bg)]',
+    bgLight: 'bg-[var(--clr-danger-bg)]',
+    text: 'text-[var(--clr-danger)]',
+    badgeBg: 'bg-[var(--clr-danger-bg)]',
+    badgeText: 'text-[var(--clr-danger)]',
   },
 }
 
@@ -399,18 +399,18 @@ function FlashcardPractice({ question, category }: {
             >
               {/* Front - Question */}
               <div
-                className="w-full p-4 rounded-xl border-2 border-blue-200 bg-blue-50"
+                className="w-full p-4 rounded-xl border-2 border-[var(--clr-info)]/30 bg-[var(--clr-info-bg)]"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-blue-600">السؤال</span>
+                  <span className="text-xs font-bold text-[var(--clr-info)]">السؤال</span>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
                     onClick={(e) => { e.stopPropagation(); speak(question.q) }}
                   >
-                    <Volume2 className="w-4 h-4 text-blue-600" />
+                    <Volume2 className="w-4 h-4 text-[var(--clr-info)]" />
                   </Button>
                 </div>
                 <p className="font-chinese-serif text-xl font-bold text-center my-3">
@@ -419,7 +419,7 @@ function FlashcardPractice({ question, category }: {
                 <p className="font-chinese-sans text-sm text-muted-foreground text-center">
                   {question.pinyin}
                 </p>
-                <p className="text-sm text-blue-700 text-center mt-1 font-bold">
+                <p className="text-sm text-[var(--clr-info)] text-center mt-1 font-bold">
                   {question.arabic}
                 </p>
                 <p className="text-xs text-center text-muted-foreground mt-3">
@@ -429,14 +429,14 @@ function FlashcardPractice({ question, category }: {
 
               {/* Back - Answer */}
               <div
-                className="w-full p-4 rounded-xl border-2 border-green-200 bg-green-50 absolute inset-0"
+                className="w-full p-4 rounded-xl border-2 border-[var(--clr-success)]/30 bg-[var(--clr-success-bg)] absolute inset-0"
                 style={{
                   backfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
                 }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-green-600">الجواب</span>
+                  <span className="text-xs font-bold text-[var(--clr-success)]">الجواب</span>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -446,7 +446,7 @@ function FlashcardPractice({ question, category }: {
                       if (question.answers.length > 0) speak(question.answers[0].zh)
                     }}
                   >
-                    <Volume2 className="w-4 h-4 text-green-600" />
+                    <Volume2 className="w-4 h-4 text-[var(--clr-success)]" />
                   </Button>
                 </div>
                 {hasAnswers ? (
@@ -455,7 +455,7 @@ function FlashcardPractice({ question, category }: {
                       <div key={i} className="text-center space-y-1">
                         <p className="font-chinese-serif text-lg font-bold">{ans.zh}</p>
                         <p className="font-chinese-sans text-sm text-muted-foreground">{ans.pinyin}</p>
-                        <p className="text-sm text-green-700 font-bold">{ans.arabic}</p>
+                        <p className="text-sm text-[var(--clr-success)] font-bold">{ans.arabic}</p>
                       </div>
                     ))}
                   </div>
@@ -677,7 +677,7 @@ export default function QASection() {
         className="text-center space-y-2"
       >
         <div className="flex items-center justify-center gap-2 mb-2">
-          <HelpCircle className="w-7 h-7 text-blue-600" />
+          <HelpCircle className="w-7 h-7 text-[var(--clr-info)]" />
           <h2 className="text-2xl font-bold">الأسئلة اليومية</h2>
         </div>
         <p className="text-muted-foreground text-sm max-w-lg mx-auto">
@@ -812,7 +812,7 @@ export default function QASection() {
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      className={"gap-2 text-xs border-purple-300 text-purple-700 hover:bg-purple-50"}
+                                      className={"gap-2 text-xs border-[var(--clr-primary)]/40 text-[var(--clr-primary)] hover:bg-[var(--clr-primary)]/10"}
                                       onClick={() => toggleFlashcard(flashcardKey)}
                                     >
                                       <Lightbulb className="w-3.5 h-3.5" />
@@ -831,9 +831,9 @@ export default function QASection() {
                                           transition={{ duration: 0.3 }}
                                           className="overflow-hidden"
                                         >
-                                          <div className={"rounded-lg p-3 space-y-2 border-r-4 border-r-green-500 bg-green-50"}>
+                                          <div className={"rounded-lg p-3 space-y-2 border-r-4 border-r-green-500 bg-[var(--clr-success-bg)]"}>
                                             <div className="flex items-center justify-between">
-                                              <span className="text-xs font-bold text-green-600 flex items-center gap-1">
+                                              <span className="text-xs font-bold text-[var(--clr-success)] flex items-center gap-1">
                                                 <Check className="w-3 h-3" />
                                                 الإجابة
                                               </span>
@@ -843,7 +843,7 @@ export default function QASection() {
                                                 className="h-6 w-6"
                                                 onClick={() => speak(question.answers[0].zh)}
                                               >
-                                                <Volume2 className="w-3 h-3 text-green-600" />
+                                                <Volume2 className="w-3 h-3 text-[var(--clr-success)]" />
                                               </Button>
                                             </div>
                                             {question.answers.map((ans, aIdx) => (
@@ -855,7 +855,7 @@ export default function QASection() {
                                                   <p className="text-xs text-muted-foreground font-chinese-sans">
                                                     {ans.pinyin}
                                                   </p>
-                                                  <p className="text-sm text-green-700">
+                                                  <p className="text-sm text-[var(--clr-success)]">
                                                     {ans.arabic}
                                                   </p>
                                                 </div>
@@ -903,12 +903,12 @@ export default function QASection() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <Move className="w-5 h-5 text-blue-600" />
+                    <Move className="w-5 h-5 text-[var(--clr-info)]" />
                     <span className="font-bold">تمرين ترتيب الكلمات</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge variant="outline" className="gap-1">
-                      <Check className="w-3 h-3 text-green-500" />
+                      <Check className="w-3 h-3 text-[var(--clr-success)]" />
                       {dndScore}
                     </Badge>
                     <span className="text-sm text-muted-foreground">/</span>
@@ -935,8 +935,8 @@ export default function QASection() {
               <Card className="text-center shadow-md">
                 <CardContent className="p-8 space-y-4">
                   <div className="flex justify-center">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center bg-blue-50">
-                      <Move className="w-8 h-8 text-blue-600" />
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[var(--clr-info-bg)]">
+                      <Move className="w-8 h-8 text-[var(--clr-info)]" />
                     </div>
                   </div>
                   <p className="font-bold text-lg">تمرين ترتيب الكلمات</p>
@@ -961,7 +961,7 @@ export default function QASection() {
               >
                 {/* Category info */}
                 <div className="flex items-center gap-2">
-                  <Badge className="text-sm px-3 py-1 bg-blue-100 text-blue-700 border-blue-300">
+                  <Badge className="text-sm px-3 py-1 bg-[var(--clr-info-bg)] text-[var(--clr-info)] border-[var(--clr-info)]/40">
                     {dndCategory}
                   </Badge>
                 </div>
@@ -971,9 +971,9 @@ export default function QASection() {
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-3 rounded-lg bg-red-50 border border-red-200 space-y-1"
+                    className="p-3 rounded-lg bg-[var(--clr-danger-bg)] border border-[var(--clr-danger)]/30 space-y-1"
                   >
-                    <p className="text-xs text-red-500 font-bold">الجملة الصحيحة:</p>
+                    <p className="text-xs text-[var(--clr-danger)] font-bold">الجملة الصحيحة:</p>
                     <p className="font-chinese-serif text-lg">{dndSentence}</p>
                   </motion.div>
                 )}
@@ -983,8 +983,8 @@ export default function QASection() {
                   className={(
                     dndChecked
                       ? dndCorrect
-                        ? 'min-h-20 transition-all shadow-sm border-2 border-green-500 bg-green-50'
-                        : 'min-h-20 transition-all shadow-sm border-2 border-red-500'
+                        ? 'min-h-20 transition-all shadow-sm border-2 border-[var(--clr-success)] bg-[var(--clr-success-bg)]'
+                        : 'min-h-20 transition-all shadow-sm border-2 border-[var(--clr-danger)]'
                       : 'min-h-20 transition-all shadow-sm border-2 border-dashed border-muted-foreground/30'
                   )}
                 >
@@ -1013,7 +1013,7 @@ export default function QASection() {
                           }}
                           transition={{ duration: 0.2 }}
                           draggable
-                          onDragStart={(e) => handleDragStartDropped(e, idx)}
+                          onDragStart={(e) => handleDragStartDropped(e as any, idx)}
                           onDragOver={(e) => handleDragOverSlot(e, idx)}
                           onDragLeave={handleDragLeaveSlot}
                           onDrop={(e) => handleDropOnSlot(e, idx)}
@@ -1024,18 +1024,18 @@ export default function QASection() {
                             (dndChecked ? 'pointer-events-none' : '') +
                             (dndChecked
                               ? dndCorrect
-                                ? ' border-green-500 bg-green-50'
-                                : ' border-red-500 bg-red-50'
+                                ? ' border-[var(--clr-success)] bg-[var(--clr-success-bg)]'
+                                : ' border-[var(--clr-danger)] bg-[var(--clr-danger-bg)]'
                               : dndDragOverIdx === idx
-                                ? ' border-blue-500 bg-blue-50'
-                                : ' border-blue-200 bg-white'
+                                ? ' border-[var(--clr-info)] bg-[var(--clr-info-bg)]'
+                                : ' border-[var(--clr-info)]/30 bg-[var(--surface-card)]'
                             )
                           )}
                         >
                           <span>{word}</span>
                           {!dndChecked && (
                             <button
-                              className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-red-100 text-red-500 flex items-center justify-center text-xs hover:bg-red-200 transition-colors"
+                              className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-[var(--clr-danger-bg)] text-[var(--clr-danger)] flex items-center justify-center text-xs hover:bg-[var(--clr-danger-bg)] transition-colors"
                               onClick={() => handleRemoveDropped(idx)}
                               onMouseDown={(e) => e.stopPropagation()}
                             >
@@ -1091,10 +1091,10 @@ export default function QASection() {
                             whileHover={!isUsedInPool ? { scale: 1.05 } : {}}
                             whileTap={!isUsedInPool ? { scale: 0.95 } : {}}
                             draggable={!isUsedInPool}
-                            onDragStart={(e) => !isUsedInPool && handleDragStartSource(e, idx)}
+                            onDragStart={(e) => !isUsedInPool && handleDragStartSource(e as any, idx)}
                             className={
                               'px-3 py-2 rounded-lg border-2 text-base font-chinese-serif ' +
-                              'select-none transition-colors border-blue-200 bg-blue-50 ' +
+                              'select-none transition-colors border-[var(--clr-info)]/30 bg-[var(--clr-info-bg)] ' +
                               (isUsedInPool ? 'opacity-30 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing')
                             }
                           >
@@ -1147,9 +1147,9 @@ export default function QASection() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="p-3 rounded-lg bg-green-50 border border-green-200 text-center"
+                      className="p-3 rounded-lg bg-[var(--clr-success-bg)] border border-[var(--clr-success)]/30 text-center"
                     >
-                      <div className="flex items-center justify-center gap-2 text-green-600">
+                      <div className="flex items-center justify-center gap-2 text-[var(--clr-success)]">
                         <Check className="w-5 h-5" />
                         <span className="font-bold">أحسنت! إجابة صحيحة! 🎉</span>
                       </div>
@@ -1169,9 +1169,9 @@ export default function QASection() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="p-3 rounded-lg bg-red-50 border border-red-200 text-center"
+                      className="p-3 rounded-lg bg-[var(--clr-danger-bg)] border border-[var(--clr-danger)]/30 text-center"
                     >
-                      <div className="flex items-center justify-center gap-2 text-red-500">
+                      <div className="flex items-center justify-center gap-2 text-[var(--clr-danger)]">
                         <X className="w-5 h-5" />
                         <span className="font-bold">ليس تماماً... حاول مرة أخرى!</span>
                       </div>
@@ -1198,8 +1198,8 @@ export default function QASection() {
               <Card className="text-center shadow-md">
                 <CardContent className="p-8 space-y-4">
                   <div className="flex justify-center">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center bg-blue-50">
-                      <Lightbulb className="w-8 h-8 text-blue-600" />
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[var(--clr-info-bg)]">
+                      <Lightbulb className="w-8 h-8 text-[var(--clr-info)]" />
                     </div>
                   </div>
                   <p className="font-bold text-lg">اختبار التصنيف السريع</p>
@@ -1232,7 +1232,7 @@ export default function QASection() {
                     <div className="flex justify-center">
                       <div className={
                         'w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold ' +
-                        (quizScore >= 8 ? 'bg-green-500' : quizScore >= 5 ? 'bg-yellow-500' : 'bg-red-500')
+                        (quizScore >= 8 ? 'bg-[var(--clr-success)]' : quizScore >= 5 ? 'bg-[var(--clr-warning)]' : 'bg-[var(--clr-danger)]')
                       }>
                         {quizScore}
                       </div>
@@ -1257,7 +1257,7 @@ export default function QASection() {
                         transition={{ duration: 1, delay: 0.3 }}
                         className={
                           'h-3 rounded-full ' +
-                          (quizScore >= 8 ? 'bg-green-500' : quizScore >= 5 ? 'bg-yellow-500' : 'bg-red-500')
+                          (quizScore >= 8 ? 'bg-[var(--clr-success)]' : quizScore >= 5 ? 'bg-[var(--clr-warning)]' : 'bg-[var(--clr-danger)]')
                         }
                       />
                     </div>
@@ -1299,7 +1299,7 @@ export default function QASection() {
                       </span>
                       <div className="flex items-center gap-3">
                         <Badge variant="outline" className="gap-1">
-                          <Check className="w-3 h-3 text-green-500" />
+                          <Check className="w-3 h-3 text-[var(--clr-success)]" />
                           {quizScore}
                         </Badge>
                         {/* Timer */}
@@ -1314,7 +1314,7 @@ export default function QASection() {
                     {/* Progress bar */}
                     <div className="w-full bg-muted rounded-full h-1.5 mt-2">
                       <div
-                        className="h-1.5 rounded-full transition-all duration-300 bg-blue-600"
+                        className="h-1.5 rounded-full transition-all duration-300 bg-[var(--clr-info)]"
                         style={{
                           width: ((quizCurrent + 1) / quizQuestions.length) * 100 + "%",
                         }}
@@ -1328,19 +1328,19 @@ export default function QASection() {
                   <Card className="shadow-md">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <HelpCircle className="w-4 h-4 text-blue-600" />
+                        <HelpCircle className="w-4 h-4 text-[var(--clr-info)]" />
                         ما التصنيف المناسب لهذا السؤال؟
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div className="space-y-2 p-3 rounded-lg bg-blue-50">
+                      <div className="space-y-2 p-3 rounded-lg bg-[var(--clr-info-bg)]">
                         <p className="font-chinese-serif text-lg font-bold">
                           {quizQuestions[quizCurrent].questionZh}
                         </p>
                         <p className="font-chinese-sans text-sm text-muted-foreground">
                           {quizQuestions[quizCurrent].questionPinyin}
                         </p>
-                        <p className="text-sm font-bold text-blue-700">
+                        <p className="text-sm font-bold text-[var(--clr-info)]">
                           {quizQuestions[quizCurrent].questionAr}
                         </p>
                       </div>
@@ -1363,9 +1363,9 @@ export default function QASection() {
                                 'relative p-3 rounded-lg border-2 text-center transition-all text-sm ' +
                                 (showResult
                                   ? isCorrect
-                                    ? 'border-green-500 bg-green-50 text-green-700'
+                                    ? 'border-[var(--clr-success)] bg-[var(--clr-success-bg)] text-[var(--clr-success)]'
                                     : isSelected
-                                      ? 'border-red-500 bg-red-50 text-red-700'
+                                      ? 'border-[var(--clr-danger)] bg-[var(--clr-danger-bg)] text-[var(--clr-danger)]'
                                       : 'border-muted opacity-50'
                                   : 'border-muted hover:bg-muted/50'
                                 )
@@ -1376,7 +1376,7 @@ export default function QASection() {
                                 <motion.div
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center"
+                                  className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-[var(--clr-success)] text-white flex items-center justify-center"
                                 >
                                   <Check className="w-3 h-3" />
                                 </motion.div>
@@ -1385,7 +1385,7 @@ export default function QASection() {
                                 <motion.div
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center"
+                                  className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-[var(--clr-danger)] text-white flex items-center justify-center"
                                 >
                                   <X className="w-3 h-3" />
                                 </motion.div>
@@ -1405,8 +1405,8 @@ export default function QASection() {
                             className={
                               'p-3 rounded-lg text-center text-sm ' +
                               (quizAnswer === quizQuestions[quizCurrent].correctIndex
-                                ? 'bg-green-50 text-green-600'
-                                : 'bg-red-50 text-red-500')
+                                ? 'bg-[var(--clr-success-bg)] text-[var(--clr-success)]'
+                                : 'bg-[var(--clr-danger-bg)] text-[var(--clr-danger)]')
                             }
                           >
                             {quizAnswer === quizQuestions[quizCurrent].correctIndex

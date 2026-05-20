@@ -31,10 +31,11 @@ export async function POST(req: NextRequest) {
       })),
     ];
 
-    // Use the LLM from z-ai-web-dev-sdk
-    const { LLM } = await import('z-ai-web-dev-sdk');
+    // Use the ZAI SDK for chat completion
+    const ZAI = (await import('z-ai-web-dev-sdk')).default;
+    const zai = await ZAI.create();
 
-    const response = await LLM.chat({
+    const response = await zai.chat.completions.create({
       model: 'glm-4-flash',
       messages: apiMessages,
       temperature: 0.7,

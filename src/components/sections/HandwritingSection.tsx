@@ -186,7 +186,7 @@ export function HandwritingSection() {
       <div className="grid md:grid-cols-2 gap-4">
         {/* Left: Character Info */}
         <div className="space-y-4">
-          <Card className="border-0 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <Card className="j-card border-0 shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-6 text-center">
               <button onClick={() => speak(currentChar.zh)} className="group block mx-auto mb-3">
                 <div className="font-chinese-serif text-7xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-red-600 transition-colors drop-shadow-sm">
@@ -201,7 +201,7 @@ export function HandwritingSection() {
             </CardContent>
           </Card>
           {/* Quick Select */}
-          <Card className="border-0 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <Card className="j-card border-0 shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-4">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">اختر حرفاً:</h3>
               <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto custom-scrollbar">
@@ -228,7 +228,7 @@ export function HandwritingSection() {
           </div>
         </div>
         {/* Right: Canvas */}
-        <Card className="border-0 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        <Card className="j-card border-0 shadow-sm dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-4 space-y-3">
             {/* Canvas Tools — grouped */}
             <div className="flex flex-col gap-2">

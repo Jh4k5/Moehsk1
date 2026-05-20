@@ -86,7 +86,7 @@ export function ChatSection() {
       </div>
       <p className="text-gray-500 text-sm">اسألني عن أي كلمة صينية أو احصل على نصائح للتعلم!</p>
       {/* Chat Messages */}
-      <Card className="border-0 shadow-sm">
+      <Card className="j-card border-0 shadow-sm">
         <CardContent className="p-0">
           <div className="h-[400px] overflow-y-auto custom-scrollbar p-4 space-y-4" id="chat-container">
             {store.chatMessages.length === 0 && (

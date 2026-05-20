@@ -114,7 +114,7 @@ export default function PomodoroTimer() {
             className={`flex-1 gap-1.5 text-xs ${
               mode === key
                 ? 'border-0 shadow-sm'
-                : 'hover:bg-gray-50'
+                : 'hover:bg-[var(--surface-card-h)]'
             }`}
             style={mode === key ? { backgroundColor: m.color, color: 'white' } : { borderColor: m.color, color: m.color }}
             onClick={() => switchMode(key)}
@@ -157,7 +157,7 @@ export default function PomodoroTimer() {
             >
               {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </div>
-            <div className="text-xs text-gray-500 mt-1">{currentMode.label}</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1">{currentMode.label}</div>
           </div>
 
           {/* Celebration effect */}
@@ -211,31 +211,31 @@ export default function PomodoroTimer() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
-        <Card className="border-0 shadow-sm text-center">
+        <Card className="j-card border-0 shadow-sm text-center">
           <CardContent className="p-3">
             <div className="flex items-center justify-center mb-1">
-              <Flame className="w-4 h-4 text-amber-500 animate-streak-glow" />
+              <Flame className="w-4 h-4 text-[var(--clr-warning)] animate-streak-glow" />
             </div>
             <div className="text-xl font-bold" style={{ color: currentMode.color }}>
               {sessionsCompleted}
             </div>
-            <div className="text-[10px] text-gray-500">جلسات مكتملة</div>
+            <div className="text-[10px] text-[var(--text-muted)]">جلسات مكتملة</div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm text-center">
+        <Card className="j-card border-0 shadow-sm text-center">
           <CardContent className="p-3">
             <div className="text-lg mb-1">⏱️</div>
-            <div className="text-xl font-bold text-gray-700">{totalMinutesFocused}</div>
-            <div className="text-[10px] text-gray-500">دقائق تركيز</div>
+            <div className="text-xl font-bold text-[var(--text-secondary)]">{totalMinutesFocused}</div>
+            <div className="text-[10px] text-[var(--text-muted)]">دقائق تركيز</div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm text-center">
+        <Card className="j-card border-0 shadow-sm text-center">
           <CardContent className="p-3">
             <div className="text-lg mb-1">🎯</div>
-            <div className="text-xl font-bold text-gray-700">
+            <div className="text-xl font-bold text-[var(--text-secondary)]">
               {sessionsCompleted > 0 ? Math.round((sessionsCompleted / 4) * 100) : 0}%
             </div>
-            <div className="text-[10px] text-gray-500">تقدم الدورة</div>
+            <div className="text-[10px] text-[var(--text-muted)]">تقدم الدورة</div>
           </CardContent>
         </Card>
       </div>

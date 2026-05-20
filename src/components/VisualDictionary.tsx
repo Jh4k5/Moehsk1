@@ -293,7 +293,7 @@ export default function VisualDictionary() {
       setPronResult({
         score: s,
         spoken: bestSpoken,
-        color: s >= 85 ? '#22c55e' : s >= 60 ? '#f97316' : '#ef4444',
+        color: s >= 85 ? 'var(--clr-success)' : s >= 60 ? '#f97316' : 'var(--clr-danger)',
         msg: s >= 85 ? 'ممتاز! نطقك رائع! 🎉' : s >= 60 ? 'جيد! استمر بالتدريب 💪' : 'حاول مرة أخرى، استمع أولاً 🎧',
       })
       setIsRecording(false)
@@ -351,14 +351,14 @@ export default function VisualDictionary() {
   return (
     <div className="space-y-5">
       {/* ─── Header ──────────────────────────────────────────────────── */}
-      <div className="rounded-2xl bg-gradient-to-l from-red-600 via-rose-600 to-red-700 p-6 text-white shadow-lg">
+      <div className="rounded-2xl bg-gradient-to-l from-[var(--clr-danger)] via-[var(--clr-danger)] to-[var(--clr-danger)] p-6 text-white shadow-lg">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
               <span className="text-4xl">📖</span>
               القاموس المرئي والنطق
             </h2>
-            <p className="text-red-100 mt-1 text-sm sm:text-base">
+            <p className="text-[var(--clr-danger)] mt-1 text-sm sm:text-base">
               تعلّم الكلمات الصينية بالصور والنطق الصحيح — {totalWords + vocabulary.length} كلمة شاملة
             </p>
           </div>
@@ -368,7 +368,7 @@ export default function VisualDictionary() {
               variant={activeView === 'browse' ? 'secondary' : 'ghost'}
               className={activeView === 'browse'
                 ? 'bg-white/20 hover:bg-white/30 text-white'
-                : 'text-red-100 hover:text-white hover:bg-white/10'}
+                : 'text-[var(--clr-danger)] hover:text-white hover:bg-white/10'}
               size="sm"
             >
               <Languages className="w-4 h-4 ml-1" />
@@ -379,7 +379,7 @@ export default function VisualDictionary() {
               variant={activeView === 'pronounce' ? 'secondary' : 'ghost'}
               className={activeView === 'pronounce'
                 ? 'bg-white/20 hover:bg-white/30 text-white'
-                : 'text-red-100 hover:text-white hover:bg-white/10'}
+                : 'text-[var(--clr-danger)] hover:text-white hover:bg-white/10'}
               size="sm"
               disabled={!pronSupported}
             >
@@ -391,7 +391,7 @@ export default function VisualDictionary() {
               variant={activeView === 'quiz' ? 'secondary' : 'ghost'}
               className={activeView === 'quiz'
                 ? 'bg-white/20 hover:bg-white/30 text-white'
-                : 'text-red-100 hover:text-white hover:bg-white/10'}
+                : 'text-[var(--clr-danger)] hover:text-white hover:bg-white/10'}
               size="sm"
             >
               <Gamepad2 className="w-4 h-4 ml-1" />
@@ -413,8 +413,8 @@ export default function VisualDictionary() {
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
                 className={activeCategory === cat.key
-                  ? 'whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 bg-red-600 text-white shadow-md shadow-red-600/25'
-                  : 'whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 bg-white text-gray-600 hover:bg-red-50 hover:text-red-600 border border-gray-200'}
+                  ? 'whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 bg-[var(--clr-danger)] text-white shadow-md shadow-[var(--clr-danger)]/25/25'
+                  : 'whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 bg-[var(--surface-card)] text-[var(--text-tertiary)] hover:bg-[var(--clr-danger-bg)] hover:text-[var(--clr-danger)] border border-[var(--line-default)]'}
               >
                 <span>{cat.icon}</span>
                 {cat.label}
@@ -430,7 +430,7 @@ export default function VisualDictionary() {
 
           {/* Category title */}
           <div className="flex items-center justify-between px-1">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
               <span className="text-xl">{currentCat?.icon}</span>
               {currentCat?.label}
               <Badge variant="secondary" className="font-normal">
@@ -440,7 +440,7 @@ export default function VisualDictionary() {
             <Button
               size="sm"
               variant="outline"
-              className="text-red-600 border-red-200 hover:bg-red-50"
+              className="text-[var(--clr-danger)] border-[var(--clr-danger)]/30 hover:bg-[var(--clr-danger-bg)]"
               onClick={() => {
                 let i = 0
                 const speakNext = () => {
@@ -477,12 +477,12 @@ export default function VisualDictionary() {
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.03 }}
-                    className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-red-200 hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden"
+                    className="group relative bg-[var(--surface-card)] rounded-2xl border border-[var(--line-subtle)] shadow-sm hover:shadow-lg hover:border-[var(--clr-danger)]/30 hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden"
                     onClick={() => speak(w.hanzi)}
                   >
                     {/* Learned indicator */}
                     {learned && (
-                      <div className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-sm">
+                      <div className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-[var(--clr-success)] flex items-center justify-center shadow-sm">
                         <Check className="w-3.5 h-3.5 text-white" />
                       </div>
                     )}
@@ -497,17 +497,17 @@ export default function VisualDictionary() {
                       <span className="text-4xl block drop-shadow-sm">{w.emoji}</span>
 
                       {/* Hanzi */}
-                      <span className="block text-2xl font-bold text-gray-900 font-chinese-serif">
+                      <span className="block text-2xl font-bold text-[var(--text-primary)] font-chinese-serif">
                         {w.hanzi}
                       </span>
 
                       {/* Pinyin */}
-                      <span className="block text-sm text-rose-600 font-medium font-chinese-sans">
+                      <span className="block text-sm text-[var(--clr-danger)] font-medium font-chinese-sans">
                         {w.pinyin}
                       </span>
 
                       {/* Arabic meaning */}
-                      <span className="block text-xs text-gray-500 truncate" dir="rtl">
+                      <span className="block text-xs text-[var(--text-muted)] truncate" dir="rtl">
                         {w.arabic}
                       </span>
 
@@ -518,13 +518,13 @@ export default function VisualDictionary() {
                           speak(w.hanzi)
                         }}
                         className={learned
-                          ? 'mx-auto mt-1 w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 flex items-center justify-center transition-colors'
-                          : 'mx-auto mt-1 w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors group-hover:bg-red-600 group-hover:text-white'}
+                          ? 'mx-auto mt-1 w-8 h-8 rounded-full bg-[var(--clr-success-bg)] hover:bg-[var(--clr-success-bg)] flex items-center justify-center transition-colors'
+                          : 'mx-auto mt-1 w-8 h-8 rounded-full bg-[var(--clr-danger-bg)] hover:bg-[var(--clr-danger-bg)] flex items-center justify-center transition-colors group-hover:bg-[var(--clr-danger)] group-hover:text-white'}
                         aria-label={`نطق ${w.hanzi}`}
                       >
                         <Volume2 className={learned
-                          ? 'w-3.5 h-3.5 text-green-500 transition-colors'
-                          : 'w-3.5 h-3.5 text-red-500 group-hover:text-white transition-colors'} />
+                          ? 'w-3.5 h-3.5 text-[var(--clr-success)] transition-colors'
+                          : 'w-3.5 h-3.5 text-[var(--clr-danger)] group-hover:text-white transition-colors'} />
                       </button>
                     </div>
                   </motion.div>
@@ -541,21 +541,21 @@ export default function VisualDictionary() {
       {activeView === 'pronounce' && (
         <div className="space-y-4">
           {!pronSupported ? (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-              <p className="text-amber-700 font-medium">المتصفح لا يدعم التعرف على الصوت</p>
-              <p className="text-amber-600 text-sm mt-1">يرجى استخدام Chrome أو Edge لهذه الميزة</p>
+            <div className="bg-[var(--clr-warning-bg)] border border-[var(--clr-warning)]/30 rounded-xl p-4 text-center">
+              <p className="text-[var(--clr-warning)] font-medium">المتصفح لا يدعم التعرف على الصوت</p>
+              <p className="text-[var(--clr-warning)] text-sm mt-1">يرجى استخدام Chrome أو Edge لهذه الميزة</p>
             </div>
           ) : (
             <>
               {/* Pronounce view header: stats + controls */}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className="flex items-center gap-1.5 bg-green-50 text-green-700 border-green-200">
+                  <Badge variant="secondary" className="flex items-center gap-1.5 bg-[var(--clr-success-bg)] text-[var(--clr-success)] border-[var(--clr-success)]/30">
                     <BookCheck className="w-3.5 h-3.5" />
                     تم حفظ {pronLearnedCount} من {pronWords.length}
                   </Badge>
                   {pronLearnedCount > 0 && (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-[var(--text-muted)]">
                       {Math.round((pronLearnedCount / pronWords.length) * 100)}%
                     </span>
                   )}
@@ -566,8 +566,8 @@ export default function VisualDictionary() {
                     variant={showOnlyUnlearned ? 'default' : 'outline'}
                     size="sm"
                     className={showOnlyUnlearned
-                      ? 'bg-red-600 hover:bg-red-700 text-white'
-                      : 'text-gray-500 border-gray-200 hover:bg-red-50 hover:text-red-600'}
+                      ? 'bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80 text-white'
+                      : 'text-[var(--text-muted)] border-[var(--line-default)] hover:bg-[var(--clr-danger-bg)] hover:text-[var(--clr-danger)]'}
                     onClick={() => {
                       setShowOnlyUnlearned((v) => !v)
                       setPronounceWordIdx(0)
@@ -582,7 +582,7 @@ export default function VisualDictionary() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-gray-500 border-gray-200 hover:bg-red-50 hover:text-red-600"
+                      className="text-[var(--text-muted)] border-[var(--line-default)] hover:bg-[var(--clr-danger-bg)] hover:text-[var(--clr-danger)]"
                       onClick={resetLearned}
                     >
                       <Trash2 className="w-4 h-4 ml-1" />
@@ -597,16 +597,16 @@ export default function VisualDictionary() {
                 <button
                   onClick={() => handlePronCategoryChange('all')}
                   className={pronCategory === 'all'
-                    ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-red-600 text-white'
-                    : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-white text-gray-500 hover:bg-red-50 border border-gray-200'}
+                    ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-[var(--clr-danger)] text-white'
+                    : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-[var(--surface-card)] text-[var(--text-muted)] hover:bg-[var(--clr-danger-bg)] border border-[var(--line-default)]'}
                 >
                   الكل ({totalWords})
                 </button>
                 <button
                   onClick={() => handlePronCategoryChange('all-vocab')}
                   className={pronCategory === 'all-vocab'
-                    ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-red-600 text-white'
-                    : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-white text-gray-500 hover:bg-red-50 border border-gray-200'}
+                    ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-[var(--clr-danger)] text-white'
+                    : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-[var(--surface-card)] text-[var(--text-muted)] hover:bg-[var(--clr-danger-bg)] border border-[var(--line-default)]'}
                 >
                   📚 كل المفردات ({vocabulary.length})
                 </button>
@@ -615,8 +615,8 @@ export default function VisualDictionary() {
                     key={cat.key}
                     onClick={() => handlePronCategoryChange(cat.key)}
                     className={pronCategory === cat.key
-                      ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-red-600 text-white'
-                      : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-white text-gray-500 hover:bg-red-50 border border-gray-200'}
+                      ? 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-[var(--clr-danger)] text-white'
+                      : 'whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all bg-[var(--surface-card)] text-[var(--text-muted)] hover:bg-[var(--clr-danger-bg)] border border-[var(--line-default)]'}
                   >
                     {cat.icon} {cat.label} ({cat.words.length})
                   </button>
@@ -625,11 +625,11 @@ export default function VisualDictionary() {
 
               {filteredPronWords.length > 0 && pronounceWordIdx < filteredPronWords.length && (
                 <div className="max-w-lg mx-auto">
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="bg-[var(--surface-card)] rounded-2xl shadow-sm border border-[var(--line-subtle)] overflow-hidden">
                     {/* Progress */}
-                    <div className="h-1 bg-gray-100">
+                    <div className="h-1 bg-[var(--surface-card-h)]">
                       <div
-                        className="h-full bg-gradient-to-l from-red-500 to-rose-500 transition-all duration-300"
+                        className="h-full bg-gradient-to-l from-[var(--clr-danger)] to-[var(--clr-danger)] transition-all duration-300"
                         style={{ width: `${((pronounceWordIdx + 1) / filteredPronWords.length) * 100}%` }}
                       />
                     </div>
@@ -637,11 +637,11 @@ export default function VisualDictionary() {
                     <div className="p-6 sm:p-8 text-center space-y-6">
                       {/* Counter + learned indicator */}
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-[var(--text-muted)]">
                           {pronounceWordIdx + 1} / {filteredPronWords.length}
                         </p>
                         {isLearned(filteredPronWords[pronounceWordIdx].id) && (
-                          <div className="flex items-center gap-1 text-green-600 text-xs font-medium">
+                          <div className="flex items-center gap-1 text-[var(--clr-success)] text-xs font-medium">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             محفوظة ✓
                           </div>
@@ -657,7 +657,7 @@ export default function VisualDictionary() {
                       >
                         <span className="text-5xl block">{filteredPronWords[pronounceWordIdx].emoji}</span>
                         <div
-                          className="text-5xl font-bold text-gray-900 font-chinese-serif cursor-pointer hover:text-red-600 transition-colors"
+                          className="text-5xl font-bold text-[var(--text-primary)] font-chinese-serif cursor-pointer hover:text-[var(--clr-danger)] transition-colors"
                           onClick={() => speak(filteredPronWords[pronounceWordIdx].hanzi)}
                           role="button"
                           tabIndex={0}
@@ -665,10 +665,10 @@ export default function VisualDictionary() {
                         >
                           {filteredPronWords[pronounceWordIdx].hanzi}
                         </div>
-                        <div className="text-xl text-rose-600 font-medium font-chinese-sans">
+                        <div className="text-xl text-[var(--clr-danger)] font-medium font-chinese-sans">
                           {filteredPronWords[pronounceWordIdx].pinyin}
                         </div>
-                        <div className="text-base text-gray-600" dir="rtl">
+                        <div className="text-base text-[var(--text-tertiary)]" dir="rtl">
                           {filteredPronWords[pronounceWordIdx].arabic}
                         </div>
                       </motion.div>
@@ -677,7 +677,7 @@ export default function VisualDictionary() {
                       <Button
                         variant="outline"
                         size="lg"
-                        className="mx-auto gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                        className="mx-auto gap-2 text-[var(--clr-danger)] border-[var(--clr-danger)]/30 hover:bg-[var(--clr-danger-bg)]"
                         onClick={() => speak(filteredPronWords[pronounceWordIdx].hanzi)}
                       >
                         <Volume2 className="w-5 h-5" />
@@ -689,8 +689,8 @@ export default function VisualDictionary() {
                         variant="outline"
                         size="sm"
                         className={isLearned(filteredPronWords[pronounceWordIdx].id)
-                          ? 'mx-auto gap-2 text-green-600 border-green-300 bg-green-50'
-                          : 'mx-auto gap-2 text-gray-400 border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300'}
+                          ? 'mx-auto gap-2 text-[var(--clr-success)] border-[var(--clr-success)]/40 bg-[var(--clr-success-bg)]'
+                          : 'mx-auto gap-2 text-[var(--text-muted)] border-[var(--line-default)] hover:bg-[var(--clr-success-bg)] hover:text-[var(--clr-success)] hover:border-[var(--clr-success)]/40'}
                         onClick={() => toggleLearned(filteredPronWords[pronounceWordIdx].id)}
                       >
                         {isLearned(filteredPronWords[pronounceWordIdx].id)
@@ -706,22 +706,22 @@ export default function VisualDictionary() {
                           whileTap={{ scale: 0.95 }}
                           onClick={isRecording ? stopRecording : startRecording}
                           className={isRecording
-                            ? 'relative w-20 h-20 rounded-full flex items-center justify-center transition-all bg-red-600 shadow-lg shadow-red-200'
-                            : 'relative w-20 h-20 rounded-full flex items-center justify-center transition-all bg-red-50 border-2 border-red-300 hover:border-red-500 hover:bg-red-100'}
+                            ? 'relative w-20 h-20 rounded-full flex items-center justify-center transition-all bg-[var(--clr-danger)] shadow-lg shadow-[var(--clr-danger)]/30'
+                            : 'relative w-20 h-20 rounded-full flex items-center justify-center transition-all bg-[var(--clr-danger-bg)] border-2 border-[var(--clr-danger)]/40 hover:border-[var(--clr-danger)] hover:bg-[var(--clr-danger-bg)]'}
                         >
                           {isRecording && (
                             <motion.div
-                              className="absolute inset-0 rounded-full border-4 border-red-400"
+                              className="absolute inset-0 rounded-full border-4 border-[var(--clr-danger)]/50"
                               animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
                               transition={{ duration: 1.5, repeat: Infinity }}
                             />
                           )}
                           {isRecording
                             ? <MicOff className="w-8 h-8 text-white" />
-                            : <Mic className="w-8 h-8 text-red-600" />
+                            : <Mic className="w-8 h-8 text-[var(--clr-danger)]" />
                           }
                         </motion.button>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-[var(--text-muted)]">
                           {isRecording ? 'جاري التسجيل... اضغط للإيقاف' : 'تسجيل'}
                         </p>
                       </div>
@@ -732,7 +732,7 @@ export default function VisualDictionary() {
                           {Array.from({ length: 16 }).map((_, i) => (
                             <motion.div
                               key={i}
-                              className="w-1 bg-red-400 rounded-full"
+                              className="w-1 bg-[var(--clr-danger)] rounded-full"
                               animate={{ height: [4, Math.random() * 20 + 4, 4] }}
                               transition={{
                                 duration: 0.4 + Math.random() * 0.4,
@@ -767,14 +767,14 @@ export default function VisualDictionary() {
                             >
                               {pronResult.msg}
                             </div>
-                            <div className="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
+                            <div className="bg-[var(--surface-card-h)] rounded-lg p-3 text-sm space-y-1">
                               <div className="flex justify-between">
-                                <span className="text-gray-400">ما قلته:</span>
+                                <span className="text-[var(--text-muted)]">ما قلته:</span>
                                 <span className="font-chinese-sans">{pronResult.spoken}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-gray-400">الصحيح:</span>
-                                <span className="font-chinese-sans font-bold text-red-600">
+                                <span className="text-[var(--text-muted)]">الصحيح:</span>
+                                <span className="font-chinese-sans font-bold text-[var(--clr-danger)]">
                                   {filteredPronWords[pronounceWordIdx].hanzi}
                                 </span>
                               </div>
@@ -796,7 +796,7 @@ export default function VisualDictionary() {
                         </Button>
                         <Button
                           size="sm"
-                          className="bg-red-600 hover:bg-red-700"
+                          className="bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80"
                           disabled={pronounceWordIdx >= filteredPronWords.length - 1}
                           onClick={() => { setPronounceWordIdx(p => p + 1); setPronResult(null) }}
                         >
@@ -813,10 +813,10 @@ export default function VisualDictionary() {
               {filteredPronWords.length === 0 && (
                 <div className="max-w-lg mx-auto text-center py-12">
                   <div className="text-6xl mb-4">🎉</div>
-                  <p className="text-xl font-semibold text-gray-800" dir="rtl">
+                  <p className="text-xl font-semibold text-[var(--text-primary)]" dir="rtl">
                     أحسنت! لقد حفظت جميع الكلمات!
                   </p>
-                  <p className="text-gray-500 mt-2" dir="rtl">
+                  <p className="text-[var(--text-muted)] mt-2" dir="rtl">
                     قم بإيقاف عامل التصفية لمراجعة جميع الكلمات
                   </p>
                   <Button
@@ -846,15 +846,15 @@ export default function VisualDictionary() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center space-y-6"
+              className="bg-[var(--surface-card)] rounded-2xl shadow-sm border border-[var(--line-subtle)] p-8 text-center space-y-6"
             >
               <div className="text-7xl">{scoreEmoji}</div>
-              <p className="text-3xl font-bold text-gray-900">{scoreMessage}</p>
-              <p className="text-xl text-gray-500" dir="rtl">
+              <p className="text-3xl font-bold text-[var(--text-primary)]">{scoreMessage}</p>
+              <p className="text-xl text-[var(--text-muted)]" dir="rtl">
                 {score} / {quizQuestions.length}
               </p>
               <div className="flex items-center justify-center gap-3">
-                <Button onClick={startQuiz} className="bg-red-600 hover:bg-red-700 gap-2">
+                <Button onClick={startQuiz} className="bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80 gap-2">
                   <RotateCcw className="h-4 w-4" />
                   تمرين جديد
                 </Button>
@@ -876,17 +876,17 @@ export default function VisualDictionary() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -40 }}
                 transition={{ duration: 0.3 }}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden space-y-4"
+                className="bg-[var(--surface-card)] rounded-2xl shadow-sm border border-[var(--line-subtle)] overflow-hidden space-y-4"
               >
                 {/* Progress */}
                 <div className="space-y-2 p-4 pb-0">
-                  <div className="flex items-center justify-between text-sm text-gray-400">
+                  <div className="flex items-center justify-between text-sm text-[var(--text-muted)]">
                     <span dir="rtl">السؤال {quizIndex + 1} من {quizQuestions.length}</span>
                     <span>{score} ✓</span>
                   </div>
-                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-[var(--surface-card-h)] rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-gradient-to-l from-red-500 to-rose-500 rounded-full"
+                      className="h-full bg-gradient-to-l from-[var(--clr-danger)] to-[var(--clr-danger)] rounded-full"
                       animate={{ width: `${((quizIndex + 1) / quizQuestions.length) * 100}%` }}
                       transition={{ duration: 0.3 }}
                     />
@@ -901,7 +901,7 @@ export default function VisualDictionary() {
                       variant="ghost"
                       size="sm"
                       onClick={() => speak(quizQuestions[quizIndex].word.hanzi)}
-                      className="text-gray-400 hover:text-red-500 gap-1"
+                      className="text-[var(--text-muted)] hover:text-[var(--clr-danger)] gap-1"
                     >
                       <Volume2 className="h-4 w-4" />
                       <span className="text-xs">استمع</span>
@@ -913,12 +913,12 @@ export default function VisualDictionary() {
                     {quizQuestions[quizIndex].options.map((opt, idx) => {
                       const isCorrect = idx === quizQuestions[quizIndex].correctIndex
                       const isSelected = selectedOption === idx
-                      let bgClass = 'bg-gray-50 border-gray-200 hover:border-red-300 hover:bg-red-50'
+                      let bgClass = 'bg-[var(--surface-card-h)] border-[var(--line-default)] hover:border-[var(--clr-danger)]/40 hover:bg-[var(--clr-danger-bg)]'
 
                       if (selectedOption !== null) {
-                        if (isCorrect) bgClass = 'bg-green-50 border-green-400'
-                        else if (isSelected && !isCorrect) bgClass = 'bg-red-50 border-red-400'
-                        else bgClass = 'bg-gray-50 border-gray-100'
+                        if (isCorrect) bgClass = 'bg-[var(--clr-success-bg)] border-[var(--clr-success)]'
+                        else if (isSelected && !isCorrect) bgClass = 'bg-[var(--clr-danger-bg)] border-[var(--clr-danger)]/50'
+                        else bgClass = 'bg-[var(--surface-card-h)] border-[var(--line-subtle)]'
                       }
 
                       return (
@@ -929,13 +929,13 @@ export default function VisualDictionary() {
                           onClick={() => handleAnswer(idx)}
                           className={`${bgClass} border rounded-xl p-4 text-center cursor-pointer transition-all duration-200`}
                         >
-                          <span className="font-chinese-serif text-xl font-bold text-gray-900 block mb-1">
+                          <span className="font-chinese-serif text-xl font-bold text-[var(--text-primary)] block mb-1">
                             {opt.hanzi}
                           </span>
-                          <span className="text-xs text-gray-400 font-chinese-sans block">
+                          <span className="text-xs text-[var(--text-muted)] font-chinese-sans block">
                             {opt.pinyin}
                           </span>
-                          <span className="text-sm text-gray-600 block mt-1" dir="rtl">
+                          <span className="text-sm text-[var(--text-tertiary)] block mt-1" dir="rtl">
                             {opt.arabic}
                           </span>
                         </motion.button>

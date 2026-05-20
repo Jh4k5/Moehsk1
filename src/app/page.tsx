@@ -610,9 +610,11 @@ export default function Home() {
     })
   }, [searchQuery, selectedCategory, hideMastered, isWordMastered])
 
-  // ─── Quiz Generation (20 questions) ──────────────────────
+  // ─── Quiz Generation (30 questions) ──────────────────────
+  const sessionSeed = useMemo(() => Date.now(), [])
+
   const generateQuiz = useCallback(() => {
-    const count = 20
+    const count = 30
     const shuffled = [...vocabulary].sort(() => Math.random() - 0.5).slice(0, count)
     const questions = shuffled.map(word => {
       const wrongOptions = vocabulary
@@ -2461,7 +2463,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                 <Brain className="w-16 h-16 text-gray-300" />
                 <h3 className="text-lg font-bold text-gray-700">اختبار المفردات</h3>
                 <p className="text-sm text-gray-500 text-center max-w-md">
-                  20 سؤال عشوائي لاختبار معرفتك بالمفردات الصينية. اختر مستوى الصعوبة.
+                  30 سؤال عشوائي لاختبار معرفتك بالمفردات الصينية. اختر مستوى الصعوبة.
                 </p>
                 <div className="flex gap-2">
                   {(['easy', 'medium', 'hard'] as const).map(d => (

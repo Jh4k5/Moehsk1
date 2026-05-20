@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -138,6 +138,16 @@ export default function HanziSection() {
   const writerRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Randomize character order each session
+  const shuffledChars = useMemo(() => {
+    const arr = [...HSK1_CHARS]
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    }
+    return arr
+  }, [])
+
   // Load hanzi-writer from CDN
   useEffect(() => {
     if (typeof window === 'undefined' || hanziWriterLoaded) return
@@ -240,7 +250,7 @@ export default function HanziSection() {
           <Card className="border-red-200">
             <CardContent className="p-4">
               <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2 max-h-[520px] overflow-y-auto">
-                {HSK1_CHARS.map((char, idx) => {
+                {shuffledChars.map((char, idx) => {
                   const isSelected = selectedChar === char
                   const info = charInfoMap[char]
                   return (

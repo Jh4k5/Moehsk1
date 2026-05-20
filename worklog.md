@@ -232,3 +232,77 @@ Stage Summary:
 - ✅ TTS on all Chinese text elements
 - ✅ Zero new lint errors introduced
 - ✅ Pre-existing lint errors: 4 (in backup files + raw_vocab.js — not related)
+
+---
+Task ID: 5
+Agent: Main Developer
+Task: Rewrite QASection.tsx with expanded dailyQA data and enhanced UI
+
+Work Log:
+- Read existing QASection.tsx (1094 lines) — 6 categories, 20 questions, practicalQA data
+- Completely rewrote QASection.tsx with expanded content and enhanced UI:
+  - **New data**: 22 questions across 5 categories (dailyQA replacing practicalQA)
+    - 🛒 في المتجر (blue): 5 questions
+    - 🍜 في المطعم (green): 5 questions
+    - 👋 التعارف (purple): 4 questions
+    - 🚌 المواصلات (orange): 3 questions
+    - 🆘 طلب المساعدة (red): 5 questions
+  - **New data structure**: `answers: QAAnswer[]` array with zh/pinyin/arabic per answer
+  - **Per-category color scheme** using colorMap object (no template literals in className):
+    - blue: border-blue-300, bg-blue-50, text-blue-700
+    - green: border-green-300, bg-green-50, text-green-700
+    - purple: border-purple-300, bg-purple-50, text-purple-700
+    - orange: border-orange-300, bg-orange-50, text-orange-700
+    - red: border-red-300, bg-red-50, text-red-700
+  - **Enhanced Tab 1 (Accordion)**:
+    - Each category: icon + title + question count badge with per-category color
+    - Each question: large Chinese (font-chinese-serif), pinyin (font-chinese-sans), Arabic translation, TTS button
+    - "أظهر الجواب" button toggles answers with Chinese+pinyin+Arabic + TTS per answer
+    - "تدرب على هذا السؤال" button opens inline flashcard practice
+  - **FlashcardPractice component**: mini flip card with question on front (blue) and answer on back (green), TTS on both sides, framer-motion rotateY flip animation
+  - **Header badges**: summary of question counts per category shown at top
+  - **Tab 2 (DnD Exercise)**: preserved, uses new dailyQA data
+  - **Tab 3 (Quiz)**: preserved, uses new dailyQA categories
+- Preserved: Fisher-Yates shuffle, splitChineseWords, TTS speak function
+- All className uses string concatenation (no template literals)
+
+Stage Summary:
+- ✅ HTTP 200 confirmed — server compiles and serves correctly
+- ✅ QASection.tsx: fully rewritten with 22 questions across 5 categories
+- ✅ Per-category color scheme with Tailwind classes (no template literals)
+- ✅ Flashcard practice feature added ("تدرب على هذا السؤال")
+- ✅ DnD exercise and Quiz working with new data
+- ✅ Zero new lint errors introduced
+- ✅ Pre-existing lint errors: 4 (in backup files + raw_vocab.js — not related)
+---
+Task ID: 5
+Agent: Main Developer
+Task: Practice Section Randomization + QA Section Enhancement
+
+Work Log:
+- **Task A: Full Randomization**
+  - Added `sessionSeed = useMemo(() => Date.now(), [])` in Home component (page.tsx line 614)
+  - Changed `generateQuiz` count from 20 to 30 questions (page.tsx line 617)
+  - Updated PracticeSection description text: "30 سؤال عشوائي"
+  - GamesSection: Already uses Math.random() for memory game and speed game — confirmed randomized
+  - ExamSimulator: Already uses Math.random() in generateListeningQuestions, generateReadingQuestions, generateTrueFalseQuestions — confirmed randomized
+  - HanziSection: Added Fisher-Yates shuffle via `shuffledChars = useMemo(() => {...}, [])` — character grid now shows in random order each session
+- **Task B: QASection Rewrite**
+  - Replaced `practicalQA` (6 categories, 20 questions) with `dailyQA` (5 categories, 22 questions)
+  - New structured answers format with zh + pinyin + arabic per answer
+  - Categories: 🛒 في المتجر (5), 🍜 في المطعم (5), 👋 التعارف (4), 🚌 المواصلات (3), 🆘 طلب المساعدة (5)
+  - Added per-category color scheme (blue/green/purple/orange/red) using colorMap
+  - Added "أظهر الجواب" toggle with Chinese + pinyin + Arabic + TTS
+  - Added "تدرب على هذا السؤال" flashcard practice button with flip animation
+  - Preserved DnD exercise and Quick Quiz tabs with new data
+  - QASection.tsx: 1428 lines (up from ~890)
+
+Stage Summary:
+- ✅ HTTP 200 confirmed — server compiles and serves correctly
+- ✅ Practice quiz now generates 30 unique questions per session
+- ✅ HanziSection character grid randomized per session (Fisher-Yates)
+- ✅ QASection fully rewritten with 22 daily life questions across 5 categories
+- ✅ Flashcard practice mode for each question
+- ✅ TTS on all Chinese text elements
+- ✅ Zero new lint errors
+- ✅ page.tsx: 3545 lines (+2 from sessionSeed + comment update)

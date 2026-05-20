@@ -8,67 +8,274 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import {
   Volume2, HelpCircle, Play, Check, X, ArrowUpDown,
-  GripVertical, RotateCcw, Lightbulb, ChevronDown, Move, Eye, EyeOff,
+  GripVertical, RotateCcw, Lightbulb, Move, Eye, EyeOff,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// ─── Accent Color ────────────────────────────────────────────────
-const ACCENT = '#1A5FA8'
-const ACCENT_BG = '#E8F0FA'
+// ─── Color Map ────────────────────────────────────────────────
+// Using object mapping to avoid template literals in className
+const colorMap: Record<string, {
+  border: string
+  bg: string
+  bgLight: string
+  text: string
+  badgeBg: string
+  badgeText: string
+}> = {
+  blue: {
+    border: 'border-blue-300',
+    bg: 'bg-blue-50',
+    bgLight: 'bg-blue-50',
+    text: 'text-blue-700',
+    badgeBg: 'bg-blue-100',
+    badgeText: 'text-blue-700',
+  },
+  green: {
+    border: 'border-green-300',
+    bg: 'bg-green-50',
+    bgLight: 'bg-green-50',
+    text: 'text-green-700',
+    badgeBg: 'bg-green-100',
+    badgeText: 'text-green-700',
+  },
+  purple: {
+    border: 'border-purple-300',
+    bg: 'bg-purple-50',
+    bgLight: 'bg-purple-50',
+    text: 'text-purple-700',
+    badgeBg: 'bg-purple-100',
+    badgeText: 'text-purple-700',
+  },
+  orange: {
+    border: 'border-orange-300',
+    bg: 'bg-orange-50',
+    bgLight: 'bg-orange-50',
+    text: 'text-orange-700',
+    badgeBg: 'bg-orange-100',
+    badgeText: 'text-orange-700',
+  },
+  red: {
+    border: 'border-red-300',
+    bg: 'bg-red-50',
+    bgLight: 'bg-red-50',
+    text: 'text-red-700',
+    badgeBg: 'bg-red-100',
+    badgeText: 'text-red-700',
+  },
+}
 
-// ─── Practical Q&A Data ─────────────────────────────────────────
-const practicalQA = [
+// ─── Daily QA Data ────────────────────────────────────────────
+interface QAAnswer {
+  zh: string
+  pinyin: string
+  arabic: string
+}
+
+interface QAQuestion {
+  q: string
+  pinyin: string
+  arabic: string
+  answers: QAAnswer[]
+}
+
+interface QACategory {
+  category: string
+  icon: string
+  color: string
+  questions: QAQuestion[]
+}
+
+const dailyQA: QACategory[] = [
   {
-    category: "في المتجر 🛒",
+    category: "🛒 في المتجر",
+    icon: "🛒",
+    color: "blue",
     questions: [
-      { q: "这个多少钱？", pinyin: "Zhège duōshao qián?", arabic: "بكم هذا؟", answer: "...块钱 / ...kuài qián", answerAr: "...يوان" },
-      { q: "有没有...？", pinyin: "Yǒu méiyǒu...?", arabic: "هل يوجد...؟", answer: "有 Yǒu / 没有 Méiyǒu", answerAr: "يوجد / لا يوجد" },
-      { q: "可以便宜一点吗？", pinyin: "Kěyǐ piányí yīdiǎn ma?", arabic: "هل يمكن تخفيض السعر؟", answer: "可以 / 不可以", answerAr: "ممكن / مش ممكن" },
-    ]
+      {
+        q: "这个多少钱？",
+        pinyin: "Zhège duōshao qián?",
+        arabic: "بكم هذا؟",
+        answers: [
+          { zh: "二十块钱", pinyin: "Èrshí kuài qián", arabic: "عشرون يواناً" },
+        ],
+      },
+      {
+        q: "有没有...？",
+        pinyin: "Yǒu méiyǒu...?",
+        arabic: "هل يوجد...؟",
+        answers: [
+          { zh: "有/没有", pinyin: "Yǒu/Méiyǒu", arabic: "يوجد/لا يوجد" },
+        ],
+      },
+      {
+        q: "可以便宜一点吗？",
+        pinyin: "Kěyǐ piányí yīdiǎn ma?",
+        arabic: "هل يمكن تخفيض السعر؟",
+        answers: [
+          { zh: "可以/不行", pinyin: "Kěyǐ/Bùxíng", arabic: "ممكن/لا يمكن" },
+        ],
+      },
+      {
+        q: "我要这个",
+        pinyin: "Wǒ yào zhège",
+        arabic: "أريد هذا",
+        answers: [],
+      },
+      {
+        q: "给我看看",
+        pinyin: "Gěi wǒ kànkan",
+        arabic: "أرني إياه",
+        answers: [],
+      },
+    ],
   },
   {
-    category: "في المطعم 🍜",
+    category: "🍜 في المطعم",
+    icon: "🍜",
+    color: "green",
     questions: [
-      { q: "菜单在哪里？", pinyin: "Càidān zài nǎlǐ?", arabic: "أين القائمة؟", answer: "在这里 Zài zhèlǐ", answerAr: "هنا" },
-      { q: "我要这个", pinyin: "Wǒ yào zhège", arabic: "أريد هذا", answer: "好的 Hǎo de", answerAr: "حسناً" },
-      { q: "不辣的，谢谢", pinyin: "Bù là de, xièxie", arabic: "بدون حار، شكراً", answer: "", answerAr: "" },
-    ]
+      {
+        q: "菜单在哪里？",
+        pinyin: "Càidān zài nǎlǐ?",
+        arabic: "أين القائمة؟",
+        answers: [
+          { zh: "在这里", pinyin: "Zài zhèlǐ", arabic: "هنا" },
+        ],
+      },
+      {
+        q: "我要一个...",
+        pinyin: "Wǒ yào yī gè...",
+        arabic: "أريد واحد من...",
+        answers: [],
+      },
+      {
+        q: "不辣的，谢谢",
+        pinyin: "Bù là de, xièxie",
+        arabic: "بدون حار، شكراً",
+        answers: [],
+      },
+      {
+        q: "买单！",
+        pinyin: "Mǎidān!",
+        arabic: "الحساب من فضلك!",
+        answers: [],
+      },
+      {
+        q: "好吃！",
+        pinyin: "Hǎo chī!",
+        arabic: "لذيذ!",
+        answers: [],
+      },
+    ],
   },
   {
-    category: "التعريف بالنفس 👋",
+    category: "👋 التعارف",
+    icon: "👋",
+    color: "purple",
     questions: [
-      { q: "你叫什么名字？", pinyin: "Nǐ jiào shénme míngzì?", arabic: "ما اسمك؟", answer: "我叫... Wǒ jiào...", answerAr: "اسمي..." },
-      { q: "你是哪国人？", pinyin: "Nǐ shì nǎ guó rén?", arabic: "من أي بلد أنت؟", answer: "我是...人 Wǒ shì...rén", answerAr: "أنا من..." },
-      { q: "你会说中文吗？", pinyin: "Nǐ huì shuō Zhōngwén ma?", arabic: "هل تتكلم الصينية؟", answer: "我在学 Wǒ zài xué", answerAr: "أنا أتعلم" },
-    ]
+      {
+        q: "你叫什么名字？",
+        pinyin: "Nǐ jiào shénme míngzì?",
+        arabic: "ما اسمك؟",
+        answers: [
+          { zh: "我叫...", pinyin: "Wǒ jiào...", arabic: "اسمي..." },
+        ],
+      },
+      {
+        q: "你是哪国人？",
+        pinyin: "Nǐ shì nǎ guó rén?",
+        arabic: "من أي بلد أنت؟",
+        answers: [
+          { zh: "我是也门人", pinyin: "Wǒ shì Yěmén rén", arabic: "أنا يمني" },
+        ],
+      },
+      {
+        q: "你多大了？",
+        pinyin: "Nǐ duō dà le?",
+        arabic: "كم عمرك؟",
+        answers: [
+          { zh: "我...岁", pinyin: "Wǒ...suì", arabic: "عمري ... سنة" },
+        ],
+      },
+      {
+        q: "你做什么工作？",
+        pinyin: "Nǐ zuò shénme gōngzuò?",
+        arabic: "ما عملك؟",
+        answers: [
+          { zh: "我是学生", pinyin: "Wǒ shì xuéshēng", arabic: "أنا طالب" },
+        ],
+      },
+    ],
   },
   {
-    category: "طلب المساعدة 🆘",
+    category: "🚌 المواصلات",
+    icon: "🚌",
+    color: "orange",
     questions: [
-      { q: "请问...在哪里？", pinyin: "Qǐngwèn...zài nǎlǐ?", arabic: "عذراً، أين يوجد...؟", answer: "在.../ 不知道", answerAr: "في... / لا أعرف" },
-      { q: "我不明白", pinyin: "Wǒ bù míngbái", arabic: "لم أفهم", answer: "", answerAr: "" },
-      { q: "请再说一遍", pinyin: "Qǐng zài shuō yībiàn", arabic: "من فضلك أعد مرة أخرى", answer: "", answerAr: "" },
-    ]
+      {
+        q: "去...怎么走？",
+        pinyin: "Qù...zěnme zǒu?",
+        arabic: "كيف أذهب إلى...؟",
+        answers: [
+          { zh: "向左/右转", pinyin: "Xiàng zuǒ/yòu zhuǎn", arabic: "اتجه يساراً/يميناً" },
+        ],
+      },
+      {
+        q: "这里是哪里？",
+        pinyin: "Zhèlǐ shì nǎlǐ?",
+        arabic: "أين هذا المكان؟",
+        answers: [],
+      },
+      {
+        q: "多少钱一张票？",
+        pinyin: "Duōshao qián yī zhāng piào?",
+        arabic: "بكم التذكرة؟",
+        answers: [],
+      },
+    ],
   },
   {
-    category: "المواصلات 🚌",
+    category: "🆘 طلب المساعدة",
+    icon: "🆘",
+    color: "red",
     questions: [
-      { q: "去...怎么走？", pinyin: "Qù...zěnme zǒu?", arabic: "كيف أذهب إلى...؟", answer: "向左/右转 Turn left/right", answerAr: "اتجه يسار/يمين" },
-      { q: "多少站？", pinyin: "Duōshao zhàn?", arabic: "كم محطة؟", answer: "...站 ...zhàn", answerAr: "... محطات" },
-    ]
-  },
-  {
-    category: "الصحة 🏥",
-    questions: [
-      { q: "我不舒服", pinyin: "Wǒ bù shūfu", arabic: "أنا لست بخير", answer: "", answerAr: "" },
-      { q: "医院在哪里？", pinyin: "Yīyuàn zài nǎlǐ?", arabic: "أين المستشفى؟", answer: "", answerAr: "" },
-    ]
+      {
+        q: "请问...在哪里？",
+        pinyin: "Qǐngwèn...zài nǎlǐ?",
+        arabic: "عذراً، أين يوجد...؟",
+        answers: [],
+      },
+      {
+        q: "我不明白",
+        pinyin: "Wǒ bù míngbái",
+        arabic: "لم أفهم",
+        answers: [],
+      },
+      {
+        q: "请再说一遍",
+        pinyin: "Qǐng zài shuō yībiàn",
+        arabic: "من فضلك أعد",
+        answers: [],
+      },
+      {
+        q: "你会说英语吗？",
+        pinyin: "Nǐ huì shuō Yīngyǔ ma?",
+        arabic: "هل تتكلم الإنجليزية؟",
+        answers: [],
+      },
+      {
+        q: "请写下来",
+        pinyin: "Qǐng xiě xia lái",
+        arabic: "من فضلك اكتبها",
+        answers: [],
+      },
+    ],
   },
 ]
 
 // ─── Flat all questions with category reference ──────────────────
-const allQuestions = practicalQA.flatMap(cat =>
-  cat.questions.map(q => ({ category: cat.category, ...q }))
+const allQuestions = dailyQA.flatMap(cat =>
+  cat.questions.map(q => ({ category: cat.category, color: cat.color, ...q }))
 )
 
 // ─── TTS Helper ───────────────────────────────────────────────────
@@ -94,7 +301,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 // ─── Split Chinese sentence into words ────────────────────────
 function splitChineseWords(sentence: string): string[] {
-  const cleaned = sentence.replace(/[？？！!。，、；：""''（）《》【】…—\s]/g, '')
+  const cleaned = sentence.replace(/[？？！!。，、؛：""''（）《》【】…—\s]/g, '')
   if (!cleaned) return []
   const words: string[] = []
   let i = 0
@@ -126,7 +333,7 @@ function splitChineseWords(sentence: string): string[] {
   return refined
 }
 
-// ─── Quiz question generator (quizzes over practicalQA categories) ──
+// ─── Quiz question generator (quizzes over dailyQA categories) ──
 function generateQuizQuestions(count: number = 10) {
   const questions: Array<{
     questionZh: string;
@@ -140,7 +347,7 @@ function generateQuizQuestions(count: number = 10) {
   const shuffled = shuffleArray(allQuestions).slice(0, count)
 
   for (const ex of shuffled) {
-    const wrongOptions = practicalQA
+    const wrongOptions = dailyQA
       .filter(c => c.category !== ex.category)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3)
@@ -160,12 +367,133 @@ function generateQuizQuestions(count: number = 10) {
   return questions
 }
 
+// ─── Flashcard Practice Component ────────────────────────────
+function FlashcardPractice({ question, category }: {
+  question: QAQuestion
+  category: string
+}) {
+  const [flipped, setFlipped] = useState(false)
+  const hasAnswers = question.answers.length > 0
+
+  return (
+    <div className="mt-3 space-y-2">
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3 }}
+          className="overflow-hidden"
+        >
+          {/* Flashcard */}
+          <div
+            className="relative w-full cursor-pointer perspective-1000"
+            onClick={() => setFlipped(!flipped)}
+            style={{ perspective: '1000px' }}
+          >
+            <motion.div
+              animate={{ rotateY: flipped ? 180 : 0 }}
+              transition={{ duration: 0.5 }}
+              className="relative w-full"
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {/* Front - Question */}
+              <div
+                className="w-full p-4 rounded-xl border-2 border-blue-200 bg-blue-50"
+                style={{ backfaceVisibility: 'hidden' }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-blue-600">السؤال</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={(e) => { e.stopPropagation(); speak(question.q) }}
+                  >
+                    <Volume2 className="w-4 h-4 text-blue-600" />
+                  </Button>
+                </div>
+                <p className="font-chinese-serif text-xl font-bold text-center my-3">
+                  {question.q}
+                </p>
+                <p className="font-chinese-sans text-sm text-muted-foreground text-center">
+                  {question.pinyin}
+                </p>
+                <p className="text-sm text-blue-700 text-center mt-1 font-bold">
+                  {question.arabic}
+                </p>
+                <p className="text-xs text-center text-muted-foreground mt-3">
+                  اضغط لقلب البطاقة {hasAnswers ? 'ورؤية الجواب' : ''}
+                </p>
+              </div>
+
+              {/* Back - Answer */}
+              <div
+                className="w-full p-4 rounded-xl border-2 border-green-200 bg-green-50 absolute inset-0"
+                style={{
+                  backfaceVisibility: 'hidden',
+                  transform: 'rotateY(180deg)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-green-600">الجواب</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (question.answers.length > 0) speak(question.answers[0].zh)
+                    }}
+                  >
+                    <Volume2 className="w-4 h-4 text-green-600" />
+                  </Button>
+                </div>
+                {hasAnswers ? (
+                  <div className="space-y-2 my-3">
+                    {question.answers.map((ans, i) => (
+                      <div key={i} className="text-center space-y-1">
+                        <p className="font-chinese-serif text-lg font-bold">{ans.zh}</p>
+                        <p className="font-chinese-sans text-sm text-muted-foreground">{ans.pinyin}</p>
+                        <p className="text-sm text-green-700 font-bold">{ans.arabic}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground my-6">لا يوجد جواب محدد لهذا السؤال</p>
+                )}
+                <p className="text-xs text-center text-muted-foreground mt-3">
+                  اضغط للعودة
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Reset button */}
+          <div className="flex justify-center mt-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs gap-1"
+              onClick={() => setFlipped(false)}
+            >
+              <RotateCcw className="w-3 h-3" />
+              أعد البطاقة
+            </Button>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}
+
 // ═══════════════════════════════════════════════════════════════
-// COMPONENT
+// MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════
 export default function QASection() {
   // ─── State ──────────────────────────────────────────────────
   const [revealedAnswers, setRevealedAnswers] = useState<Set<string>>(new Set())
+  const [activeFlashcard, setActiveFlashcard] = useState<string | null>(null)
 
   // Drag & Drop state
   const [dndActive, setDndActive] = useState(false)
@@ -198,6 +526,11 @@ export default function QASection() {
       else next.add(key)
       return next
     })
+  }
+
+  // ─── Flashcard toggle ──────────────────────────────────────
+  const toggleFlashcard = (key: string) => {
+    setActiveFlashcard(prev => prev === key ? null : key)
   }
 
   // ─── Drag & Drop logic ──────────────────────────────────────
@@ -327,6 +660,9 @@ export default function QASection() {
     }
   }, [quizAnswer])
 
+  // ─── Total questions count ──────────────────────────────────
+  const totalQ = dailyQA.reduce((sum, cat) => sum + cat.questions.length, 0)
+
   // ═══════════════════════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════════════════════
@@ -341,12 +677,23 @@ export default function QASection() {
         className="text-center space-y-2"
       >
         <div className="flex items-center justify-center gap-2 mb-2">
-          <HelpCircle className="w-7 h-7" style={{ color: ACCENT }} />
-          <h2 className="text-2xl font-bold">أسئلة عملية للمحادثة</h2>
+          <HelpCircle className="w-7 h-7 text-blue-600" />
+          <h2 className="text-2xl font-bold">الأسئلة اليومية</h2>
         </div>
         <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-          أسئلة وعبارات صينية شائعة للمواقف اليومية مع الترجمة العربية والنطق
+          {totalQ} سؤالاً وعبارة صينية شائعة للمواقف اليومية مع الترجمة العربية والنطق
         </p>
+        <div className="flex justify-center gap-2 flex-wrap mt-3">
+          {dailyQA.map(cat => {
+            const cm = colorMap[cat.color]
+            return (
+              <Badge key={cat.category} variant="outline" className={cm.badgeBg + " " + cm.badgeText + " gap-1 text-xs"}>
+                <span>{cat.icon}</span>
+                <span>{cat.questions.length}</span>
+              </Badge>
+            )
+          })}
+        </div>
       </motion.div>
 
       {/* ─── Tabs ───────────────────────────────────────────── */}
@@ -354,7 +701,7 @@ export default function QASection() {
         <TabsList className="w-full grid grid-cols-3 mb-4">
           <TabsTrigger value="patterns" className="text-xs sm:text-sm">
             <HelpCircle className="w-4 h-4 ml-1 hidden sm:inline" />
-            الأسئلة العملية
+            الأسئلة اليومية
           </TabsTrigger>
           <TabsTrigger value="exercise" className="text-xs sm:text-sm">
             <Move className="w-4 h-4 ml-1 hidden sm:inline" />
@@ -367,7 +714,7 @@ export default function QASection() {
         </TabsList>
 
         {/* ══════════════════════════════════════════════════════
-            TAB 1: Practical Q&A Accordion
+            TAB 1: Daily Q&A Accordion
             ══════════════════════════════════════════════════════ */}
         <TabsContent value="patterns">
           <motion.div
@@ -378,94 +725,103 @@ export default function QASection() {
             <Card className="overflow-hidden shadow-md">
               <CardContent className="p-0">
                 <Accordion type="multiple" className="w-full">
-                  {practicalQA.map((cat, catIdx) => (
-                    <AccordionItem
-                      key={cat.category}
-                      value={cat.category}
-                      className="border-b last:border-b-0"
-                    >
-                      <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline hover:bg-muted/30 transition-colors">
-                        <div className="flex items-center gap-3 text-right">
-                          <span className="text-lg sm:text-xl font-bold" style={{ color: ACCENT }}>
-                            {cat.category}
-                          </span>
-                          <Badge
-                            variant="secondary"
-                            className="text-xs"
-                            style={{ backgroundColor: ACCENT_BG, color: ACCENT }}
-                          >
-                            {cat.questions.length} {cat.questions.length === 1 ? 'سؤال' : 'أسئلة'}
-                          </Badge>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="px-4 sm:px-6 pb-4">
-                        <div className="space-y-3">
-                          {cat.questions.map((question, qIdx) => {
-                            const answerKey = `${catIdx}-${qIdx}`
-                            const isRevealed = revealedAnswers.has(answerKey)
-                            const hasAnswer = question.answer !== ''
+                  {dailyQA.map((cat, catIdx) => {
+                    const cm = colorMap[cat.color]
 
-                            return (
-                              <motion.div
-                                key={answerKey}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: qIdx * 0.05, duration: 0.3 }}
-                                className="rounded-xl border p-4 transition-shadow hover:shadow-md"
-                                style={{
-                                  borderColor: isRevealed ? ACCENT + '40' : undefined,
-                                  backgroundColor: isRevealed ? ACCENT_BG + '40' : undefined,
-                                }}
-                              >
-                                {/* Question row */}
-                                <div className="flex items-start justify-between gap-2">
-                                  <div className="space-y-1 flex-1">
-                                    <p className="font-chinese-serif text-xl sm:text-2xl font-bold leading-relaxed">
-                                      {question.q}
-                                    </p>
-                                    <p className="text-xs sm:text-sm text-muted-foreground font-chinese-sans">
-                                      {question.pinyin}
-                                    </p>
-                                    <p className="text-sm font-bold" style={{ color: ACCENT }}>
-                                      {question.arabic}
-                                    </p>
+                    return (
+                      <AccordionItem
+                        key={cat.category}
+                        value={cat.category}
+                        className="border-b last:border-b-0"
+                      >
+                        <AccordionTrigger className={"px-4 sm:px-6 py-4 hover:no-underline hover:bg-muted/30 transition-colors " + cm.bgLight}>
+                          <div className="flex items-center gap-3 text-right">
+                            <span className="text-lg sm:text-xl font-bold">
+                              {cat.category}
+                            </span>
+                            <Badge className={"text-xs " + cm.badgeBg + " " + cm.badgeText}>
+                              {cat.questions.length} {cat.questions.length === 1 ? 'سؤال' : 'أسئلة'}
+                            </Badge>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 sm:px-6 pb-4">
+                          <div className="space-y-3">
+                            {cat.questions.map((question, qIdx) => {
+                              const answerKey = cat.category + "-" + qIdx
+                              const flashcardKey = "fc-" + answerKey
+                              const isRevealed = revealedAnswers.has(answerKey)
+                              const hasAnswers = question.answers.length > 0
+                              const isFlashcard = activeFlashcard === flashcardKey
+
+                              return (
+                                <motion.div
+                                  key={answerKey}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: qIdx * 0.05, duration: 0.3 }}
+                                  className={"rounded-xl border-2 p-4 transition-shadow hover:shadow-md " + cm.border + " " + cm.bg}
+                                >
+                                  {/* Question row */}
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="space-y-1 flex-1">
+                                      <p className="font-chinese-serif text-xl sm:text-2xl font-bold leading-relaxed">
+                                        {question.q}
+                                      </p>
+                                      <p className="text-xs sm:text-sm text-muted-foreground font-chinese-sans">
+                                        {question.pinyin}
+                                      </p>
+                                      <p className={"text-sm font-bold " + cm.text}>
+                                        {question.arabic}
+                                      </p>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="shrink-0 mt-1"
+                                      onClick={() => speak(question.q)}
+                                    >
+                                      <Volume2 className={"w-4 h-4 " + cm.text} />
+                                    </Button>
                                   </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="shrink-0 mt-1"
-                                    onClick={() => speak(question.q)}
-                                  >
-                                    <Volume2 className="w-4 h-4" style={{ color: ACCENT }} />
-                                  </Button>
-                                </div>
 
-                                {/* Answer toggle button */}
-                                {hasAnswer && (
-                                  <div className="mt-3">
+                                  {/* Action buttons row */}
+                                  <div className="mt-3 flex flex-wrap gap-2">
+                                    {/* Show answer button */}
+                                    {hasAnswers && (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className={"gap-2 text-xs " + cm.border + " " + cm.text}
+                                        onClick={() => toggleAnswer(answerKey)}
+                                      >
+                                        {isRevealed ? (
+                                          <>
+                                            <EyeOff className="w-3.5 h-3.5" />
+                                            إخفاء الجواب
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Eye className="w-3.5 h-3.5" />
+                                            أظهر الجواب
+                                          </>
+                                        )}
+                                      </Button>
+                                    )}
+
+                                    {/* Flashcard practice button */}
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      className="gap-2 text-xs"
-                                      style={{
-                                        borderColor: ACCENT + '40',
-                                        color: ACCENT,
-                                      }}
-                                      onClick={() => toggleAnswer(answerKey)}
+                                      className={"gap-2 text-xs border-purple-300 text-purple-700 hover:bg-purple-50"}
+                                      onClick={() => toggleFlashcard(flashcardKey)}
                                     >
-                                      {isRevealed ? (
-                                        <>
-                                          <EyeOff className="w-3.5 h-3.5" />
-                                          إخفاء الجواب
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Eye className="w-3.5 h-3.5" />
-                                          أظهر الجواب
-                                        </>
-                                      )}
+                                      <Lightbulb className="w-3.5 h-3.5" />
+                                      تدرب على هذا السؤال
                                     </Button>
+                                  </div>
 
+                                  {/* Answers reveal */}
+                                  {hasAnswers && (
                                     <AnimatePresence>
                                       {isRevealed && (
                                         <motion.div
@@ -475,48 +831,57 @@ export default function QASection() {
                                           transition={{ duration: 0.3 }}
                                           className="overflow-hidden"
                                         >
-                                          <div
-                                            className="rounded-lg p-3 space-y-1 border-r-4"
-                                            style={{
-                                              backgroundColor: ACCENT_BG + '60',
-                                              borderRightColor: ACCENT,
-                                            }}
-                                          >
+                                          <div className={"rounded-lg p-3 space-y-2 border-r-4 border-r-green-500 bg-green-50"}>
                                             <div className="flex items-center justify-between">
                                               <span className="text-xs font-bold text-green-600 flex items-center gap-1">
                                                 <Check className="w-3 h-3" />
                                                 الإجابة
                                               </span>
-                                              {question.answer && (
-                                                <Button
-                                                  variant="ghost"
-                                                  size="icon"
-                                                  className="h-6 w-6"
-                                                  onClick={() => speak(question.answer)}
-                                                >
-                                                  <Volume2 className="w-3 h-3" />
-                                                </Button>
-                                              )}
+                                              <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-6 w-6"
+                                                onClick={() => speak(question.answers[0].zh)}
+                                              >
+                                                <Volume2 className="w-3 h-3 text-green-600" />
+                                              </Button>
                                             </div>
-                                            <p className="font-chinese-serif text-base font-bold leading-relaxed">
-                                              {question.answer}
-                                            </p>
-                                            <p className="text-sm text-green-700">
-                                              {question.answerAr}
-                                            </p>
+                                            {question.answers.map((ans, aIdx) => (
+                                              <div key={aIdx} className="flex items-start justify-between gap-2">
+                                                <div className="space-y-0.5">
+                                                  <p className="font-chinese-serif text-base font-bold leading-relaxed">
+                                                    {ans.zh}
+                                                  </p>
+                                                  <p className="text-xs text-muted-foreground font-chinese-sans">
+                                                    {ans.pinyin}
+                                                  </p>
+                                                  <p className="text-sm text-green-700">
+                                                    {ans.arabic}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            ))}
                                           </div>
                                         </motion.div>
                                       )}
                                     </AnimatePresence>
-                                  </div>
-                                )}
-                              </motion.div>
-                            )
-                          })}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
+                                  )}
+
+                                  {/* Flashcard practice */}
+                                  {isFlashcard && (
+                                    <FlashcardPractice
+                                      question={question}
+                                      category={cat.category}
+                                    />
+                                  )}
+                                </motion.div>
+                              )
+                            })}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    )
+                  })}
                 </Accordion>
               </CardContent>
             </Card>
@@ -538,7 +903,7 @@ export default function QASection() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <Move className="w-5 h-5" style={{ color: ACCENT }} />
+                    <Move className="w-5 h-5 text-blue-600" />
                     <span className="font-bold">تمرين ترتيب الكلمات</span>
                   </div>
                   <div className="flex items-center gap-3">
@@ -570,11 +935,8 @@ export default function QASection() {
               <Card className="text-center shadow-md">
                 <CardContent className="p-8 space-y-4">
                   <div className="flex justify-center">
-                    <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: ACCENT_BG }}
-                    >
-                      <Move className="w-8 h-8" style={{ color: ACCENT }} />
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center bg-blue-50">
+                      <Move className="w-8 h-8 text-blue-600" />
                     </div>
                   </div>
                   <p className="font-bold text-lg">تمرين ترتيب الكلمات</p>
@@ -599,14 +961,7 @@ export default function QASection() {
               >
                 {/* Category info */}
                 <div className="flex items-center gap-2">
-                  <Badge
-                    className="text-sm px-3 py-1"
-                    style={{
-                      backgroundColor: ACCENT_BG,
-                      color: ACCENT,
-                      borderColor: ACCENT + '40',
-                    }}
-                  >
+                  <Badge className="text-sm px-3 py-1 bg-blue-100 text-blue-700 border-blue-300">
                     {dndCategory}
                   </Badge>
                 </div>
@@ -625,13 +980,13 @@ export default function QASection() {
 
                 {/* Drop zone */}
                 <Card
-                  className={`min-h-[80px] transition-all shadow-sm ${
+                  className={(
                     dndChecked
                       ? dndCorrect
-                        ? 'border-green-500 border-2 bg-green-50'
-                        : 'border-red-500 border-2'
-                      : 'border-dashed border-2 border-muted-foreground/30'
-                  }`}
+                        ? 'min-h-20 transition-all shadow-sm border-2 border-green-500 bg-green-50'
+                        : 'min-h-20 transition-all shadow-sm border-2 border-red-500'
+                      : 'min-h-20 transition-all shadow-sm border-2 border-dashed border-muted-foreground/30'
+                  )}
                 >
                   <CardContent className="p-3">
                     <p className="text-xs text-muted-foreground mb-2">
@@ -640,7 +995,7 @@ export default function QASection() {
                     </p>
                     <div
                       ref={dndDropRef}
-                      className="flex flex-wrap gap-2 min-h-[44px] items-center"
+                      className="flex flex-wrap gap-2 min-h-11 items-center"
                     >
                       {droppedWords.length === 0 && !dndChecked && (
                         <p className="text-sm text-muted-foreground/50 italic m-auto">
@@ -649,19 +1004,12 @@ export default function QASection() {
                       )}
                       {droppedWords.map((word, idx) => (
                         <motion.div
-                          key={`dropped-${idx}`}
+                          key={"dropped-" + idx}
                           layout
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{
                             opacity: 1,
                             scale: 1,
-                            borderColor: dndDragOverIdx === idx
-                              ? ACCENT
-                              : dndChecked
-                                ? dndCorrect
-                                  ? '#22c55e'
-                                  : '#ef4444'
-                                : ACCENT + '50',
                           }}
                           transition={{ duration: 0.2 }}
                           draggable
@@ -669,12 +1017,20 @@ export default function QASection() {
                           onDragOver={(e) => handleDragOverSlot(e, idx)}
                           onDragLeave={handleDragLeaveSlot}
                           onDrop={(e) => handleDropOnSlot(e, idx)}
-                          className={`
-                            relative cursor-grab active:cursor-grabbing
-                            px-3 py-2 rounded-lg border-2 text-base font-chinese-serif
-                            select-none transition-colors
-                            ${dndChecked ? 'pointer-events-none' : ''}
-                          `}
+                          className={(
+                            'relative cursor-grab active:cursor-grabbing ' +
+                            'px-3 py-2 rounded-lg border-2 text-base font-chinese-serif ' +
+                            'select-none transition-colors ' +
+                            (dndChecked ? 'pointer-events-none' : '') +
+                            (dndChecked
+                              ? dndCorrect
+                                ? ' border-green-500 bg-green-50'
+                                : ' border-red-500 bg-red-50'
+                              : dndDragOverIdx === idx
+                                ? ' border-blue-500 bg-blue-50'
+                                : ' border-blue-200 bg-white'
+                            )
+                          )}
                         >
                           <span>{word}</span>
                           {!dndChecked && (
@@ -726,7 +1082,7 @@ export default function QASection() {
 
                         return (
                           <motion.div
-                            key={`source-${idx}`}
+                            key={"source-" + idx}
                             layout
                             animate={{
                               opacity: isUsedInPool ? 0.3 : 1,
@@ -736,15 +1092,11 @@ export default function QASection() {
                             whileTap={!isUsedInPool ? { scale: 0.95 } : {}}
                             draggable={!isUsedInPool}
                             onDragStart={(e) => !isUsedInPool && handleDragStartSource(e, idx)}
-                            className={`
-                              px-3 py-2 rounded-lg border-2 text-base font-chinese-serif
-                              select-none transition-colors
-                              ${isUsedInPool ? 'opacity-30 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'}
-                            `}
-                            style={{
-                              borderColor: ACCENT + '50',
-                              backgroundColor: ACCENT + '08',
-                            }}
+                            className={
+                              'px-3 py-2 rounded-lg border-2 text-base font-chinese-serif ' +
+                              'select-none transition-colors border-blue-200 bg-blue-50 ' +
+                              (isUsedInPool ? 'opacity-30 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing')
+                            }
                           >
                             {word}
                           </motion.div>
@@ -846,11 +1198,8 @@ export default function QASection() {
               <Card className="text-center shadow-md">
                 <CardContent className="p-8 space-y-4">
                   <div className="flex justify-center">
-                    <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: ACCENT_BG }}
-                    >
-                      <Lightbulb className="w-8 h-8" style={{ color: ACCENT }} />
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center bg-blue-50">
+                      <Lightbulb className="w-8 h-8 text-blue-600" />
                     </div>
                   </div>
                   <p className="font-bold text-lg">اختبار التصنيف السريع</p>
@@ -881,15 +1230,10 @@ export default function QASection() {
                 <Card className="text-center shadow-md">
                   <CardContent className="p-8 space-y-4">
                     <div className="flex justify-center">
-                      <div
-                        className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold ${
-                          quizScore >= 8
-                            ? 'bg-green-500'
-                            : quizScore >= 5
-                              ? 'bg-yellow-500'
-                              : 'bg-red-500'
-                        }`}
-                      >
+                      <div className={
+                        'w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold ' +
+                        (quizScore >= 8 ? 'bg-green-500' : quizScore >= 5 ? 'bg-yellow-500' : 'bg-red-500')
+                      }>
                         {quizScore}
                       </div>
                     </div>
@@ -899,7 +1243,7 @@ export default function QASection() {
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {quizScore >= 8
-                        ? 'ممتاز! أنت متمكّن من الأسئلة العملية! 🌟'
+                        ? 'ممتاز! أنت متمكّن من الأسئلة اليومية! 🌟'
                         : quizScore >= 5
                           ? 'جيد! واصل التمرين لتحسين مستواك 💪'
                           : 'لا بأس! راجع الأسئلة وحاول مرة أخرى 📚'}
@@ -909,15 +1253,12 @@ export default function QASection() {
                     <div className="w-full bg-muted rounded-full h-3 max-w-xs mx-auto">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${(quizScore / quizQuestions.length) * 100}%` }}
+                        animate={{ width: (quizScore / quizQuestions.length) * 100 + "%" }}
                         transition={{ duration: 1, delay: 0.3 }}
-                        className={`h-3 rounded-full ${
-                          quizScore >= 8
-                            ? 'bg-green-500'
-                            : quizScore >= 5
-                              ? 'bg-yellow-500'
-                              : 'bg-red-500'
-                        }`}
+                        className={
+                          'h-3 rounded-full ' +
+                          (quizScore >= 8 ? 'bg-green-500' : quizScore >= 5 ? 'bg-yellow-500' : 'bg-red-500')
+                        }
                       />
                     </div>
 
@@ -964,7 +1305,7 @@ export default function QASection() {
                         {/* Timer */}
                         <Badge
                           variant={quizTimer <= 10 ? 'destructive' : 'outline'}
-                          className={`gap-1 tabular-nums ${quizTimer <= 5 ? 'animate-pulse' : ''}`}
+                          className={"gap-1 tabular-nums " + (quizTimer <= 5 ? 'animate-pulse' : '')}
                         >
                           ⏱ {quizTimer}s
                         </Badge>
@@ -973,10 +1314,9 @@ export default function QASection() {
                     {/* Progress bar */}
                     <div className="w-full bg-muted rounded-full h-1.5 mt-2">
                       <div
-                        className="h-1.5 rounded-full transition-all duration-300"
+                        className="h-1.5 rounded-full transition-all duration-300 bg-blue-600"
                         style={{
-                          width: `${((quizCurrent + 1) / quizQuestions.length) * 100}%`,
-                          backgroundColor: ACCENT,
+                          width: ((quizCurrent + 1) / quizQuestions.length) * 100 + "%",
                         }}
                       />
                     </div>
@@ -988,19 +1328,19 @@ export default function QASection() {
                   <Card className="shadow-md">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <HelpCircle className="w-4 h-4" style={{ color: ACCENT }} />
+                        <HelpCircle className="w-4 h-4 text-blue-600" />
                         ما التصنيف المناسب لهذا السؤال؟
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div className="space-y-2 p-3 rounded-lg" style={{ backgroundColor: ACCENT_BG + '50' }}>
+                      <div className="space-y-2 p-3 rounded-lg bg-blue-50">
                         <p className="font-chinese-serif text-lg font-bold">
                           {quizQuestions[quizCurrent].questionZh}
                         </p>
                         <p className="font-chinese-sans text-sm text-muted-foreground">
                           {quizQuestions[quizCurrent].questionPinyin}
                         </p>
-                        <p className="text-sm font-bold" style={{ color: ACCENT }}>
+                        <p className="text-sm font-bold text-blue-700">
                           {quizQuestions[quizCurrent].questionAr}
                         </p>
                       </div>
@@ -1019,24 +1359,17 @@ export default function QASection() {
                               whileTap={!showResult ? { scale: 0.97 } : {}}
                               onClick={() => handleQuizAnswer(idx)}
                               disabled={showResult}
-                              className={`
-                                relative p-3 rounded-lg border-2 text-center transition-all
-                                text-sm
-                                ${showResult
+                              className={
+                                'relative p-3 rounded-lg border-2 text-center transition-all text-sm ' +
+                                (showResult
                                   ? isCorrect
                                     ? 'border-green-500 bg-green-50 text-green-700'
                                     : isSelected
                                       ? 'border-red-500 bg-red-50 text-red-700'
                                       : 'border-muted opacity-50'
-                                  : isSelected
-                                    ? 'bg-opacity-5'
-                                    : 'border-muted hover:bg-muted/50'
-                                }
-                              `}
-                              style={!showResult ? {
-                                borderColor: isSelected ? ACCENT : undefined,
-                                backgroundColor: isSelected ? ACCENT_BG : undefined,
-                              } : undefined}
+                                  : 'border-muted hover:bg-muted/50'
+                                )
+                              }
                             >
                               {opt}
                               {showResult && isCorrect && (
@@ -1069,15 +1402,16 @@ export default function QASection() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className={`p-3 rounded-lg text-center text-sm ${
-                              quizAnswer === quizQuestions[quizCurrent].correctIndex
+                            className={
+                              'p-3 rounded-lg text-center text-sm ' +
+                              (quizAnswer === quizQuestions[quizCurrent].correctIndex
                                 ? 'bg-green-50 text-green-600'
-                                : 'bg-red-50 text-red-500'
-                            }`}
+                                : 'bg-red-50 text-red-500')
+                            }
                           >
                             {quizAnswer === quizQuestions[quizCurrent].correctIndex
                               ? '✅ إجابة صحيحة! أحسنت!'
-                              : `❌ إجابة خاطئة. التصنيف الصحيح هو: ${quizQuestions[quizCurrent].correctCategory}`}
+                              : '❌ إجابة خاطئة. التصنيف الصحيح هو: ' + quizQuestions[quizCurrent].correctCategory}
                           </motion.div>
                         )}
                       </AnimatePresence>

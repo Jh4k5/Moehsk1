@@ -83,3 +83,40 @@ Stage Summary:
 - Mobile: Hamburger button, drawer overlay, updated bottom nav with 5+1 items
 - Server: HTTP 200, no duplicates, 3473 lines
 - Branding: Consistent 桥/جِسر/JISR identity
+
+---
+Task ID: 3
+Agent: Main Developer
+Task: Rebuild Vocabulary System with Anki + Quizlet Standards (SRS + Active Recall + Pronunciation)
+
+Work Log:
+- Analyzed current VocabularySection (lines 1195-2153, 959 lines) in page.tsx
+- Verified data: vocabulary.ts has 410 words with `sentences[]` (3 per word), `mnemonic` field, SRS fields
+- Verified SRS library: SM-2 algorithm with `calculateNextReview()`, `isDueForReview()`, `getWeakWords()`
+- Verified store: `rateWord()`, `getDueCardIds()`, `getSRSStats()` all functional
+- Built new enhanced VocabularySection (~1030 lines) with:
+  - **Front Face**: text-9xl Chinese character (serif), pinyin, dedicated [🔊 استمع] TTS button, POS badge, "اضغط للقلب" hint
+  - **Back Face**: Large meaning, Chinese+pinyin mini display, 💡 memory tip (mnemonic), 3 sentences with per-sentence TTS, prominent [🎤 انطق الكلمة] mic button, inline pronunciation score, [✅ أعرفها] [❌ لا أعرفها] SRS buttons
+  - **4 Study Modes**: Cards, Learn, Test, Match — all preserved and enhanced
+  - **SRS Integration**: Learn mode now rates words (4/1), Test mode rates words, Cards mode has dedicated know/don't-know handlers
+  - **Due counter**: "🎯 X بطاقة مستحقة اليوم" badge in header
+  - **All 410 words** available via `word.sentences[]` + fallback to exZh/s2/s3
+  - **TTS**: speechSynthesis zh-CN via `speak()` function
+  - **Speech Recognition**: webkitSpeechRecognition zh-CN with 5 alternatives, Levenshtein similarity scoring
+  - **Event handling**: e.stopPropagation() on all 11 internal buttons, flip only on outer card click
+- Surgical replacement via Python script (lines 1195-2153 replaced)
+- Validated: HTTP 200, no TypeScript errors in modified section
+
+Stage Summary:
+- ✅ HTTP 200 confirmed — server compiles and serves correctly
+- ✅ VocabularySection rebuilt with Anki/Quizlet standards
+- ✅ Front/back flashcard design matches user spec exactly
+- ✅ Memory tips (mnemonic) displayed on both card back and learn mode
+- ✅ 3 sentences per word with per-sentence TTS
+- ✅ Prominent microphone button with recording animation
+- ✅ Inline pronunciation score display
+- ✅ SRS SM-2 integration in all 4 modes
+- ✅ Due cards counter in header
+- ✅ e.stopPropagation() on all internal interactive elements
+- ✅ page.tsx: 3543 lines (net +70 lines from enhanced card design)
+- Pre-existing lint errors: 3 (in PronunciationSection + backup — not related to this task)

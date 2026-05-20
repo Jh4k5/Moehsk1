@@ -1249,11 +1249,15 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
   const dueCount = dueCards.length
   const word = deck[store.flashcardIndex] || deck[0]
 
+  // Use word.sentences[] — guaranteed 3 per word
   const wordSentences = useMemo(() => {
     if (!word) return []
-    const sents: { zh: string; pinyin: string; ar: string }[] = [
-      { zh: word.exZh, pinyin: word.exPinyin, ar: word.exEn },
-    ]
+    if (word.sentences && word.sentences.length > 0) {
+      return word.sentences.slice(0, 3)
+    }
+    // Fallback: build from exZh + s2 + s3
+    const sents: { zh: string; pinyin: string; ar: string }[] = []
+    if (word.exZh) sents.push({ zh: word.exZh, pinyin: word.exPinyin, ar: word.exEn })
     if (word.s2) sents.push({ zh: word.s2.zh, pinyin: word.s2.py, ar: word.s2.ar })
     if (word.s3) sents.push({ zh: word.s3.zh, pinyin: word.s3.py, ar: word.s3.ar })
     return sents.filter(s => s.zh)
@@ -1390,9 +1394,11 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
       w.meaning.includes(learnInput.trim())
     setLearnFeedback(correct ? 'correct' : 'incorrect')
     if (correct) {
+      store.rateWord(w.id, 4)
       setSessionCorrect(p => p + 1)
       setLearnCompleted(p => p + 1)
     } else {
+      store.rateWord(w.id, 1)
       setSessionIncorrect(p => p + 1)
       setLearnCompleted(p => p + 1)
     }
@@ -1404,7 +1410,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
         setLearnFeedback(null)
       }
     }, 1200)
-  }, [learnInput, deck, learnIndex, markSeen])
+  }, [learnInput, deck, learnIndex, markSeen, store])
 
   // ── Test mode ──
   const initTest = useCallback(() => {
@@ -1428,9 +1434,11 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
     const q = testQuestions[testIndex]
     const isCorrect = idx === q.correctIdx
     if (isCorrect) {
+      store.rateWord(q.word.id, 4)
       setTestScore(p => p + 1)
       setSessionCorrect(p => p + 1)
     } else {
+      store.rateWord(q.word.id, 1)
       setSessionIncorrect(p => p + 1)
     }
     markSeen(q.word.id)
@@ -1442,7 +1450,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
         setTestFinished(true)
       }
     }, 1000)
-  }, [testAnswer, testIndex, testQuestions, markSeen])
+  }, [testAnswer, testIndex, testQuestions, markSeen, store])
 
   // ── Match mode ──
   const initMatch = useCallback(() => {
@@ -1501,7 +1509,6 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
         const updated = prev.map(t =>
           t.id === matchSelected || t.id === tileId ? { ...t, matched: true } : t
         )
-        // Check if all tiles are now matched
         const allMatched = updated.every(t => t.matched)
         if (allMatched) {
           setTimeout(() => setMatchDone(true), 300)
@@ -1516,14 +1523,40 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
   // ── Progress ──
   const progressPercent = deck.length > 0 ? ((store.flashcardIndex + 1) / deck.length) * 100 : 0
 
+  // ── SRS rate handlers ──
+  const handleKnowIt = () => {
+    if (!word) return
+    store.rateWord(word.id, 4)
+    incrementStreak()
+    setPronResult(null)
+    if (store.flashcardIndex < deck.length - 1) {
+      store.setFlashcardIndex(store.flashcardIndex + 1)
+    }
+  }
+  const handleDontKnow = () => {
+    if (!word) return
+    store.rateWord(word.id, 1)
+    setPronResult(null)
+    if (store.flashcardIndex < deck.length - 1) {
+      store.setFlashcardIndex(store.flashcardIndex + 1)
+    }
+  }
+
   return (
     <div className="space-y-4">
-      {/* Header */}
+      {/* Header + Due Counter */}
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <BookOpen className="w-6 h-6 text-[#1A5FA8]" />
-          المفردات
-        </h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <BookOpen className="w-6 h-6 text-[#1A5FA8]" />
+            المفردات
+          </h2>
+          {dueCount > 0 && (
+            <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100 gap-1 px-3 py-1">
+              🎯 {dueCount} بطاقة مستحقة اليوم
+            </Badge>
+          )}
+        </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant={hideMastered ? 'default' : 'outline'} className="cursor-pointer text-xs" onClick={() => setHideMastered(v => !v)}>
             {hideMastered ? '✓ إخفاء المحفوظ' : 'إخفاء المحفوظ'}
@@ -1612,11 +1645,11 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                   <Progress value={progressPercent} className="h-2" />
                   <div className="flex justify-between text-xs text-gray-400">
                     <span>{store.flashcardIndex + 1} من {deck.length}</span>
-                    <span>{sessionSeen.size > 0 ? `شوهد ${sessionSeen.size}` : ''}</span>
+                    <span>{sessionSeen.size > 0 ? 'شوهد ' + sessionSeen.size : ''}</span>
                   </div>
                 </div>
 
-                {/* Flashcard */}
+                {/* ═══ Flashcard ═══ */}
                 <div
                   ref={cardRef}
                   className="perspective-1000"
@@ -1629,72 +1662,147 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                       initial={{ opacity: 0, x: 30 }}
                       animate={{ opacity: 1, x: 0, rotateY: store.isFlipped ? 180 : 0 }}
                       exit={{ opacity: 0, x: -30 }}
-                      transition={{ duration: 0.2 }}
-                      style={{ transformStyle: 'preserve-3d', minHeight: '340px' }}
-                      className={"relative w-full max-w-lg mx-auto cursor-pointer"}
-                      onClick={() => { store.flip(); markSeen(word.id) }}
+                      transition={{ duration: 0.25 }}
+                      style={{ transformStyle: 'preserve-3d', minHeight: '420px' }}
+                      className="relative w-full max-w-lg mx-auto cursor-pointer"
+                      onClick={() => { store.flip(); markSeen(word.id); setPronResult(null) }}
                     >
-                      {/* Front */}
+                      {/* ── FRONT FACE ── */}
                       <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden' }}>
-                        <Card className="h-full border-0 shadow-xl bg-gradient-to-br from-white to-[#E8F0FA] rounded-2xl">
-                          <CardContent className="flex flex-col items-center justify-center h-full p-8 text-center">
-                            <div className="text-xs text-gray-400 mb-3">← اسحب أو استخدم الأسهم →</div>
+                        <Card className="h-full border-0 shadow-2xl bg-gradient-to-br from-white via-[#F0F5FF] to-[#E8F0FA] rounded-3xl">
+                          <CardContent className="flex flex-col items-center justify-center h-full p-8 text-center gap-4">
+                            {/* Character — Very Large Serif */}
                             <div
-                              className="font-chinese-serif text-8xl mb-3 text-gray-900 cursor-pointer hover:text-[#1A5FA8] transition-colors"
-                              onClick={(e) => { e.stopPropagation(); speak(word.zh) }}
+                              className="font-chinese-serif text-8xl sm:text-9xl text-gray-900 select-none leading-none"
                             >
                               {word.zh}
                             </div>
-                            <div className="text-xl text-gray-400 font-chinese-sans mb-2">{word.pinyin}</div>
-                            <div className="flex items-center gap-2 text-xs text-gray-300">
-                              <Volume2 className="w-3 h-3" />
-                              <span>اضغط للنطق • انقر للقلب • مسافة للقلب</span>
+                            {/* Pinyin */}
+                            <div className="text-xl sm:text-2xl text-gray-400 font-chinese-sans tracking-wide">
+                              {word.pinyin}
                             </div>
-                            <Badge className="mt-4" variant="outline">{word.pos}</Badge>
+                            {/* TTS Listen Button */}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); speak(word.zh) }}
+                              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 border border-gray-200 text-gray-600 hover:bg-blue-50 hover:border-[#1A5FA8] hover:text-[#1A5FA8] transition-all shadow-sm"
+                            >
+                              <Volume2 className="w-4 h-4" />
+                              <span className="text-sm font-medium">🔊 استمع</span>
+                            </button>
+                            {/* POS badge */}
+                            <Badge variant="outline" className="text-xs">{word.pos}</Badge>
+                            {/* Hint */}
+                            <div className="text-xs text-gray-300 mt-2">
+                              ─────── اضغط للقلب ──────
+                            </div>
                           </CardContent>
                         </Card>
                       </div>
-                      {/* Back */}
+
+                      {/* ── BACK FACE ── */}
                       <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                        <Card className="h-full border-0 shadow-xl bg-gradient-to-br from-white to-amber-50 overflow-y-auto custom-scrollbar rounded-2xl">
-                          <CardContent className="flex flex-col items-center justify-start h-full p-6 text-center space-y-3">
-                            <div className="text-3xl font-bold text-gray-900 mt-2">{word.meaning}</div>
-                            <div className="font-chinese-serif text-5xl text-[#0D4E82] cursor-pointer hover:text-[#1A5FA8] transition-colors"
-                              onClick={(e) => { e.stopPropagation(); speak(word.zh) }}>
-                              {word.zh}
+                        <Card className="h-full border-0 shadow-2xl bg-gradient-to-br from-white via-[#FFFBF0] to-amber-50 rounded-3xl">
+                          <CardContent className="flex flex-col h-full p-5 sm:p-6 text-center gap-2 overflow-y-auto custom-scrollbar">
+                            {/* Meaning — Large */}
+                            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+                              {word.meaning}
                             </div>
-                            <div className="text-sm text-gray-400 font-chinese-sans">{word.pinyin}</div>
-                            {/* Enhanced Microphone Button */}
+
+                            {/* Chinese character + pinyin (smaller) */}
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="font-chinese-serif text-3xl text-[#0D4E82]">{word.zh}</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); speak(word.zh) }}
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
+                              >
+                                <Volume2 className="w-3.5 h-3.5 text-[#1A5FA8]" />
+                              </button>
+                              <span className="text-sm text-gray-400 font-chinese-sans">{word.pinyin}</span>
+                            </div>
+
+                            {/* Memory Tip */}
+                            {word.mnemonic && (
+                              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 text-sm text-amber-800 flex items-start gap-2">
+                                <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-500" />
+                                <span>تذكّر: {word.mnemonic}</span>
+                              </div>
+                            )}
+
+                            {/* ── Separator ── */}
+                            <div className="border-t border-gray-200 my-1"></div>
+
+                            {/* ── Sentences ── */}
+                            <div className="text-right w-full">
+                              <div className="text-xs font-bold text-gray-500 mb-2 text-center">📝 الجمل:</div>
+                              <div className="space-y-2">
+                                {wordSentences.map((s, i) => (
+                                  <div
+                                    key={i}
+                                    className="flex items-start gap-2 p-2.5 rounded-xl bg-white border border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors text-right"
+                                    onClick={(e) => { e.stopPropagation(); speak(s.zh) }}
+                                  >
+                                    <Volume2 className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="font-chinese-serif text-sm text-gray-900">{s.zh}</div>
+                                      <div className="text-xs text-gray-500 font-chinese-sans">{s.pinyin}</div>
+                                      <div className="text-xs text-gray-400 mt-0.5">{s.ar}</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* ── Separator ── */}
+                            <div className="border-t border-gray-200 my-1"></div>
+
+                            {/* ── Pronunciation Button (Prominent) ── */}
                             <button
-                              onClick={(e) => { e.stopPropagation(); if (isRecording) { stopPronRecording(); } else { startPronRecording(); } }}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                if (isRecording) { stopPronRecording() } else { startPronRecording() }
+                              }}
                               className={
-                                "flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-200 shadow-lg mt-1 " +
+                                "flex items-center justify-center gap-2 w-full px-5 py-3.5 rounded-2xl transition-all duration-200 shadow-lg mx-auto " +
                                 (isRecording
                                   ? "bg-red-500 text-white scale-105 animate-pulse"
-                                  : "bg-[#1A5FA8] text-white hover:bg-[#0D4E82]")
+                                  : "bg-[#1A5FA8] text-white hover:bg-[#0D4E82] hover:shadow-xl")
                               }
                             >
-                              <Mic size={22} />
-                              <span className="text-xs font-medium">
-                                {isRecording ? 'جارٍ التسجيل...' : 'انطق الكلمة'}
+                              <Mic size={20} />
+                              <span className="text-sm font-bold">
+                                {isRecording ? '🔴 جارٍ التسجيل...' : '🎤 انطق الكلمة'}
                               </span>
                             </button>
-                            <div className="w-full border-t border-gray-200 pt-3 mt-2 space-y-2">
-                              <div className="text-xs font-medium text-gray-500">📝 أمثلة:</div>
-                              {wordSentences.map((s, i) => (
-                                <div
-                                  key={i}
-                                  className="flex items-start gap-2 p-2 rounded-lg bg-white hover:bg-gray-50 cursor-pointer transition-colors text-right"
-                                  onClick={(e) => { e.stopPropagation(); speak(s.zh) }}
-                                >
-                                  <Volume2 className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
-                                  <div className="flex-1">
-                                    <div className="font-chinese-serif text-sm text-gray-900">{s.zh}</div>
-                                    <div className="text-xs text-gray-500 font-chinese-sans">{s.pinyin}</div>
-                                    <div className="text-xs text-gray-400 mt-0.5">{s.ar}</div>
-                                  </div>
-                                </div>
-                              ))}
+
+                            {/* ── Pronunciation Result ── */}
+                            {pronResult && (
+                              <motion.div
+                                initial={{ opacity: 0, y: -5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-center text-sm py-2 px-4 rounded-xl"
+                                style={{ background: pronResult.color + '12', color: pronResult.color, border: '1px solid ' + pronResult.color + '30' }}
+                              >
+                                <div className="font-bold">{pronResult.msg}</div>
+                                <div className="text-xs mt-0.5 opacity-75">قلت: {pronResult.spoken} • النتيجة: {pronResult.score}%</div>
+                              </motion.div>
+                            )}
+
+                            {/* ── SRS Buttons ── */}
+                            <div className="flex items-center gap-3 mt-1">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleKnowIt() }}
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg"
+                              >
+                                <Check className="w-5 h-5" />
+                                أعرفها ✅
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDontKnow() }}
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white border-2 border-red-200 text-red-600 hover:bg-red-50 font-bold text-sm transition-all"
+                              >
+                                <X className="w-5 h-5" />
+                                لا أعرفها ❌
+                              </button>
                             </div>
                           </CardContent>
                         </Card>
@@ -1703,13 +1811,14 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                   </AnimatePresence>
                 </div>
 
-                {/* Navigation */}
+                {/* Navigation Arrows */}
                 <div className="flex items-center justify-between max-w-lg mx-auto">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => store.setFlashcardIndex(store.flashcardIndex - 1)}
                     disabled={store.flashcardIndex === 0}
+                    className="rounded-xl"
                   >
                     <ChevronRight className="w-4 h-4" />
                     السابق
@@ -1718,13 +1827,10 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     <Button
                       size="sm"
                       variant={store.isLearned(word.id) ? 'default' : 'outline'}
-                      onClick={() => { toggleLearned(word.id); incrementStreak() }}
-                      className={store.isLearned(word.id) ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                      onClick={(e) => { e.stopPropagation(); toggleLearned(word.id); incrementStreak() }}
+                      className={store.isLearned(word.id) ? 'bg-emerald-600 hover:bg-emerald-700 rounded-xl' : 'rounded-xl'}
                     >
                       {store.isLearned(word.id) ? <><Check className="w-4 h-4 ml-1" /> تم الحفظ</> : <><Star className="w-4 h-4 ml-1" /> حفظ</>}
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => speak(word.zh)}>
-                      <Volume2 className="w-4 h-4" />
                     </Button>
                   </div>
                   <Button
@@ -1732,55 +1838,10 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     size="sm"
                     onClick={() => store.setFlashcardIndex(store.flashcardIndex + 1)}
                     disabled={store.flashcardIndex >= deck.length - 1}
+                    className="rounded-xl"
                   >
                     التالي
                     <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                </div>
-                {pronResult && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="max-w-lg mx-auto text-center text-sm py-2 px-4 rounded-xl"
-                    style={{ background: pronResult.color + '15', color: pronResult.color, border: '1px solid ' + pronResult.color + '30' }}
-                  >
-                    <div className="font-bold">{pronResult.msg}</div>
-                    <div className="text-xs mt-0.5 opacity-75">قلت: {pronResult.spoken} • دقة: {pronResult.score}%</div>
-                  </motion.div>
-                )}
-
-                {/* SRS Buttons */}
-                <div className="flex items-center justify-center gap-3 max-w-lg mx-auto mt-2">
-                  {dueCount > 0 && (
-                    <span className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                      {dueCount} كلمة مستحقة اليوم
-                    </span>
-                  )}
-                  <Button
-                    size="sm"
-                    className="gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white border-0"
-                    onClick={() => {
-                      store.rateWord(word.id, 4)
-                      incrementStreak()
-                      if (store.flashcardIndex < deck.length - 1) {
-                        store.setFlashcardIndex(store.flashcardIndex + 1)
-                      }
-                    }}
-                  >
-                    <Check className="w-3.5 h-3.5" /> أعرفها
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="gap-1 text-xs text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => {
-                      store.rateWord(word.id, 1)
-                      if (store.flashcardIndex < deck.length - 1) {
-                        store.setFlashcardIndex(store.flashcardIndex + 1)
-                      }
-                    }}
-                  >
-                    <X className="w-3.5 h-3.5" /> لا أعرفها
                   </Button>
                 </div>
 
@@ -1851,6 +1912,14 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                         </div>
                         <div className="text-lg text-gray-400 font-chinese-sans">{deck[learnIndex].pinyin}</div>
 
+                        {/* Memory tip in learn mode */}
+                        {deck[learnIndex].mnemonic && (
+                          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 text-sm text-amber-800 flex items-start gap-2 mx-auto max-w-md">
+                            <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-500" />
+                            <span>{deck[learnIndex].mnemonic}</span>
+                          </div>
+                        )}
+
                         {/* Input */}
                         <div className="max-w-md mx-auto space-y-3">
                           <Input
@@ -1867,10 +1936,10 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                             disabled={learnFeedback !== null}
                           />
                           <div className="flex gap-2 justify-center">
-                            <Button onClick={checkLearnAnswer} disabled={learnFeedback !== null || !learnInput.trim()} className="bg-[#1A5FA8] hover:bg-[#0D4E82]">
+                            <Button onClick={checkLearnAnswer} disabled={learnFeedback !== null || !learnInput.trim()} className="bg-[#1A5FA8] hover:bg-[#0D4E82] rounded-xl">
                               تحقق
                             </Button>
-                            <Button variant="ghost" size="sm" onClick={() => speak(deck[learnIndex].zh)}>
+                            <Button variant="ghost" size="sm" onClick={() => speak(deck[learnIndex].zh)} className="rounded-xl">
                               <Volume2 className="w-4 h-4 ml-1" /> استمع
                             </Button>
                           </div>
@@ -1935,7 +2004,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                       <p>✗ خاطئ: <span className="text-red-600 font-bold">{sessionIncorrect}</span></p>
                       <p>النسبة: <span className="text-[#1A5FA8] font-bold">{deck.length > 0 ? Math.round((sessionCorrect / deck.length) * 100) : 0}%</span></p>
                     </div>
-                    <Button onClick={initLearn} className="bg-[#1A5FA8] hover:bg-[#0D4E82]">
+                    <Button onClick={initLearn} className="bg-[#1A5FA8] hover:bg-[#0D4E82] rounded-xl">
                       ابدأ من جديد
                     </Button>
                   </CardContent>
@@ -1953,9 +2022,9 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     <Target className="w-12 h-12 text-[#1A5FA8] mx-auto" />
                     <h3 className="text-lg font-bold text-gray-900">اختبار سريع</h3>
                     <p className="text-sm text-gray-500">
-                      {Math.min(10, deck.length)} سؤال متعدد الخيارات من المجموعة الحالية
+                      10 أسئلة اختيار متعدد من المجموعة الحالية
                     </p>
-                    <Button onClick={initTest} className="bg-[#1A5FA8] hover:bg-[#0D4E82]">
+                    <Button onClick={initTest} className="bg-[#1A5FA8] hover:bg-[#0D4E82] rounded-xl">
                       ابدأ الاختبار
                     </Button>
                   </CardContent>
@@ -1970,10 +2039,10 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                       <p>النسبة: {Math.round((testScore / testQuestions.length) * 100)}%</p>
                     </div>
                     <div className="flex gap-2 justify-center">
-                      <Button onClick={initTest} className="bg-[#1A5FA8] hover:bg-[#0D4E82]">
+                      <Button onClick={initTest} className="bg-[#1A5FA8] hover:bg-[#0D4E82] rounded-xl">
                         اختبار جديد
                       </Button>
-                      <Button variant="outline" onClick={() => setTestQuestions([])}>
+                      <Button variant="outline" onClick={() => setTestQuestions([])} className="rounded-xl">
                         رجوع
                       </Button>
                     </div>
@@ -2069,9 +2138,9 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     <Gamepad2 className="w-12 h-12 text-[#1A5FA8] mx-auto" />
                     <h3 className="text-lg font-bold text-gray-900">لعبة المطابقة</h3>
                     <p className="text-sm text-gray-500">
-                      طابق بين الكلمات الصينية ومعانيها بالعربية في أسرع وقت!
+                      طابق بين 6 أزواج من الكلمات الصينية ومعانيها بالعربية في أسرع وقت!
                     </p>
-                    <Button onClick={initMatch} className="bg-[#1A5FA8] hover:bg-[#0D4E82]">
+                    <Button onClick={initMatch} className="bg-[#1A5FA8] hover:bg-[#0D4E82] rounded-xl">
                       ابدأ اللعبة
                     </Button>
                   </CardContent>
@@ -2086,10 +2155,10 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                       <p>🎯 المحاولات: <span className="font-bold">{matchMoves}</span></p>
                     </div>
                     <div className="flex gap-2 justify-center">
-                      <Button onClick={initMatch} className="bg-[#1A5FA8] hover:bg-[#0D4E82]">
+                      <Button onClick={initMatch} className="bg-[#1A5FA8] hover:bg-[#0D4E82] rounded-xl">
                         العب مرة أخرى
                       </Button>
-                      <Button variant="outline" onClick={() => setMatchTiles([])}>
+                      <Button variant="outline" onClick={() => setMatchTiles([])} className="rounded-xl">
                         رجوع
                       </Button>
                     </div>
@@ -2151,6 +2220,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
     </div>
   )
 }
+
 
 // ── Helpers (outside component) ──
 function isSelectedCorrect(answer: number | null, correct: number): boolean {

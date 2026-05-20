@@ -159,3 +159,76 @@ Stage Summary:
 - ✅ TTS on all Chinese text elements
 - ✅ Zero new lint errors introduced
 - ✅ grep vocabularyIds returns 15 matches (one per lesson)
+
+---
+Task ID: 2
+Agent: Main Developer
+Task: Rewrite HanziSection.tsx — Restore HanziWriter Drawing Functionality
+
+Work Log:
+- Read existing HanziSection.tsx (647 lines) — complex multi-tab layout with viewer, list, radicals, quiz tabs
+- Completely rewrote HanziSection.tsx with simplified, focused layout:
+  - **LEFT side**: Character grid (4-8 columns responsive) with 80+ HSK1 characters as clickable buttons
+  - **RIGHT side**: Large 300x300 HanziWriter drawing area with character info card
+- HanziWriter loaded via CDN script tag (hanzi-writer@3.5), using `HanziWriter.create()` (NOT `new HanziWriter()`)
+- Character info map: 88 characters with pinyin + Arabic meaning
+- Three control buttons below drawing area:
+  1. ▶ رسم تلقائي — calls `writer.animateCharacter()` with onComplete callback
+  2. 📝 وضع الاختبار — calls `writer.quiz()` with onComplete summary (totalMistakes/totalStrokes)
+  3. 🔄 إعادة — re-creates the writer instance
+- TTS button in character info card using speechSynthesis zh-CN
+- Quiz mode: overlay on drawing area showing results (perfect/good/try again) with mistake count
+- Red color theme throughout (text-red-700, bg-red-50, border-red-200)
+- Framer Motion animations: staggered grid entry, character info transitions, quiz result overlay
+- RTL layout with dir="rtl"
+- shadcn/ui components: Card, Button, Badge
+- Lucide icons: Volume2, Play, PenLine, RotateCcw, BookOpen
+- NO template literals in Tailwind className (string concatenation only)
+- Responsive: mobile stacks grid above drawing area, desktop side-by-side (12-column grid)
+
+Stage Summary:
+- ✅ HTTP 200 confirmed — server compiles and serves correctly
+- ✅ HanziSection.tsx: ~290 lines (down from 647), cleaner and more focused
+- ✅ 88 HSK1 characters with full pinyin + Arabic meaning data
+- ✅ HanziWriter create() API (no `new` keyword)
+- ✅ Three buttons: auto-animate, quiz mode, reset
+- ✅ Quiz mode with built-in writer.quiz() + result overlay
+- ✅ TTS via speechSynthesis zh-CN
+- ✅ Zero new lint errors from this component
+- ✅ Pre-existing lint errors: 4 (in PronunciationSection, page.tsx backup, raw_vocab.js — not related)
+
+---
+Task ID: 3
+Agent: Main Developer
+Task: Redesign PinyinHub.tsx with 4 Focused Tabs
+
+Work Log:
+- Read existing PinyinHub.tsx (707 lines) with 6 tabs: initials, finals, tones, special, practice, review
+- Completely rewrote PinyinHub.tsx (~580 lines) with exactly 4 tabs:
+  1. **النبرات (Tones)**: 5 tone cards (1,2,3,4,0) with SVG pitch contour curves, Arabic descriptions, example characters with pinyin + meaning, TTS buttons. Colors: 1=blue, 2=green, 3=orange, 4=red, 0=gray. Includes classic "ma" comparison (妈/麻/马/骂) with curves.
+  2. **الحروف الأولية (Initials)**: Table with 6 columns — letter, example, meaning, IPA, Arabic explanation, TTS. 23 initials: b,p,m,f,d,t,n,l,g,k,h,j,q,x,zh,ch,sh,r,z,c,s,y,w. Info card + summary note about Arabic similarity.
+  3. **الحروف الأخيرة (Finals)**: Same table format as initials. 24 finals: a,o,e,i,u,ü,ai,ei,ui,ao,ou,iu,ie,üe,er,an,en,in,un,ün,ang,eng,ing,ong. Info card + similarity badges.
+  4. **قواعد خاصة (Special Rules)**: 4 rules with numbered cards:
+     - Tone Sandhi (三→二): 你好, 很好, 水果 examples
+     - ü with j,q,x,y: 家, 去, 学 examples
+     - r-suffix 儿化音: 一点儿, 这儿, 哪儿 examples
+     - Neutral tone: 吗, 的, 了 examples
+- SVG ToneCurveSVG component: proper pitch contours with reference lines, pitch labels (5→1), animated path drawing via framer-motion
+- SpeakButton reusable component with stopPropagation
+- Red color theme: text-red-700, bg-red-50, border-red-200, active tab bg-red-600
+- RTL layout with dir="rtl"
+- Framer Motion staggered animations on cards and table rows
+- shadcn/ui: Card, CardContent, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger, Button, Badge
+- NO template literals in Tailwind className
+- TTS: speechSynthesis zh-CN, rate 0.7
+
+Stage Summary:
+- ✅ HTTP 200 confirmed — server compiles and serves correctly
+- ✅ PinyinHub.tsx: ~580 lines (down from 707), cleaner 4-tab design
+- ✅ 5 tone cards with animated SVG pitch contours
+- ✅ 23 initials in responsive table with IPA + Arabic explanations
+- ✅ 24 finals in same table format
+- ✅ 4 special rules with clear Arabic explanations and examples
+- ✅ TTS on all Chinese text elements
+- ✅ Zero new lint errors introduced
+- ✅ Pre-existing lint errors: 4 (in backup files + raw_vocab.js — not related)

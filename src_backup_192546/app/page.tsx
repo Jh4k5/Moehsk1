@@ -730,211 +730,122 @@ export default function Home() {
       </header>
 
       <div className="flex-1 flex max-w-7xl mx-auto w-full">
-        {/* ─── Mobile Sidebar Overlay ─────────────────────── */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
-        )}
+        {/* ─── Sidebar Navigation (Desktop) ──────────────── */}
+        <nav className={`hidden lg:flex flex-col border-l border-gray-100 p-3 gap-1 sticky top-[60px] self-start max-h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar bg-white/50 transition-all duration-300 ${sidebarOpen ? 'w-56' : 'w-16'}`}>
+          {/* Toggle button */}
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors self-start mb-1">
+            {sidebarOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
+          </button>
 
-        {/* ─── Sidebar Navigation ─────────────────────────── */}
-        <aside className={
-          "fixed top-0 right-0 h-full z-50 flex flex-col shadow-2xl " +
-          "bg-gradient-to-b from-[#0A1628] to-[#0D2137] " +
-          /* Mobile: drawer */
-          "w-72 " +
-          (sidebarOpen ? "translate-x-0" : "translate-x-full") +
-          /* Tablet+: overlay on main */
-          " max-lg:shadow-2xl " +
-          /* Desktop: fixed right column */
-          " lg:sticky lg:top-0 lg:self-start lg:translate-x-0 lg:shadow-none lg:z-auto lg:max-h-screen lg:overflow-y-auto " +
-          "lg:custom-scrollbar " +
-          (sidebarOpen ? "lg:w-64" : "lg:w-[68px] lg:overflow-hidden") +
-          " transition-all duration-300 ease-in-out"
-        }>
-          <div className="flex flex-col h-full">
-
-            {/* ── Logo + Toggle ── */}
-            <div className={"flex items-center gap-3 px-4 py-4 border-b border-white/10 " + (sidebarOpen ? "" : "lg:justify-center lg:px-2")}>
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
-                <span className="font-chinese-serif text-white text-xl font-bold">桥</span>
+          {/* User info */}
+          <div className={`flex items-center gap-3 p-2 mb-2 rounded-xl bg-gradient-to-l from-[#E8F0FA] to-white ${sidebarOpen ? '' : 'justify-center p-2'}`}>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-xs shrink-0" style={{ background: 'linear-gradient(135deg, #1A5FA8, #0D4E82)' }}>
+              {currentUser?.isGuest ? '👋' : currentUser?.name?.charAt(0) || '?'}
+            </div>
+            {sidebarOpen && (
+              <div className="min-w-0">
+                <div className="text-sm font-bold text-gray-900 truncate">{currentUser?.name || 'زائر'}</div>
+                <div className="text-[10px] text-gray-500">{currentUser?.isGuest ? 'زائر' : 'مستخدم'} • {learnedWords.length} محفوظة</div>
               </div>
-              {(sidebarOpen || typeof window === 'undefined') && (
-                <div className="flex-1 min-w-0 hidden lg:block">
-                  <span className="text-white font-bold text-lg leading-tight block">جِسر</span>
-                  <span className="text-blue-300/70 text-[10px] tracking-widest">JISR · HSK 1</span>
-                </div>
-              )}
-              {/* Mobile close */}
-              <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-1 mr-auto text-blue-300/60 hover:text-white"><X className="w-5 h-5" /></button>
-              {/* Desktop toggle */}
-              <button onClick={() => setSidebarOpen(!sidebarOpen)} className={"hidden lg:flex p-1 text-blue-300/60 hover:text-white transition-colors " + (sidebarOpen ? "mr-auto" : "mx-auto")}>
-                {sidebarOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
-              </button>
-            </div>
-
-            {/* ── User info ── */}
-            <div className={"flex items-center gap-3 px-4 py-3 mx-3 mt-3 rounded-xl bg-white/5 " + (sidebarOpen ? "" : "lg:hidden")}>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 text-white text-sm font-bold">
-                {currentUser?.isGuest ? '👋' : currentUser?.name?.charAt(0) || '?'}
-              </div>
-              {sidebarOpen && (
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-white truncate">{currentUser?.name || 'زائر'}</div>
-                  <div className="text-[10px] text-blue-300/50 flex items-center gap-1.5">
-                    <Flame className="w-3 h-3 text-orange-400" />{store.dailyStreak} يوم
-                    <Star className="w-3 h-3 text-blue-400" />{learnedWords.length}/{vocabulary.length}
-                  </div>
-                </div>
-              )}
-              <button onClick={() => { localStorage.removeItem('jisr_currentUser'); localStorage.removeItem('mudann_currentUser'); setCurrentUser(null); }}
-                className={"p-1 text-blue-300/40 hover:text-red-400 transition-colors " + (sidebarOpen ? "" : "hidden")}>
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* ── Dashboard (always first) ── */}
-            <button onClick={() => { setCurrentSection('dashboard'); if (window.innerWidth < 1024) setSidebarOpen(false) }}
-              className={"flex items-center gap-3 mx-3 mt-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all " +
-                (currentSection === 'dashboard'
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30"
-                  : "text-blue-200/70 hover:bg-white/5 hover:text-white"
-                )}>
-              <LayoutDashboard className="w-5 h-5 shrink-0" />
-              {sidebarOpen && <span>الرئيسية</span>}
-            </button>
-
-            {/* ── Lessons (expandable) ── */}
-            <div className="mx-3 mt-1">
-              <button onClick={() => { setCurrentSection('lessons'); setLessonsOpen(!lessonsOpen); if (window.innerWidth < 1024) setSidebarOpen(false) }}
-                className={"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all " +
-                  (currentSection === 'lessons'
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30"
-                    : "text-blue-200/70 hover:bg-white/5 hover:text-white"
-                  )}>
-                <BookOpenText className="w-5 h-5 shrink-0" />
-                {sidebarOpen && (
-                  <>
-                    <span className="flex-1 text-right">الدروس</span>
-                    <span className="text-[10px] text-blue-300/40 transition-transform duration-200 inline-block" style={{ transform: lessonsOpen ? 'rotate(90deg)' : 'rotate(0)' }}>▸</span>
-                  </>
-                )}
-              </button>
-              {lessonsOpen && sidebarOpen && (
-                <div className="mr-8 mt-1 mb-2 space-y-0.5 max-h-52 overflow-y-auto custom-scrollbar border-r border-white/10 pr-3">
-                  {lessonNames.map((ln, i) => (
-                    <button key={i}
-                      onClick={(e) => { e.stopPropagation(); setCurrentSection('lessons'); if (store.setCurrentLesson) store.setCurrentLesson(i + 1); if (window.innerWidth < 1024) setSidebarOpen(false) }}
-                      className="w-full text-right text-xs text-blue-200/50 hover:text-white hover:bg-white/5 py-1.5 px-3 rounded-lg transition-all truncate">
-                      {i + 1}. {ln}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* ── Section groups ── */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar py-1 px-0 space-y-3 mt-2">
-              {[
-                { title: 'التعلم', items: [
-                  { id: 'vocabulary' as Section, label: 'المفردات والنطق', icon: BookOpen },
-                  { id: 'grammar' as Section, label: 'القواعد', icon: GraduationCap },
-                  { id: 'sentences' as Section, label: 'الجمل', icon: MessageCircle },
-                  { id: 'stories' as Section, label: 'القصص', icon: BookMarked },
-                  { id: 'conversations' as Section, label: 'المحادثات', icon: MessageSquare },
-                ]},
-                { title: 'التدريب', items: [
-                  { id: 'practice' as Section, label: 'التمارين', icon: Target },
-                  { id: 'games' as Section, label: 'الألعاب', icon: Gamepad2 },
-                  { id: 'exam' as Section, label: 'محاكي الامتحان', icon: FileText },
-                  { id: 'qa' as Section, label: 'أسئلة يومية', icon: HelpCircle },
-                ]},
-                { title: 'الأدوات', items: [
-                  { id: 'visual-dict' as Section, label: 'القاموس البصري', icon: Image },
-                  { id: 'pinyin' as Section, label: 'البينين', icon: Languages },
-                  { id: 'hanzi' as Section, label: 'الحروف', icon: PenTool },
-                  { id: 'pronunciation' as Section, label: 'تدريب النطق', icon: Mic },
-                ]},
-                { title: 'أخرى', items: [
-                  { id: 'roadmap' as Section, label: 'خريطة الطريق', icon: Map },
-                  { id: 'achievements' as Section, label: 'الإنجازات', icon: Medal },
-                  { id: 'chat' as Section, label: 'المساعد الذكي', icon: Bot },
-                ]},
-              ].map(group => (
-                <div key={group.title}>
-                  {sidebarOpen && (
-                    <div className="text-[10px] font-bold text-blue-300/30 uppercase tracking-wider mb-1.5 px-6">{group.title}</div>
-                  )}
-                  <div className="space-y-0.5 px-3">
-                    {group.items.map(item => (
-                      <button key={item.id}
-                        onClick={() => { setCurrentSection(item.id); if (window.innerWidth < 1024) setSidebarOpen(false) }}
-                        className={
-                          "w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all relative group " +
-                          (sidebarOpen ? "px-3 py-2.5" : "justify-center px-2 py-2.5") + " " +
-                          (currentSection === item.id
-                            ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30"
-                            : "text-blue-200/70 hover:bg-white/5 hover:text-white"
-                          )
-                        }>
-                        <item.icon className="w-5 h-5 shrink-0" />
-                        {sidebarOpen && <span className="truncate text-xs">{item.label}</span>}
-                        {!sidebarOpen && (
-                          <div className="absolute right-full mr-2 px-2 py-1 bg-[#0D2137] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity z-[60] hidden lg:block">
-                            {item.label}
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* ── Progress footer ── */}
-            <div className={"p-3 border-t border-white/10 " + (sidebarOpen ? "" : "lg:hidden")}>
-              <div className="sidebar-progress bg-white/5 rounded-xl p-3">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-[10px] text-blue-200/50 font-medium">التقدم العام</span>
-                  <span className="text-xs text-blue-300 font-bold">{stats.progress}%</span>
-                </div>
-                <div className="progress-duo mb-1">
-                  <div className="progress-duo-fill" style={{ width: stats.progress + '%' }} />
-                </div>
-                <div className="text-[10px] text-blue-300/40 text-center">{stats.learned}/{stats.total} كلمة</div>
-              </div>
-            </div>
+            )}
           </div>
-        </aside>
+          <div className="h-px bg-gray-100 mb-2" />
+          {navItems.map(item => {
+            if (item.id === 'lessons') {
+              return (
+                <div key={item.id}>
+                  <button
+                    onClick={() => { setCurrentSection(item.id); setLessonsOpen(!lessonsOpen) }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <item.icon className="w-5 h-5 text-gray-400 shrink-0" />
+                    {sidebarOpen && (
+                      <>
+                        <span className="flex-1 text-right">{item.label}</span>
+                        <span className="text-[10px] text-gray-400 transition-transform" style={{ transform: lessonsOpen ? 'rotate(90deg)' : 'rotate(0)' }}>▸</span>
+                      </>
+                    )}
+                  </button>
+                  {lessonsOpen && sidebarOpen && (
+                    <div className="mr-8 mb-1 space-y-0.5 max-h-48 overflow-y-auto custom-scrollbar">
+                      {lessonNames.map((ln, i) => (
+                        <button
+                          key={i}
+                          onClick={(e) => { e.stopPropagation(); setCurrentSection('lessons'); if (store.setCurrentLesson) store.setCurrentLesson(i + 1); }}
+                          className="w-full text-right text-xs text-gray-500 hover:text-[#1A5FA8] hover:bg-[#F0FAFF] py-1.5 px-3 rounded-lg transition-all truncate"
+                        >
+                          {i + 1}. {ln}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+            return (
+              <button
+                key={item.id}
+                onClick={() => setCurrentSection(item.id)}
+                className={currentSection === item.id
+                  ? "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all bg-[#E8F0FA] text-[#1A5FA8] shadow-sm"
+                  : "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }
+              >
+                <item.icon className={currentSection === item.id ? "w-5 h-5 text-[#1A5FA8]" : "w-5 h-5 text-gray-400 shrink-0"} />
+                {sidebarOpen && <span>{item.label}</span>}
+              </button>
+            )
+          })}
+          {/* Progress (shown when open) */}
+          {sidebarOpen && (
+            <div className="mt-4 p-4 rounded-xl bg-gradient-to-b from-[#E8F0FA] to-[#F0FAFF]">
+              <div className="text-xs text-gray-600 mb-2 font-medium">التقدم العام</div>
+              <div className="progress-duo mb-1">
+                <div className="progress-duo-fill" style={{ width: `${stats.progress}%` }} />
+              </div>
+              <div className="text-xs text-gray-500 text-center">{stats.progress}%</div>
+            </div>
+          )}
+          {/* Logout button */}
+          <div className="mt-auto pt-4 border-t border-gray-100">
+            <button
+              onClick={() => { localStorage.removeItem('jisr_currentUser'); localStorage.removeItem('mudann_currentUser'); setCurrentUser(null); }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-red-50 hover:text-red-600"
+            >
+              <LogOut className="w-5 h-5 shrink-0" />
+              {sidebarOpen && <span>تسجيل الخروج</span>}
+            </button>
+          </div>
+        </nav>
 
         {/* ─── Mobile Bottom Navigation ──────────────────── */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-gray-200 flex justify-around py-2 px-1 safe-area-bottom">
-          {[
-            { id: 'dashboard' as Section, label: 'الرئيسية', icon: LayoutDashboard },
-            { id: 'lessons' as Section, label: 'الدروس', icon: BookOpenText },
-            { id: 'vocabulary' as Section, label: 'المفردات', icon: BookOpen },
-            { id: 'practice' as Section, label: 'تمارين', icon: Target },
-            { id: 'chat' as Section, label: 'المساعد', icon: Bot },
-          ].map(item => (
-            <button key={item.id}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around py-2 px-1 safe-area-bottom">
+          {navItems.slice(0, 5).map(item => (
+            <button
+              key={item.id}
               onClick={() => { setCurrentSection(item.id); incrementStreak() }}
-              className={"flex flex-col items-center gap-0.5 px-2 py-1.5 min-w-[50px] transition-colors " +
-                (currentSection === item.id ? "text-blue-700" : "text-gray-400")
-              }>
+              className={currentSection === item.id
+                ? "flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg min-w-[50px] text-[#1A5FA8]"
+                : "flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg min-w-[50px] text-gray-400"
+              }
+            >
               <item.icon className="w-5 h-5" />
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>
           ))}
-          <button onClick={() => setSidebarOpen(true)}
-            className="flex flex-col items-center gap-0.5 px-2 py-1.5 min-w-[50px] text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={() => {
+              const moreSections: Section[] = ['pinyin', 'hanzi', 'lessons', 'conversations', 'sentences', 'stories', 'grammar', 'practice', 'games', 'qa', 'visual-dict', 'exam', 'achievements', 'chat', 'roadmap']
+              const currentIdx = moreSections.indexOf(store.currentSection as Section)
+              const nextIdx = (currentIdx + 1) % moreSections.length
+              setCurrentSection(moreSections[nextIdx])
+            }}
+            className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg min-w-[50px] text-gray-400"
+          >
             <MoreHorizontal className="w-5 h-5" />
             <span className="text-[10px] font-medium">المزيد</span>
           </button>
         </nav>
-
-        {/* ─── Mobile Header Hamburger ──────────────────── */}
-        <button onClick={() => setSidebarOpen(true)}
-          className="lg:hidden fixed top-4 right-4 z-50 bg-white/90 backdrop-blur-sm p-2.5 rounded-xl shadow-lg border border-gray-100 hover:bg-gray-50 transition-colors">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="5" x2="17" y2="5" /><line x1="3" y1="10" x2="17" y2="10" /><line x1="3" y1="15" x2="17" y2="15" /></svg>
-        </button>
 
         {/* ─── Main Content ──────────────────────────────── */}
         <main className="flex-1 p-4 md:p-6 pb-24 lg:pb-6 animate-fade-in" key={currentSection}>

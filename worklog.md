@@ -52,3 +52,34 @@ Stage Summary:
 - ✅ LoginScreen.tsx: rebranded to Jisr
 - ✅ globals.css: dark blue color scheme applied
 - ✅ Backups created for all modified files
+
+---
+Task ID: Sidebar Redesign
+Agent: Main Agent
+Task: Complete sidebar redesign with JISR branding and dark theme
+
+Work Log:
+- Analyzed current sidebar: inline `<nav>` within Home component, white theme, w-56/w-16 toggle
+- Replaced navItems: reorganized order (Dashboard first, then Lessons expandable, then section groups)
+- Updated lessonNames to match actual lessons.ts titles (15 lessons)
+- Changed "أسئلة شائعة" to "أسئلة يومية" in navItems
+- Changed "المساعد" to "المساعد الذكي" in navItems
+- Replaced entire sidebar `<nav>` with `<aside>` dark theme:
+  - Background: from-[#0A1628] to-[#0D2137] (dark navy)
+  - Logo: 桥 icon in blue gradient + جِسر / JISR · HSK 1
+  - Desktop: sticky, w-64 expanded / w-[68px] collapsed with tooltips
+  - Mobile: drawer with overlay, translate-x-full/translate-x-0
+  - Mobile hamburger button added (fixed top-right)
+  - Lessons expandable dropdown with 15 lesson titles
+  - 4 section groups: التعلم, التدريب, الأدوات, أخرى
+  - User info card with avatar, streak, word count, logout
+  - Progress footer with blue gradient bar on dark background
+- Replaced mobile bottom nav: 5 items (Dashboard, Lessons, Vocab, Practice, Chat) + "المزيد" hamburger
+- Added CSS: sidebar-progress class for dark theme progress bars
+- Fixed CSS parsing error (backslash in class selector → named class)
+
+Stage Summary:
+- Sidebar: Dark navy gradient, collapsible, mobile drawer, grouped sections, JISR branding
+- Mobile: Hamburger button, drawer overlay, updated bottom nav with 5+1 items
+- Server: HTTP 200, no duplicates, 3473 lines
+- Branding: Consistent 桥/جِسر/JISR identity

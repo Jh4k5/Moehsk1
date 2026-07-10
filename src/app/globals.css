@@ -212,12 +212,12 @@
    ╚═══════════════════════════════════════════════════════╝ */
 .light {
   /* ── الأسطح ── */
-  --surface-base:    #faf8ff;
-  --surface-page:    #f5f2ff;
+  --surface-base:    #fdfcff;
+  --surface-page:    #f7f4ff;
   --surface-card:    #ffffff;
-  --surface-card-h:  #f0ecff;
-  --surface-card-a:  #ebe5ff;
-  --surface-sidebar: #1e0a3c;
+  --surface-card-h:  #f3eeff;
+  --surface-card-a:  #ece4ff;
+  --surface-sidebar: #6d28d9;
   --surface-header:  rgba(255, 255, 255, 0.92);
 
   /* ── الحدود ── */
@@ -260,9 +260,9 @@
   --shadow-glow-success: 0 4px 24px rgba(16, 185, 129, 0.18);
 
   /* ── التدرجات ── */
-  --gradient-primary: linear-gradient(135deg, var(--violet-600), var(--violet-700));
-  --gradient-hero:    linear-gradient(135deg, var(--violet-700) 0%, var(--violet-600) 60%, var(--fuchsia-600) 100%);
-  --gradient-sidebar: linear-gradient(180deg, #1e0a3c 0%, #2e1065 100%);
+  --gradient-primary: linear-gradient(135deg, var(--violet-500), var(--fuchsia-600));
+  --gradient-hero:    linear-gradient(135deg, var(--violet-600) 0%, var(--fuchsia-500) 55%, var(--orange-400) 130%);
+  --gradient-sidebar: linear-gradient(180deg, #7c3aed 0%, #a21caf 100%);
   --gradient-card-back: linear-gradient(135deg, var(--violet-100), var(--violet-50));
 
   /* ── shadcn/ui متوافق ── */
@@ -289,14 +289,14 @@
   --chart-3: #f59e0b;
   --chart-4: #f43f5e;
   --chart-5: #0ea5e9;
-  --sidebar: #1e0a3c;
-  --sidebar-foreground: #ddd6fe;
-  --sidebar-primary: #a78bfa;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2e1065;
-  --sidebar-accent-foreground: #ddd6fe;
-  --sidebar-border: rgba(139, 92, 246, 0.20);
-  --sidebar-ring: #a78bfa;
+  --sidebar: #6d28d9;
+  --sidebar-foreground: #f3eeff;
+  --sidebar-primary: #fbbf24;
+  --sidebar-primary-foreground: #1e1145;
+  --sidebar-accent: #8b5cf6;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-ring: #fbbf24;
 }
 
 
@@ -324,9 +324,15 @@
    ╚═══════════════════════════════════════════════════════╝ */
 .font-chinese-serif {
   font-family: var(--font-noto-serif-sc), 'Noto Serif SC', serif;
+  font-size: calc(1em * var(--hanzi-scale, 1));
 }
 .font-chinese-sans {
   font-family: var(--font-noto-sans-sc), 'Noto Sans SC', sans-serif;
+  font-size: calc(1em * var(--hanzi-scale, 1));
+}
+.font-chinese {
+  font-family: var(--font-noto-sans-sc), 'Noto Sans SC', sans-serif;
+  font-size: calc(1em * var(--hanzi-scale, 1));
 }
 .font-arabic {
   font-family: var(--font-tajawal), 'Tajawal', sans-serif;

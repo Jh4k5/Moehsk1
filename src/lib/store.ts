@@ -28,7 +28,22 @@ type Section =
   | 'sentences'
   | 'qa'
   | 'visual-dict'
-  | 'achievements';
+  | 'achievements'
+  | 'settings';
+
+// ── Profile & Settings ─────────────────────────────────────────────────────
+export interface UserProfile {
+  name: string;
+  avatarEmoji: string;
+  dailyGoal: number;
+  createdAt: string;
+}
+
+export interface AppSettings {
+  hanziFontScale: number; // 1.0 - 1.6
+  ttsRate: number; // 0.5 - 1.2
+  ttsVoiceURI: string | null;
+}
 
 // ── Existing interfaces ───────────────────────────────────────────────────
 interface QuizQuestion {
@@ -173,6 +188,19 @@ interface LearningStore
   bookmarkedWords: number[];
   isBookmarked: (wordId: number) => boolean;
   toggleBookmark: (wordId: number) => void;
+
+  // Profile
+  profile: UserProfile | null;
+  setProfile: (profile: UserProfile) => void;
+  clearProfile: () => void;
+
+  // Settings
+  settings: AppSettings;
+  updateSettings: (partial: Partial<AppSettings>) => void;
+
+  // Hydration flag (avoids onboarding flash before localStorage loads)
+  _hasHydrated: boolean;
+  setHasHydrated: (v: boolean) => void;
 }
 
 export type { Section, QuizQuestion, MemoryCard, ChatMessage };
@@ -394,6 +422,20 @@ export const useLearningStore = create<LearningStore>()(
             : [...state.bookmarkedWords, wordId],
         })),
 
+      // ── Profile ────────────────────────────────────────────────────────
+      profile: null,
+      setProfile: (profile) => set({ profile }),
+      clearProfile: () => set({ profile: null }),
+
+      // ── Settings ───────────────────────────────────────────────────────
+      settings: { hanziFontScale: 1, ttsRate: 0.8, ttsVoiceURI: null },
+      updateSettings: (partial) =>
+        set((state) => ({ settings: { ...state.settings, ...partial } })),
+
+      // ── Hydration ──────────────────────────────────────────────────────
+      _hasHydrated: false,
+      setHasHydrated: (v) => set({ _hasHydrated: v }),
+
       // ── Exam ──────────────────────────────────────────────────────────
       examStarted: false,
       examType: null,
@@ -412,6 +454,8 @@ export const useLearningStore = create<LearningStore>()(
     }),
     {
       name: 'hsk-learning-storage',
+      version: 2,
+      migrate: (persisted: unknown) => persisted as LearningStore,
       partialize: (state) => ({
         learnedWords: state.learnedWords,
         dailyStreak: state.dailyStreak,
@@ -422,7 +466,12 @@ export const useLearningStore = create<LearningStore>()(
         highScores: state.highScores,
         completedStories: state.completedStories,
         bookmarkedWords: state.bookmarkedWords,
+        profile: state.profile,
+        settings: state.settings,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

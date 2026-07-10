@@ -7,16 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Volume2, Play, PenLine, RotateCcw, BookOpen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// ─── TTS Helper ─────────────────────────────────────────────
-const speak = (text: string, lang = 'zh-CN') => {
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = lang
-    u.rate = 0.7
-    window.speechSynthesis.speak(u)
-  }
-}
+import { speak } from '@/lib/tts'
 
 // ─── HSK1 Character List (80+ characters) ───────────────────
 const HSK1_CHARS = [

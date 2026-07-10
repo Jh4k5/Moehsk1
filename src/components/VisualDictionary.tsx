@@ -14,23 +14,9 @@ import {
 } from 'lucide-react'
 import { useLearningStore } from '@/lib/store'
 
-// ── TTS helper (high quality) ────────────────────────────────────────────────
-const speak = (text: string, lang = 'zh-CN') => {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = lang
-  u.rate = 0.75
-  u.pitch = 1
-  // Try to find a Chinese voice for better quality
-  const voices = window.speechSynthesis.getVoices()
-  const zhVoice = voices.find(v => v.lang.startsWith('zh-CN'))
-    || voices.find(v => v.lang.startsWith('zh'))
-  if (zhVoice) u.voice = zhVoice
-  window.speechSynthesis.speak(u)
-}
+import { speak } from '@/lib/tts'
 
-// Load voices
+// Load voices early (some browsers populate them asynchronously)
 if (typeof window !== 'undefined') {
   window.speechSynthesis?.getVoices()
   window.speechSynthesis?.addEventListener('voiceschanged', () => {

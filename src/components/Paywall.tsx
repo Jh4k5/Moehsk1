@@ -67,6 +67,7 @@ function PaywallOverlay() {
 
     if (result.success) {
       setSuccess(true)
+      setTimeout(() => window.location.reload(), 1800)
     } else {
       setError(result.error || 'مفتاح خاطئ')
     }
@@ -104,7 +105,7 @@ function PaywallOverlay() {
                   <Check className="h-10 w-10 text-emerald-600" />
                 </motion.div>
                 <h3 className="text-xl font-bold text-gray-900">تم التفعيل بنجاح! 🎉</h3>
-                <p className="text-sm text-gray-500">مرحباً بك في مُضَّن الكامل</p>
+                <p className="text-sm text-gray-500">مرحباً بك في جِسر — النسخة الكاملة</p>
                 <p className="text-xs text-gray-400">سيتم تحديث الصفحة تلقائياً...</p>
               </div>
             ) : (
@@ -119,7 +120,7 @@ function PaywallOverlay() {
                     </div>
                     <h3 className="mb-1 text-2xl font-bold text-white">انتهت فترة التجربة</h3>
                     <p className="text-sm text-blue-200">
-                      احصل على وصول كامل لـ <strong className="text-amber-300">410 كلمة</strong> و <strong className="text-amber-300">دروس تفاعلية</strong>
+                      احصل على وصول كامل لـ <strong className="text-amber-300">411 كلمة</strong> و <strong className="text-amber-300">دروس تفاعلية</strong>
                     </p>
                   </div>
                 </div>

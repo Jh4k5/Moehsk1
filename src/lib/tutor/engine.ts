@@ -1,0 +1,351 @@
+// ─── محرك المعلم الذكي: فهم النية + توليد الرد من بيانات المنصة ─────────────
+import { vocabulary, type VocabWord } from '@/data/vocabulary'
+import { grammarPracticeQuestions } from '@/data/grammarPracticeQuestions'
+import { categories } from '@/data/categories'
+import { getTutorIndex, segmentHanzi } from './index'
+import { normalizeArabic, stripPinyinTones, extractHanzi, contentTokens, tokenize } from './normalize'
+
+export interface TutorQuiz {
+  question: string
+  options: string[]
+  correctIndex: number
+  explanation: string
+}
+
+export interface TutorContext {
+  learnedWordIds: number[]
+  weakWords: VocabWord[]
+  dueCount: number
+  masteredCount: number
+  dailyStreak: number
+  dailyGoal: number
+  pendingQuiz: TutorQuiz | null
+}
+
+export interface TutorReply {
+  text: string
+  followUps?: string[]
+  quiz?: TutorQuiz | null // undefined = لا تغيير، null = مسح الاختبار المعلق
+}
+
+const TONE_NAMES = ['محايدة', 'الأولى (ـ مسطحة عالية)', 'الثانية (↗ صاعدة)', 'الثالثة (∨ هابطة صاعدة)', 'الرابعة (↘ حادة هابطة)']
+
+function posLabel(pos: string): string {
+  return categories.find((c) => c.value === pos)?.label || pos
+}
+
+function toneLine(w: VocabWord): string {
+  if (!w.tones?.length) return ''
+  const parts = w.tones.map((t) => TONE_NAMES[t] || `${t}`)
+  return `🎵 النبرات: ${parts.join(' ثم ')}`
+}
+
+function wordCard(w: VocabWord, ctx: TutorContext): string {
+  const lines: string[] = []
+  lines.push(`📚 **${w.zh}** (${w.pinyin}) — ${w.meaning}`)
+  lines.push(`🏷️ ${posLabel(w.pos)} • ${w.strokeCount} ضربة${w.radicals?.length ? ` • الجذور: ${w.radicals.join(' ')}` : ''}`)
+  const tl = toneLine(w)
+  if (tl) lines.push(tl)
+  if (w.mnemonic) lines.push(`🧠 للحفظ: ${w.mnemonic}`)
+  const examples = (w.sentences || []).slice(0, 2)
+  if (examples.length) {
+    lines.push('')
+    lines.push('📝 أمثلة:')
+    for (const s of examples) {
+      lines.push(`• ${s.zh}`)
+      lines.push(`  ${s.pinyin}${/[ء-ي]/.test(s.ar) ? ` — ${s.ar}` : ''}`)
+    }
+  }
+  if (ctx.learnedWordIds.includes(w.id)) {
+    lines.push('')
+    lines.push('✅ هذه الكلمة ضمن كلماتك المتعلمة — أحسنت!')
+  } else {
+    lines.push('')
+    lines.push(`💡 أضفها لقائمتك من قسم المفردات لتدخل جدول مراجعاتك.`)
+  }
+  return lines.join('\n')
+}
+
+function findWords(message: string): VocabWord[] {
+  const index = getTutorIndex()
+  const results: VocabWord[] = []
+
+  // 1) هانزي مباشر
+  for (const run of extractHanzi(message)) {
+    for (const w of segmentHanzi(run, index)) {
+      if (!results.includes(w)) results.push(w)
+    }
+  }
+  if (results.length) return results
+
+  // 2) بينيين (بدون نبرات): "nihao" أو "ni hao"
+  const latin = message.match(/[a-zA-Zàáǎāèéěēìíǐīòóǒōùúǔūǖǘǚǜü\s]+/g)?.join(' ') || ''
+  if (latin.trim()) {
+    const folded = stripPinyinTones(latin).replace(/\s+/g, '')
+    const byPinyin = index.pinyinMap.get(folded)
+    if (byPinyin) return [...byPinyin]
+    const eng = index.englishMap.get(latin.trim().toLowerCase())
+    if (eng) return [eng]
+  }
+
+  // 3) عربي: رموز دلالية ضد فهرس المعاني
+  for (const token of contentTokens(message)) {
+    const hits = index.arabicIndex.get(token)
+    if (hits) {
+      for (const w of hits) if (!results.includes(w)) results.push(w)
+    }
+  }
+  return results
+}
+
+function makeWordQuiz(ctx: TutorContext): TutorQuiz {
+  const pool = ctx.weakWords.length
+    ? ctx.weakWords
+    : vocabulary.filter((w) => !ctx.learnedWordIds.includes(w.id))
+  const target = (pool.length ? pool : vocabulary)[Math.floor(Math.random() * (pool.length ? pool.length : vocabulary.length))]
+  const distractors = vocabulary
+    .filter((w) => w.id !== target.id && w.pos === target.pos)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3)
+  while (distractors.length < 3) {
+    const r = vocabulary[Math.floor(Math.random() * vocabulary.length)]
+    if (r.id !== target.id && !distractors.includes(r)) distractors.push(r)
+  }
+  const options = [target, ...distractors].sort(() => Math.random() - 0.5)
+  return {
+    question: `ما معنى 「${target.zh}」 (${target.pinyin})؟`,
+    options: options.map((w) => w.meaning.split('/')[0].trim()),
+    correctIndex: options.indexOf(target),
+    explanation: `${target.zh} (${target.pinyin}) تعني: ${target.meaning}${target.mnemonic ? `\n🧠 ${target.mnemonic}` : ''}`,
+  }
+}
+
+function parseQuizAnswer(message: string, quiz: TutorQuiz): number | null {
+  const m = normalizeArabic(message)
+  const num = m.match(/^[\s]*([1-4١-٤])[\s.)]*$/)
+  if (num) {
+    const map: Record<string, number> = { '1': 0, '2': 1, '3': 2, '4': 3, '١': 0, '٢': 1, '٣': 2, '٤': 3 }
+    return map[num[1]]
+  }
+  const letters: Record<string, number> = { 'ا': 0, 'أ': 0, 'ب': 1, 'ج': 2, 'د': 3, a: 0, b: 1, c: 2, d: 3 }
+  if (m.length === 1 && m in letters) return letters[m]
+  const idx = quiz.options.findIndex((o) => normalizeArabic(o) === m || normalizeArabic(o).includes(m))
+  return idx >= 0 && m.length > 1 ? idx : null
+}
+
+function formatQuiz(q: TutorQuiz): string {
+  const letters = ['1', '2', '3', '4']
+  return `🎯 ${q.question}\n\n${q.options.map((o, i) => `${letters[i]}. ${o}`).join('\n')}\n\nأجب برقم الخيار (1-4)`
+}
+
+const GRAMMAR_TRIGGERS = ['قاعده', 'قواعد', 'نحو', 'grammar', 'تركيب', 'صيغه']
+const TONE_TRIGGERS = ['نطق', 'انطق', 'نبره', 'نبرات', 'تون', 'tone', 'بينيين', 'pinyin', 'صوت']
+const QUIZ_TRIGGERS = ['اختبر', 'اختبار', 'كويز', 'quiz', 'امتحن', 'سؤال لي', 'اسالني', 'اسئلني']
+const ADVICE_TRIGGERS = ['اراجع', 'مراجعه', 'نصيحه', 'نصائح', 'خطه', 'تقدمي', 'اذاكر', 'ادرس', 'مستواي']
+const EXAMPLE_TRIGGERS = ['مثال', 'امثله', 'جمله', 'جمل']
+const NUMBER_TRIGGERS = ['رقم', 'ارقام', 'اعداد', 'عد ', 'الاعداد']
+
+function matchTriggers(normalized: string, triggers: string[]): boolean {
+  return triggers.some((t) => normalized.includes(t))
+}
+
+export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
+  const message = raw.trim()
+  const normalized = normalizeArabic(message)
+  const index = getTutorIndex()
+
+  // ── 0) إجابة اختبار معلّق ──────────────────────────────────────────────
+  if (ctx.pendingQuiz) {
+    const answer = parseQuizAnswer(message, ctx.pendingQuiz)
+    if (answer !== null) {
+      const correct = answer === ctx.pendingQuiz.correctIndex
+      const text = correct
+        ? `🎉 صحيح! أحسنت!\n\n${ctx.pendingQuiz.explanation}`
+        : `❌ ليست الإجابة الصحيحة. الجواب: **${ctx.pendingQuiz.options[ctx.pendingQuiz.correctIndex]}**\n\n${ctx.pendingQuiz.explanation}`
+      return { text, quiz: null, followUps: ['اختبرني مرة أخرى', 'ماذا أراجع اليوم؟'] }
+    }
+    // ليست إجابة → يكمل التحليل الطبيعي مع مسح الاختبار
+  }
+
+  // ── 1) طلب اختبار ─────────────────────────────────────────────────────
+  if (matchTriggers(normalized, QUIZ_TRIGGERS)) {
+    const quiz = makeWordQuiz(ctx)
+    return { text: formatQuiz(quiz), quiz }
+  }
+
+  // ── 2) نطق / نبرات ────────────────────────────────────────────────────
+  if (matchTriggers(normalized, TONE_TRIGGERS)) {
+    const words = findWords(message)
+    if (words.length) {
+      const w = words[0]
+      const lines = [
+        `🎵 نطق **${w.zh}**: ${w.pinyin}`,
+        toneLine(w),
+        '',
+        `📝 جرّبها في جملة: ${w.sentences?.[0]?.zh || w.exZh}`,
+        `   ${w.sentences?.[0]?.pinyin || w.exPinyin}`,
+        '',
+        '💡 اضغط زر الصوت 🔊 في قسم المفردات لسماع النطق، وتدرّب في قسم النطق!',
+      ].filter(Boolean)
+      return { text: lines.join('\n'), followUps: [`اختبرني`, `أمثلة على ${w.zh}`], quiz: null }
+    }
+    return {
+      text: '🎵 النبرات الأربع هي روح الصينية:\n\n1️⃣ الأولى (ā): مسطحة عالية — 妈 mā (أم)\n2️⃣ الثانية (á): صاعدة كسؤال — 麻 má\n3️⃣ الثالثة (ǎ): تهبط ثم تصعد — 马 mǎ (حصان)\n4️⃣ الرابعة (à): حادة هابطة كأمر — 骂 mà\n\n⚡ قاعدتان مهمتان:\n• 不 bù تصبح bú قبل النبرة الرابعة: 不是 bú shì\n• نبرتان ثالثتان متتاليتان: الأولى تصبح ثانية — 你好 ní hǎo\n\n💡 تدرّب في قسم "النطق" وقسم "البينيين"!',
+      followUps: ['كيف أنطق 谢谢؟', 'اختبرني'],
+      quiz: null,
+    }
+  }
+
+  // ── 3) قاعدة نحوية ────────────────────────────────────────────────────
+  if (matchTriggers(normalized, GRAMMAR_TRIGGERS) || (extractHanzi(message).join('').length === 1 && '的吗呢吧了和比太不没'.includes(extractHanzi(message).join('')))) {
+    const msgTokens = new Set(tokenize(message))
+    const msgHanzi = new Set(extractHanzi(message).join('').split(''))
+    let best: { score: number; rule: (typeof index.grammarKeywords)[0] } | null = null
+    for (const gk of index.grammarKeywords) {
+      let score = 0
+      for (const kw of gk.keywords) if (msgTokens.has(kw)) score += 2
+      for (const p of gk.particles) if (msgHanzi.has(p)) score += 3
+      if (score > 0 && (!best || score > best.score)) best = { score, rule: gk }
+    }
+    if (best) {
+      const r = best.rule.rule
+      const lines = [
+        `📐 **${r.titleAr}**`,
+        '',
+        r.description,
+        `🔧 النمط: ${r.pattern}`,
+        '',
+        '📝 أمثلة:',
+      ]
+      for (const ex of r.examples.slice(0, 2)) {
+        lines.push(`• ${ex.zh}`)
+        lines.push(`  ${ex.pinyin} — ${ex.ar}`)
+      }
+      if (r.tips) lines.push('', `💡 ${r.tips}`)
+      const practice = grammarPracticeQuestions[r.id]
+      let quiz: TutorQuiz | undefined
+      if (practice?.length) {
+        const p = practice[Math.floor(Math.random() * practice.length)]
+        quiz = {
+          question: p.zh,
+          options: p.options,
+          correctIndex: p.correct,
+          explanation: `القاعدة: ${r.titleAr} — ${r.pattern}`,
+        }
+        lines.push('', '🎯 سؤال تدريبي:', formatQuiz(quiz))
+      }
+      return { text: lines.join('\n'), quiz: quiz ?? null, followUps: quiz ? undefined : ['اختبرني', 'اشرح قاعدة أخرى'] }
+    }
+    return {
+      text: '📐 أهم قواعد HSK 1:\n\n• ترتيب الجملة: فاعل + فعل + مفعول — 我吃饭\n• 是 للهوية: 我是学生 (أنا طالب)\n• 有 للملكية: 我有一本书 — نفيها بـ 没有 فقط\n• 不 لنفي الحاضر، 没 لنفي الماضي\n• 吗 تحوّل أي جملة لسؤال: 你好吗？\n• 的 للملكية والوصف: 我的书 (كتابي)\n\nاسألني عن أي قاعدة بالتحديد، مثل: "اشرح قاعدة 吗"',
+      followUps: ['اشرح قاعدة 的', 'اشرح قاعدة النفي', 'اختبرني'],
+      quiz: null,
+    }
+  }
+
+  // ── 4) أمثلة وجمل ─────────────────────────────────────────────────────
+  if (matchTriggers(normalized, EXAMPLE_TRIGGERS)) {
+    const words = findWords(message)
+    if (words.length) {
+      const w = words[0]
+      const related = index.sentences.filter((s) => s.zh.includes(w.zh)).slice(0, 3)
+      const pool = related.length ? related : (w.sentences || []).map((s) => ({ ...s, wordZh: w.zh }))
+      const lines = [`📝 جمل تستخدم **${w.zh}** (${w.pinyin} — ${w.meaning}):`, '']
+      for (const s of pool.slice(0, 3)) {
+        lines.push(`• ${s.zh}`)
+        lines.push(`  ${s.pinyin}${/[ء-ي]/.test(s.ar) ? ` — ${s.ar}` : ''}`)
+      }
+      return { text: lines.join('\n'), followUps: [`اختبرني`, `كيف أنطق ${w.zh}؟`], quiz: null }
+    }
+  }
+
+  // ── 5) بحث كلمة (هانزي / بينيين / عربي) ───────────────────────────────
+  const words = findWords(message)
+  if (words.length) {
+    if (words.length === 1) {
+      const w = words[0]
+      return { text: wordCard(w, ctx), followUps: [`أمثلة على ${w.zh}`, `كيف أنطق ${w.zh}؟`, 'اختبرني'], quiz: null }
+    }
+    if (extractHanzi(message).join('').length >= 2 && words.length >= 2) {
+      // جملة/عبارة صينية: فكّكها كلمة كلمة
+      const lines = ['🔍 تحليل العبارة كلمة كلمة:', '']
+      for (const w of words.slice(0, 6)) {
+        lines.push(`• **${w.zh}** (${w.pinyin}) — ${w.meaning}`)
+      }
+      lines.push('', 'اسألني عن أي كلمة منها لشرح أوسع!')
+      return { text: lines.join('\n'), followUps: words.slice(0, 2).map((w) => `اشرح ${w.zh}`), quiz: null }
+    }
+    // عدة نتائج عربية محتملة
+    const lines = ['وجدت أكثر من كلمة مناسبة:', '']
+    for (const w of words.slice(0, 4)) {
+      lines.push(`• **${w.zh}** (${w.pinyin}) — ${w.meaning}`)
+    }
+    lines.push('', 'اكتب الكلمة الصينية التي تريد شرحها بالتفصيل.')
+    return { text: lines.join('\n'), followUps: words.slice(0, 2).map((w) => `اشرح ${w.zh}`), quiz: null }
+  }
+
+  // ── 6) نصيحة دراسية مبنية على تقدم المستخدم ───────────────────────────
+  if (matchTriggers(normalized, ADVICE_TRIGGERS)) {
+    const learned = ctx.learnedWordIds.length
+    const total = vocabulary.length
+    const pct = Math.round((learned / total) * 100)
+    const lines = [
+      `📊 تقدمك الحالي:`,
+      `• تعلمت ${learned} من ${total} كلمة (${pct}%)`,
+      `• سلسلة الأيام: ${ctx.dailyStreak} 🔥`,
+      ctx.dueCount ? `• لديك ${ctx.dueCount} كلمة مستحقة للمراجعة اليوم!` : `• لا مراجعات مستحقة اليوم — ممتاز!`,
+      '',
+    ]
+    if (ctx.weakWords.length) {
+      lines.push('⚠️ كلماتك الأضعف — ركّز عليها:')
+      for (const w of ctx.weakWords.slice(0, 5)) {
+        lines.push(`• ${w.zh} (${w.pinyin}) — ${w.meaning}`)
+      }
+      lines.push('')
+    }
+    lines.push(`🎯 خطة اليوم المقترحة:`)
+    lines.push(`1. راجع الكلمات المستحقة في قسم المفردات`)
+    lines.push(`2. تعلّم ${ctx.dailyGoal || 10} كلمات جديدة (هدفك اليومي)`)
+    lines.push(`3. أنجز درساً من قسم الدروس أو اقرأ قصة قصيرة`)
+    return { text: lines.join('\n'), followUps: ['اختبرني بكلماتي الضعيفة', 'اشرح قاعدة جديدة'], quiz: null }
+  }
+
+  // ── 7) أرقام ──────────────────────────────────────────────────────────
+  if (matchTriggers(normalized, NUMBER_TRIGGERS)) {
+    return {
+      text: '🔢 الأرقام الصينية:\n\n一 yī (1) • 二 èr (2) • 三 sān (3) • 四 sì (4) • 五 wǔ (5)\n六 liù (6) • 七 qī (7) • 八 bā (8) • 九 jiǔ (9) • 十 shí (10)\n\n💡 التركيب منطقي جداً:\n• 11 = 十一 (عشرة وواحد)\n• 25 = 二十五 (اثنان عشرة خمسة)\n• 100 = 一百 yìbǎi\n• مع المعدودات استخدم 两 liǎng بدل 二: 两个人 (شخصان)',
+      followUps: ['اختبرني بالأرقام', 'ما معنى 几؟'],
+      quiz: null,
+    }
+  }
+
+  // ── 8) تحية / شكر ─────────────────────────────────────────────────────
+  if (/(مرحب|سلام|اهل|هلا|صباح|مساء|هاي|你好)/.test(normalized)) {
+    return {
+      text: `你好！👋 أنا معلمك الشخصي (老师 lǎoshī).\n\nيمكنني:\n• شرح أي كلمة — اكتبها بالصيني أو البينيين أو العربي\n• شرح قواعد HSK 1 مع أمثلة وتمارين\n• اختبارك بأسئلة مبنية على نقاط ضعفك\n• اقتراح خطة مراجعة من تقدمك الفعلي\n\nجرّب: "ما معنى 你好؟" أو "اختبرني"! 😊`,
+      followUps: ['ما معنى 谢谢؟', 'اختبرني', 'ماذا أراجع اليوم؟'],
+      quiz: null,
+    }
+  }
+  if (/(شكر|ممتاز|رائع|جميل)/.test(normalized)) {
+    return {
+      text: '不客气 (bú kèqi) — على الرحب والسعة! 😊\n\n加油 (jiāyóu) — واصل التقدم! أنا هنا متى احتجتني.',
+      followUps: ['اختبرني', 'ماذا أراجع اليوم؟'],
+      quiz: null,
+    }
+  }
+  if (/(صعب|مستحيل|تعبت|مليت|احبطت)/.test(normalized)) {
+    return {
+      text: `💪 طبيعي أن تشعر بذلك — الصينية تحتاج صبراً، لكن انظر:\n\n• سلسلتك ${ctx.dailyStreak} يوم 🔥 — هذا التزام حقيقي\n• تعلمت ${ctx.learnedWordIds.length} كلمة حتى الآن\n• تحتاج ~150 حرفاً فقط لفهم نصف النصوص اليومية!\n\nنصيحتي: قلّل الجرعة ولا توقفها — ٥ كلمات يومياً أفضل من ٥٠ مرة في الأسبوع.\n\n加油！`,
+      followUps: ['ماذا أراجع اليوم؟', 'اختبرني بشيء سهل'],
+      quiz: null,
+    }
+  }
+
+  // ── 9) الرد الافتراضي ─────────────────────────────────────────────────
+  return {
+    text: `لم أفهم سؤالك تماماً 🤔 — لكن يمكنني مساعدتك في:\n\n📚 **شرح الكلمات**: اكتب أي كلمة بالصيني (你好) أو البينيين (nihao) أو العربي (مرحبا)\n📐 **القواعد**: "اشرح قاعدة 吗" أو "قاعدة النفي"\n🎯 **اختبار**: "اختبرني" — أسئلة مبنية على كلماتك الضعيفة\n📊 **خطة مراجعة**: "ماذا أراجع اليوم؟"`,
+    followUps: ['ما معنى 你好؟', 'اختبرني', 'ماذا أراجع اليوم؟'],
+    quiz: null,
+  }
+}

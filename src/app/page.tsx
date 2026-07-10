@@ -22,7 +22,8 @@ import {
   Clock, Flame, Languages, MessageCircle, ArrowLeftRight, Bot,
   Send, MoreHorizontal, Lightbulb, PenTool, FileText, Medal,
   Image, HelpCircle, GraduationCap as GradIcon, BookOpenText, MessageSquare,
-  PanelRightClose, PanelRightOpen, LogOut, Mic, Moon, Sun
+  PanelRightClose, PanelRightOpen, LogOut, Mic, Moon, Sun,
+  Settings as SettingsGear
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -37,11 +38,17 @@ import VisualDictionary from '@/components/VisualDictionary'
 import AchievementsSection from '@/components/AchievementsSection'
 import PronunciationPractice from '@/components/PronunciationPractice'
 import PomodoroTimer from '@/components/PomodoroTimer'
-import LoginScreen from '@/components/LoginScreen'
+import OnboardingScreen from '@/components/OnboardingScreen'
+import SettingsSection from '@/components/SettingsSection'
+import Paywall from '@/components/Paywall'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 // ─── SRS Helper
 import { isDueForReview, getDifficultyLabel, getWeakWords } from '@/lib/srs'
+
+// ─── AI Tutor Engine + TTS ──────────────────────────────────
+import { answerMessage, type TutorQuiz } from '@/lib/tutor/engine'
+import { speak } from '@/lib/tts'
 
 // ═══ Error Boundary ═══
 class SectionErrorBoundary extends React.Component<
@@ -72,17 +79,6 @@ class SectionErrorBoundary extends React.Component<
       )
     }
     return this.props.children
-  }
-}
-
-// ─── TTS Helper ─────────────────────────────────────────────
-const speak = (text: string, lang = 'zh-CN') => {
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = lang
-    u.rate = 0.8
-    window.speechSynthesis.speak(u)
   }
 }
 
@@ -446,71 +442,6 @@ const grammarPracticeQuestions: Record<number, { zh: string; options: string[]; 
   ],
 }
 
-// ─── Smart Chat Responses ────────────────────────────────────
-function getChatResponse(message: string): string {
-  const msg = message.toLowerCase()
-  
-  // Search for vocabulary words
-  const foundWord = vocabulary.find(w => 
-    msg.includes(w.zh.toLowerCase()) || 
-    msg.includes(w.pinyin.toLowerCase()) ||
-    w.meaning.split('/').some(m => msg.includes(m.trim().toLowerCase()))
-  )
-  
-  if (foundWord) {
-    const sentences: string[] = []
-    sentences.push(`📚 **${foundWord.zh}** (${foundWord.pinyin}) — ${foundWord.meaning}`)
-    sentences.push(`🏷️ نوع الكلمة: ${categories.find(c => c.value === foundWord.pos)?.label || foundWord.pos}`)
-    sentences.push(`\n📝 أمثلة:`)
-    sentences.push(`• ${foundWord.exZh}`)
-    sentences.push(`  ${foundWord.exPinyin}`)
-    if (foundWord.s2) {
-      sentences.push(`• ${foundWord.s2.zh}`)
-      sentences.push(`  ${foundWord.s2.py}`)
-    }
-    if (foundWord.s3) {
-      sentences.push(`• ${foundWord.s3.zh}`)
-      sentences.push(`  ${foundWord.s3.py}`)
-    }
-    sentences.push(`\n💡 نصيحة: حاول استخدام "${foundWord.zh}" في جملة اليوم!`)
-    return sentences.join('\n')
-  }
-  
-  // Greeting responses
-  if (msg.includes('مرحب') || msg.includes('سلام') || msg.includes('أهل') || msg.includes('هلا')) {
-    return '你好！👋 مرحباً بك! كيف يمكنني مساعدتك في تعلم الصينية اليوم؟\n\nيمكنني مساعدتك في:\n• شرح مفردات معينة\n• تقديم نصائح للنطق\n• شرح القواعد النحوية\n• إعطاء أمثلة عملية\n\nاكتب كلمة صينية أو عربية وسأشرحها لك! 😊'
-  }
-  
-  if (msg.includes('شكر') || msg.includes('ممتاز') || msg.includes('شكرا')) {
-    return '不客气！ 😊 أنا دائماً هنا لمساعدتك. تابع التعلم ولا تستسلم!加油 (jiāyóu) = هيا!/استمر!'
-  }
-  
-  if (msg.includes('نطق') || msg.includes('صوت') || msg.includes('لهجة') || msg.includes('نبر')) {
-    return '🎵 النطق الصيني يعتمد على النبرات الأربع:\n\n1️⃣ النبرة الأولى (ـ): مسطحة عالية — mā (أم)\n2️⃣ النبرة الثانية (↗): صاعدة — má (قنب)\n3️⃣ النبرة الثالثة (↘↗): هابطة ثم صاعدة — mǎ (حصان)\n4️⃣ النبرة الرابعة (↘): حادة هابطة — mà (يشتم)\n\n💡 نصيحة: استمع كثيراً وتدرب على تقليد النطق. يمكنك استخدام قسم "تمييز النبرات" في الألعاب للتدرب!'
-  }
-  
-  if (msg.includes('قاع') || msg.includes('نح') || msg.includes('grammar') || msg.includes('قاعدة')) {
-    return '📐 القواعد الأساسية في HSK 1:\n\n• **ترتيب الجملة**: فاعل + فعل + مفعول (مثل العربية)\n• **是 (shì)**: للتعريف بالهوية — 我是学生\n• **有 (yǒu)**: للملكية — 我有一本书\n• **不 (bù)**: نفي الحاضر، **没 (méi)**: نفي الماضي\n• **吗 (ma)**: لتحويل الجملة لسؤال — 你好吗？\n\n💡 جرّب قسم "القواعد" للاطلاع على جميع القواعد مع أمثلة!'
-  }
-  
-  if (msg.includes('صع') || msg.includes('مستحيل') || msg.includes('صعب') || msg.includes('تحدي')) {
-    return '💪 لا تستسلم! تعلم الصينية يحتاج صبراً لكنه ممتع!\n\n نصائح مهمة:\n1. تعلم 5-10 كلمات يومياً\n2. راجع باستخدام البطاقات التعليمية\n3. استمع للمحتوى الصيني\n4. تكلم ولو خطأ — الممارسة أهم من الكمال!\n5. استخدم قسم "التمارين" وال "ألعاب" يومياً\n\n加油！أنت تبلي حسناً! 🌟'
-  }
-  
-  if (msg.includes('عد') || msg.includes('رقم') || msg.includes('أرقام') || msg.includes('إحص')) {
-    return '🔢 الأرقام الصينية الأساسية:\n\n一 yī (1) 二 èr (2) 三 sān (3) 四 sì (4) 五 wǔ (5)\n六 liù (6) 七 qī (7) 八 bā (8) 九 jiǔ (9) 十 shí (10)\n\n💡 قاعدة مهمة:\n• 11 = 十一 (shíyī) = 10 + 1\n• 20 = 二十 (èrshí) = 2 × 10\n• 100 = 一百 (yībǎi)\n• اثنان مع المعدّ = 两 (liǎng) وليس 二\n\nجرّب قسم "الألعاب" — لعبة الذاكرة — للتدرب!'
-  }
-  
-  // Default helpful response
-  const tips = [
-    '💡 نصيحة: حاول قراءة القصص القصيرة في قسم "القصص" — القراءة تساعد كثيراً!\n\nيمكنك سؤالي عن أي كلمة صينية وأنا سأشرحها لك بالتفصيل.',
-    '🌟 هل تعلم؟ الصينية لها أكثر من 5000 حرف، لكنك تحتاج فقط حوالي 150 حرفاً لفهم 50% من النصوص اليومية!\n\nHSK 1 يعلمك 304 كلمة — بداية ممتازة!',
-    '📝 تمارين يومية مقترحة:\n1. راجع 10 بطاقات تعليمية\n2. أجب على 5 أسئلة في قسم التمارين\n3. العب لعبة واحدة في قسم الألعاب\n4. اقرأ قصة قصيرة\n\nالاستمرارية هي مفتاح النجاح! 💪',
-    '🎮 العب واستنتج! ألعابنا التعليمية مصممة لتجعل التعلم ممتعاً:\n• لعبة الذاكرة — طابق الصينية بالعربية\n• تمييز النبرات — تدرب على النطق الصحيح\n• اختبارات متعددة المستويات\n\nجرّبها الآن! 🚀',
-  ]
-  return tips[Math.floor(Math.random() * tips.length)]
-}
-
 // ─── Build sentences from vocabulary ─────────────────────────
 function buildAllSentences(): { zh: string; pinyin: string; ar: string; wordZh: string }[] {
   const seen = new Set<string>()
@@ -534,7 +465,7 @@ const allSentences = buildAllSentences()
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
 type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | 'stories' | 'roadmap' | 'sentences' | 'chat'
-  | 'pinyin' | 'hanzi' | 'exam' | 'conversations' | 'lessons' | 'qa' | 'visual-dict' | 'achievements'
+  | 'pinyin' | 'hanzi' | 'exam' | 'conversations' | 'lessons' | 'qa' | 'visual-dict' | 'achievements' | 'settings'
 
 export default function Home() {
   const store = useLearningStore()
@@ -554,13 +485,31 @@ export default function Home() {
   const [activeStory, setActiveStory] = useState(0)
   const [sentenceFlipped, setSentenceFlipped] = useState(false)
   const [sentenceIndex, setSentenceIndex] = useState(0)
-  const [currentUser, setCurrentUser] = useState<{ name: string; isGuest: boolean } | null>(() => {
-    if (typeof window !== 'undefined') {
+  const profile = store.profile
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  // ترحيل مستخدمي النظام القديم (jisr_currentUser) إلى الملف الشخصي الجديد
+  useEffect(() => {
+    if (!mounted || profile) return
+    try {
       const saved = localStorage.getItem('jisr_currentUser') || localStorage.getItem('mudann_currentUser')
-      return saved ? JSON.parse(saved) : null
-    }
-    return null
-  })
+      if (saved) {
+        const old = JSON.parse(saved)
+        if (old?.name && !old.isGuest) {
+          store.setProfile({ name: old.name, avatarEmoji: '🐼', dailyGoal: 10, createdAt: new Date().toISOString() })
+        }
+        localStorage.removeItem('jisr_currentUser')
+        localStorage.removeItem('mudann_currentUser')
+        localStorage.removeItem('mudann_users')
+      }
+    } catch {}
+  }, [mounted, profile])
+
+  // تطبيق حجم الحروف الصينية المخصص
+  useEffect(() => {
+    document.documentElement.style.setProperty('--hanzi-scale', String(store.settings.hanziFontScale))
+  }, [store.settings.hanziFontScale])
 
   // Hard mode timer
   useEffect(() => {
@@ -597,27 +546,6 @@ export default function Home() {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [currentSection, store.flashcardIndex])
-
-  // ─── Navigation Items ──────────────────────────────────────
-  const navItems = [
-    { id: 'dashboard' as Section, label: 'لوحة التحكم', icon: LayoutDashboard },
-    { id: 'vocabulary' as Section, label: 'المفردات', icon: BookOpen },
-    { id: 'pinyin' as Section, label: 'البينين', icon: Languages },
-    { id: 'hanzi' as Section, label: 'الحروف', icon: PenTool },
-    { id: 'grammar' as Section, label: 'القواعد', icon: GraduationCap },
-    { id: 'lessons' as Section, label: 'الدروس', icon: BookOpenText },
-    { id: 'conversations' as Section, label: 'المحادثات', icon: MessageSquare },
-    { id: 'sentences' as Section, label: 'الجمل', icon: MessageCircle },
-    { id: 'stories' as Section, label: 'القصص', icon: BookMarked },
-    { id: 'practice' as Section, label: 'التمارين', icon: Target },
-    { id: 'games' as Section, label: 'الألعاب', icon: Gamepad2 },
-    { id: 'qa' as Section, label: 'أسئلة شائعة', icon: HelpCircle },
-    { id: 'visual-dict' as Section, label: 'القاموس والنطق', icon: Image },
-    { id: 'exam' as Section, label: 'محاكي الامتحان', icon: FileText },
-    { id: 'achievements' as Section, label: 'الإنجازات', icon: Medal },
-    { id: 'chat' as Section, label: 'المساعد', icon: Bot },
-    { id: 'roadmap' as Section, label: 'خريطة الطريق', icon: Map },
-  ]
 
   // ─── Lesson names for sidebar dropdown
   const lessonNames = ['مرحباً يا آي شياو يو', 'اسمي لي ون', 'أنا صيني', 'لدي طفلان', 'أنا أرتاح اليوم', 'ما رقم هاتفك؟', 'أنهي العمل الساعة 6:30 مساءً', 'أبي يعمل أيضاً في المستشفى', 'سأدرس في المدرسة غداً صباحاً', 'التفاح هنا رخيص حقاً!', 'أمطرت الثلوج أمس', 'أنا أدرس في الجامعة', 'من فضلك أعطني كوب شاي', 'شاهدت فيلماً', 'أراكم في مطار داشينغ!']
@@ -727,10 +655,19 @@ export default function Home() {
   }, [learnedWords])
 
   // ═══════════════════════════════════════════════════════════
-  // AUTH GUARD
+  // ONBOARDING GUARD
   // ═══════════════════════════════════════════════════════════
-  if (!currentUser) {
-    return <LoginScreen onLogin={(user) => setCurrentUser(user)} />
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#17111f' }}>
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center animate-pulse">
+          <span className="text-2xl font-bold text-white">桥</span>
+        </div>
+      </div>
+    )
+  }
+  if (!profile) {
+    return <OnboardingScreen />
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -738,6 +675,8 @@ export default function Home() {
   // ═══════════════════════════════════════════════════════════
   return (
     <div className="min-h-screen flex flex-col" dir="rtl">
+      {/* ─── License gate: trial banner + expiry overlay ── */}
+      <Paywall />
       {/* ─── Header ──────────────────────────────────────── */}
       <header className="j-header sticky top-0 z-50">
         <div className="px-4 py-3 flex items-center justify-between max-w-[1600px] mx-auto w-full">
@@ -811,19 +750,19 @@ export default function Home() {
 
             {/* ── User info ── */}
             <div className={"flex items-center gap-3 px-4 py-3 mx-3 mt-3 rounded-xl bg-white/5 " + (sidebarOpen ? "" : "lg:hidden")}>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--violet-500)] to-[var(--violet-700)] flex items-center justify-center shrink-0 text-white text-sm font-bold">
-                {currentUser?.isGuest ? '👋' : currentUser?.name?.charAt(0) || '?'}
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--violet-500)] to-[var(--violet-700)] flex items-center justify-center shrink-0 text-lg">
+                {profile.avatarEmoji || '🐼'}
               </div>
               {sidebarOpen && (
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-white truncate">{currentUser?.name || 'زائر'}</div>
+                  <div className="text-sm font-bold text-white truncate">{profile.name}</div>
                   <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5">
                     <Flame className="w-3 h-3 text-[var(--clr-energy)]" />{store.dailyStreak} يوم
                     <Star className="w-3 h-3 text-[var(--clr-info)]" />{learnedWords.length}/{vocabulary.length}
                   </div>
                 </div>
               )}
-              <button onClick={() => { localStorage.removeItem('jisr_currentUser'); localStorage.removeItem('mudann_currentUser'); setCurrentUser(null); }}
+              <button onClick={() => store.clearProfile()} title="تبديل الملف الشخصي"
                 className={"p-1 text-[var(--text-muted)] hover:text-[var(--clr-danger)] transition-colors " + (sidebarOpen ? "" : "hidden")}>
                 <LogOut className="w-4 h-4" />
               </button>
@@ -895,6 +834,7 @@ export default function Home() {
                   { id: 'roadmap' as Section, label: 'خريطة الطريق', icon: Map },
                   { id: 'achievements' as Section, label: 'الإنجازات', icon: Medal },
                   { id: 'chat' as Section, label: 'المساعد الذكي', icon: Bot },
+                  { id: 'settings' as Section, label: 'الإعدادات', icon: SettingsGear },
                 ]},
               ].map(group => (
                 <div key={group.title}>
@@ -1054,6 +994,7 @@ export default function Home() {
               {currentSection === 'qa' && <QASection />}
               {currentSection === 'visual-dict' && <VisualDictionary />}
               {currentSection === 'achievements' && <AchievementsSection />}
+              {currentSection === 'settings' && <SectionErrorBoundary sectionName='الإعدادات'><SettingsSection /></SectionErrorBoundary>}
             </motion.div>
           </AnimatePresence>
         </main>
@@ -1077,14 +1018,35 @@ function DashboardSection({ stats, onNavigate }: {
   onNavigate: (s: Section) => void
 }) {
   const store = useLearningStore()
+  const todayKey = new Date().toDateString()
+  const todayWords = store.dailyActivity[todayKey]?.wordsLearned || 0
+  const dailyGoal = store.profile?.dailyGoal || 10
+  const goalPct = Math.min(100, Math.round((todayWords / dailyGoal) * 100))
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
-          <LayoutDashboard className="w-6 h-6 text-primary" />
-          لوحة التحكم
-        </h2>
-        <p className="text-[var(--text-muted)] mt-1">مرحباً بك في رحلة تعلم اللغة الصينية!</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+            <span className="text-2xl">{store.profile?.avatarEmoji || '🐼'}</span>
+            أهلاً {store.profile?.name || 'بك'}!
+          </h2>
+          <p className="text-[var(--text-muted)] mt-1">
+            {goalPct >= 100
+              ? '🎉 أنجزت هدفك اليومي — استمر إن أردت المزيد!'
+              : `هدف اليوم: ${todayWords} من ${dailyGoal} كلمات جديدة`}
+          </p>
+        </div>
+        {/* حلقة تقدم الهدف اليومي */}
+        <div className="relative w-16 h-16 shrink-0">
+          <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--line-default)" strokeWidth="3.5" />
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--clr-primary)" strokeWidth="3.5"
+              strokeLinecap="round" strokeDasharray={`${goalPct * 0.974} 100`} />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[var(--text-primary)]">
+            {goalPct}%
+          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -3338,31 +3300,48 @@ function ChatSection() {
   const [input, setInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
   const [isTyping, setIsTyping] = useState(false)
+  const [followUps, setFollowUps] = useState<string[]>([])
+  const pendingQuizRef = useRef<TutorQuiz | null>(null)
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [store.chatMessages])
 
-  const handleSend = () => {
-    if (!input.trim()) return
-    const userMsg = input.trim()
+  const handleSend = (text?: string) => {
+    const userMsg = (text ?? input).trim()
+    if (!userMsg) return
     setInput('')
+    setFollowUps([])
     store.addChatMessage({ role: 'user', content: userMsg })
     setIsTyping(true)
 
-    // Simulate typing delay
     setTimeout(() => {
-      const response = getChatResponse(userMsg)
-      store.addChatMessage({ role: 'assistant', content: response })
+      const weakWords = store
+        .getWeakWordIds(10)
+        .map((id) => vocabulary.find((w) => w.id === id))
+        .filter((w): w is VocabWord => !!w)
+      const srsStats = store.getSRSStats()
+      const reply = answerMessage(userMsg, {
+        learnedWordIds: store.learnedWords,
+        weakWords,
+        dueCount: store.getDueCardIds().length,
+        masteredCount: srsStats.mastered,
+        dailyStreak: store.dailyStreak,
+        dailyGoal: store.profile?.dailyGoal ?? 10,
+        pendingQuiz: pendingQuizRef.current,
+      })
+      if (reply.quiz !== undefined) pendingQuizRef.current = reply.quiz
+      store.addChatMessage({ role: 'assistant', content: reply.text })
+      setFollowUps(reply.followUps || [])
       setIsTyping(false)
-    }, 800 + Math.random() * 1200)
+    }, 500 + Math.random() * 700)
   }
 
   const quickQuestions = [
-    'كيف أنطق النبرات؟',
-    'اشرح كلمة 你好',
-    'أحتاج نصائح للتعلم',
-    'الأرقام الصينية',
+    'ما معنى 你好؟',
+    'اختبرني',
+    'اشرح قاعدة 吗',
+    'ماذا أراجع اليوم؟',
   ]
 
   return (
@@ -3398,7 +3377,7 @@ function ChatSection() {
                       variant="outline"
                       size="sm"
                       className="text-xs"
-                      onClick={() => setInput(q)}
+                      onClick={() => handleSend(q)}
                     >
                       {q}
                     </Button>
@@ -3440,6 +3419,22 @@ function ChatSection() {
                 </div>
               </div>
             )}
+
+            {!isTyping && followUps.length > 0 && store.chatMessages.length > 0 && (
+              <div className="flex flex-wrap gap-2 justify-end">
+                {followUps.map(f => (
+                  <Button
+                    key={f}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs rounded-full"
+                    onClick={() => handleSend(f)}
+                  >
+                    {f}
+                  </Button>
+                ))}
+              </div>
+            )}
             <div ref={chatEndRef} />
           </div>
         </CardContent>
@@ -3455,7 +3450,7 @@ function ChatSection() {
           className="flex-1"
           disabled={isTyping}
         />
-        <Button onClick={handleSend} className="bg-primary hover:brightness-110" disabled={!input.trim() || isTyping}>
+        <Button onClick={() => handleSend()} className="bg-primary hover:brightness-110" disabled={!input.trim() || isTyping}>
           <Send className="w-4 h-4" />
         </Button>
       </div>

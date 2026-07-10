@@ -278,16 +278,7 @@ const allQuestions = dailyQA.flatMap(cat =>
   cat.questions.map(q => ({ category: cat.category, color: cat.color, ...q }))
 )
 
-// ─── TTS Helper ───────────────────────────────────────────────────
-const speak = (text: string, lang = 'zh-CN') => {
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = lang
-    u.rate = 0.7
-    window.speechSynthesis.speak(u)
-  }
-}
+import { speak } from '@/lib/tts'
 
 // ─── Fisher-Yates Shuffle ─────────────────────────────────────
 function shuffleArray<T>(arr: T[]): T[] {

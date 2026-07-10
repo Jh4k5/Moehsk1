@@ -11,16 +11,7 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// ─── TTS Helper ─────────────────────────────────────────────
-const speak = (text: string, lang = 'zh-CN') => {
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = lang
-    u.rate = 0.7
-    window.speechSynthesis.speak(u)
-  }
-}
+import { speak } from '@/lib/tts'
 
 // ─── Levenshtein Distance ───────────────────────────────────
 function levenshteinDistance(a: string, b: string): number {

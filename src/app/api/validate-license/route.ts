@@ -5,6 +5,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 // For demo/testing, we accept specific keys
 const VALID_KEYS = [
+  'JISR-TEST-KEY-0001',
+  'JISR-TEST-KEY-0002',
+  'JISR-BETA-LAUNCH',
   'MUDANN-TEST-KEY-0001',
   'MUDANN-TEST-KEY-0002',
   'MUDANN-BETA-LAUNCH',

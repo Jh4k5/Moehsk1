@@ -8,16 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Volume2, Headphones, BookOpen, Info, AlertCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-// ─── TTS Helper ─────────────────────────────────────────────
-const speak = (text: string, lang = 'zh-CN') => {
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = lang
-    u.rate = 0.7
-    window.speechSynthesis.speak(u)
-  }
-}
+import { speak } from '@/lib/tts'
 
 // ─── Tone Data ──────────────────────────────────────────────
 interface ToneData {

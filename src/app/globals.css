@@ -690,33 +690,14 @@
    ║  9. FLASHCARD — البطاقات                              ║
    ╚═══════════════════════════════════════════════════════╝ */
 .j-flashcard {
-  perspective: 1200px;
-  cursor: pointer;
+  perspective: 1400px;
 }
 .j-flashcard-inner {
   position: relative;
   width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.j-flashcard.flipped .j-flashcard-inner {
-  transform: rotateY(180deg);
-}
-.j-flashcard-front,
+/* الوجه الخلفي: تخطيط مسطّح قابل للتمرير (بلا قلب ثلاثي الأبعاد يعكس التمرير) */
 .j-flashcard-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: 1.25rem;
-  background: var(--surface-card);
-  border: 1px solid var(--line-default);
-  box-shadow: var(--shadow-md);
-}
-.j-flashcard-back {
-  transform: rotateY(180deg);
   background: var(--gradient-card-back);
   border-color: var(--line-subtle);
 }

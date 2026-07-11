@@ -224,9 +224,10 @@ function PaywallOverlay() {
 // Exported Paywall component
 // ═══════════════════════════════════════════════════════════
 export default function Paywall() {
+  // شريط الاشتراك العلوي (TrialBanner) مُزال حالياً بناءً على طلب المستخدم —
+  // كان غير متوازن ويغطّي الأقسام. تبقى نافذة انتهاء التجربة فقط.
   return (
     <>
-      <TrialBanner />
       <PaywallOverlay />
     </>
   )

@@ -775,7 +775,17 @@ export default function Home() {
                   ? "active"
                   : "text-white/50 hover:bg-white/6 hover:text-white/85"
                 )}>
-              <span className="j-nav-icon"><LayoutDashboard className="w-4.5 h-4.5" /></span>
+              <span
+                className="j-nav-icon flex items-center justify-center rounded-lg transition-all"
+                style={{
+                  width: '30px', height: '30px',
+                  background: currentSection === 'dashboard' ? '#8b5cf6' : '#8b5cf622',
+                  color: currentSection === 'dashboard' ? '#fff' : '#a78bfa',
+                  boxShadow: currentSection === 'dashboard' ? '0 4px 12px #8b5cf655' : 'none',
+                }}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+              </span>
               {sidebarOpen && <span className="j-nav-label">الرئيسية</span>}
             </button>
 
@@ -787,7 +797,17 @@ export default function Home() {
                     ? "active"
                     : "text-white/50 hover:bg-white/6 hover:text-white/85"
                   )}>
-                <span className="j-nav-icon"><BookOpenText className="w-4.5 h-4.5" /></span>
+                <span
+                  className="j-nav-icon flex items-center justify-center rounded-lg transition-all"
+                  style={{
+                    width: '30px', height: '30px',
+                    background: currentSection === 'lessons' ? '#f97316' : '#f9731622',
+                    color: currentSection === 'lessons' ? '#fff' : '#fb923c',
+                    boxShadow: currentSection === 'lessons' ? '0 4px 12px #f9731655' : 'none',
+                  }}
+                >
+                  <BookOpenText className="w-4 h-4" />
+                </span>
                 {sidebarOpen && (
                   <>
                     <span className="flex-1 text-right j-nav-label">الدروس</span>
@@ -812,29 +832,29 @@ export default function Home() {
             <div className="flex-1 overflow-y-auto custom-scrollbar py-1 px-0 space-y-3 mt-2">
               {[
                 { title: 'التعلم', items: [
-                  { id: 'vocabulary' as Section, label: 'المفردات والنطق', icon: BookOpen },
-                  { id: 'grammar' as Section, label: 'القواعد', icon: GraduationCap },
-                  { id: 'sentences' as Section, label: 'الجمل', icon: MessageCircle },
-                  { id: 'stories' as Section, label: 'القصص', icon: BookMarked },
-                  { id: 'conversations' as Section, label: 'المحادثات', icon: MessageSquare },
+                  { id: 'vocabulary' as Section, label: 'المفردات والنطق', icon: BookOpen, color: '#fbbf24' },
+                  { id: 'grammar' as Section, label: 'القواعد', icon: GraduationCap, color: '#38bdf8' },
+                  { id: 'sentences' as Section, label: 'الجمل', icon: MessageCircle, color: '#34d399' },
+                  { id: 'stories' as Section, label: 'القصص', icon: BookMarked, color: '#f472b6' },
+                  { id: 'conversations' as Section, label: 'المحادثات', icon: MessageSquare, color: '#2dd4bf' },
                 ]},
                 { title: 'التدريب', items: [
-                  { id: 'practice' as Section, label: 'التمارين', icon: Target },
-                  { id: 'games' as Section, label: 'الألعاب', icon: Gamepad2 },
-                  { id: 'exam' as Section, label: 'محاكي الامتحان', icon: FileText },
-                  { id: 'qa' as Section, label: 'أسئلة يومية', icon: HelpCircle },
+                  { id: 'practice' as Section, label: 'التمارين', icon: Target, color: '#fb923c' },
+                  { id: 'games' as Section, label: 'الألعاب', icon: Gamepad2, color: '#fb7185' },
+                  { id: 'exam' as Section, label: 'محاكي الامتحان', icon: FileText, color: '#818cf8' },
+                  { id: 'qa' as Section, label: 'أسئلة يومية', icon: HelpCircle, color: '#a3e635' },
                 ]},
                 { title: 'الأدوات', items: [
-                  { id: 'visual-dict' as Section, label: 'القاموس البصري', icon: Image },
-                  { id: 'pinyin' as Section, label: 'البينين', icon: Languages },
-                  { id: 'hanzi' as Section, label: 'الحروف', icon: PenTool },
-                  { id: 'pronunciation' as Section, label: 'تدريب النطق', icon: Mic },
+                  { id: 'visual-dict' as Section, label: 'القاموس البصري', icon: Image, color: '#e879f9' },
+                  { id: 'pinyin' as Section, label: 'البينين', icon: Languages, color: '#22d3ee' },
+                  { id: 'hanzi' as Section, label: 'الحروف', icon: PenTool, color: '#f87171' },
+                  { id: 'pronunciation' as Section, label: 'تدريب النطق', icon: Mic, color: '#c084fc' },
                 ]},
                 { title: 'أخرى', items: [
-                  { id: 'roadmap' as Section, label: 'خريطة الطريق', icon: Map },
-                  { id: 'achievements' as Section, label: 'الإنجازات', icon: Medal },
-                  { id: 'chat' as Section, label: 'المساعد الذكي', icon: Bot },
-                  { id: 'settings' as Section, label: 'الإعدادات', icon: SettingsGear },
+                  { id: 'roadmap' as Section, label: 'خريطة الطريق', icon: Map, color: '#4ade80' },
+                  { id: 'achievements' as Section, label: 'الإنجازات', icon: Medal, color: '#facc15' },
+                  { id: 'chat' as Section, label: 'المساعد الذكي', icon: Bot, color: '#60a5fa' },
+                  { id: 'settings' as Section, label: 'الإعدادات', icon: SettingsGear, color: '#cbd5e1' },
                 ]},
               ].map(group => (
                 <div key={group.title}>
@@ -853,7 +873,17 @@ export default function Home() {
                             : "text-white/50 hover:bg-white/6 hover:text-white/85"
                           )
                         }>
-                        <span className="j-nav-icon"><item.icon className="w-4.5 h-4.5" /></span>
+                        <span
+                          className="j-nav-icon flex items-center justify-center rounded-lg transition-all"
+                          style={{
+                            width: '30px', height: '30px',
+                            background: currentSection === item.id ? item.color : item.color + '22',
+                            color: currentSection === item.id ? '#fff' : item.color,
+                            boxShadow: currentSection === item.id ? `0 4px 12px ${item.color}55` : 'none',
+                          }}
+                        >
+                          <item.icon className="w-4 h-4" />
+                        </span>
                         {sidebarOpen && <span className="j-nav-label truncate">{item.label}</span>}
                         {!sidebarOpen && (
                           <div className="absolute right-full mr-2 px-2 py-1 j-tooltip">
@@ -1659,22 +1689,23 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                   className="j-flashcard"
                   onTouchStart={onTouchStart}
                   onTouchEnd={onTouchEnd}
+                  style={{ perspective: '1400px' }}
                 >
-                  <AnimatePresence mode="wait">
+                  <AnimatePresence mode="wait" initial={false}>
+                    {!store.isFlipped ? (
                     <motion.div
-                      key={word.id}
-                      initial={{ opacity: 0, x: 30 }}
-                      animate={{ opacity: 1, x: 0, rotateY: store.isFlipped ? 180 : 0 }}
-                      exit={{ opacity: 0, x: -30 }}
-                      transition={{ duration: 0.25 }}
-                      style={{ transformStyle: 'preserve-3d', minHeight: '420px' }}
-                      className="j-flashcard-inner relative w-full max-w-lg mx-auto cursor-pointer"
+                      key={`front-${word.id}`}
+                      initial={{ opacity: 0, rotateY: -90 }}
+                      animate={{ opacity: 1, rotateY: 0 }}
+                      exit={{ opacity: 0, rotateY: 90 }}
+                      transition={{ duration: 0.22, ease: 'easeInOut' }}
+                      className="relative w-full max-w-lg mx-auto cursor-pointer"
                       onClick={() => { store.flip(); markSeen(word.id); setPronResult(null) }}
                     >
                       {/* ── FRONT FACE ── */}
-                      <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden' }}>
-                        <Card className="j-hero-card h-full border-0 shadow-2xl bg-gradient-to-br from-white via-primary/5 to-primary/10 rounded-3xl">
-                          <CardContent className="flex flex-col items-center justify-center h-full p-8 text-center gap-4">
+                      <div>
+                        <Card className="j-hero-card border-0 shadow-2xl bg-gradient-to-br from-white via-primary/5 to-primary/10 rounded-3xl" style={{ minHeight: '420px' }}>
+                          <CardContent className="flex flex-col items-center justify-center h-full p-8 text-center gap-4" style={{ minHeight: '420px' }}>
                             {/* Character — Very Large Serif */}
                             <div
                               className="font-chinese-serif text-8xl sm:text-9xl text-[var(--text-primary)] select-none leading-none"
@@ -1702,11 +1733,28 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                           </CardContent>
                         </Card>
                       </div>
-
+                    </motion.div>
+                    ) : (
+                    <motion.div
+                      key={`back-${word.id}`}
+                      initial={{ opacity: 0, rotateY: 90 }}
+                      animate={{ opacity: 1, rotateY: 0 }}
+                      exit={{ opacity: 0, rotateY: -90 }}
+                      transition={{ duration: 0.22, ease: 'easeInOut' }}
+                      className="relative w-full max-w-lg mx-auto"
+                    >
                       {/* ── BACK FACE ── */}
-                      <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                        <Card className="j-flashcard-back h-full border-0 shadow-2xl bg-gradient-to-br from-white via-[var(--surface-card-h)] to-[var(--clr-warning-bg)] rounded-3xl">
-                          <CardContent className="flex flex-col h-full p-5 sm:p-6 text-center gap-2 overflow-y-auto custom-scrollbar">
+                      <div>
+                        <Card className="j-flashcard-back border-0 shadow-2xl bg-gradient-to-br from-white via-[var(--surface-card-h)] to-[var(--clr-warning-bg)] rounded-3xl">
+                          {/* زر القلب للأمام */}
+                          <button
+                            onClick={() => { store.flip(); setPronResult(null) }}
+                            className="absolute top-3 left-3 z-10 flex items-center gap-1 px-3 py-1.5 rounded-full bg-[var(--surface-card)]/80 border border-[var(--line-default)] text-xs text-[var(--text-tertiary)] hover:text-primary hover:border-primary transition-all shadow-sm"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            قلب
+                          </button>
+                          <CardContent className="flex flex-col p-5 sm:p-6 text-center gap-2">
                             {/* Meaning — Large */}
                             <div className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-1">
                               {word.meaning}
@@ -1812,6 +1860,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                         </Card>
                       </div>
                     </motion.div>
+                    )}
                   </AnimatePresence>
                 </div>
 

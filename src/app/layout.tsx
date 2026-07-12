@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PaywallProvider } from "@/lib/paywall-context";
+import { LangController } from "@/components/LangController";
 
 const tajawal = Tajawal({
   variable: "--font-tajawal",
@@ -44,15 +45,22 @@ export default function RootLayout({
               if (t === 'dark') { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light'); }
               else { document.documentElement.classList.add('light'); document.documentElement.classList.remove('dark'); }
             } catch(e) { document.documentElement.classList.add('light'); }
+            try {
+              var s = JSON.parse(localStorage.getItem('hsk-learning-storage')||'{}');
+              var lang = (s && s.state && s.state.lang) || 'ar';
+              document.documentElement.lang = lang;
+              document.documentElement.dir = lang === 'en' ? 'ltr' : 'rtl';
+              document.documentElement.classList.add(lang === 'en' ? 'lang-en' : 'lang-ar');
+            } catch(e) {}
           })();
         ` }} />
       </head>
       <body
         className={`${tajawal.variable} ${notoSansSC.variable} ${notoSerifSC.variable} antialiased bg-background text-foreground font-arabic`}
-        style={{ fontFamily: "'Tajawal', sans-serif" }}
       >
         <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
           <PaywallProvider>
+            <LangController />
             {children}
           </PaywallProvider>
         </ThemeProvider>

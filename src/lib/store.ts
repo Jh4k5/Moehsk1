@@ -205,6 +205,10 @@ interface LearningStore
   // Active HSK level (1 or 2)
   currentLevel: 1 | 2;
   setLevel: (level: 1 | 2) => void;
+
+  // UI language ('ar' Arabic default | 'en' English)
+  lang: 'ar' | 'en';
+  setLang: (lang: 'ar' | 'en') => void;
 }
 
 export type { Section, QuizQuestion, MemoryCard, ChatMessage };
@@ -444,6 +448,10 @@ export const useLearningStore = create<LearningStore>()(
       currentLevel: 1,
       setLevel: (level) => set({ currentLevel: level }),
 
+      // ── UI language ────────────────────────────────────────────────────
+      lang: 'ar',
+      setLang: (lang) => set({ lang }),
+
       // ── Exam ──────────────────────────────────────────────────────────
       examStarted: false,
       examType: null,
@@ -477,6 +485,7 @@ export const useLearningStore = create<LearningStore>()(
         profile: state.profile,
         settings: state.settings,
         currentLevel: state.currentLevel,
+        lang: state.lang,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

@@ -313,6 +313,10 @@
     font-family: 'Tajawal', var(--font-geist-sans), sans-serif;
     transition: background 0.35s ease, color 0.35s ease;
   }
+  /* الإنجليزية: خط لاتيني نظيف */
+  html.lang-en body {
+    font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  }
   ::selection {
     background: rgba(139, 92, 246, 0.25);
   }

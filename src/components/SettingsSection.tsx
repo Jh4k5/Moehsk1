@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { useLearningStore } from '@/lib/store'
+import { useI18n } from '@/lib/i18n'
 import { usePaywall, CONFIG } from '@/lib/paywall-context'
 import { speak, getChineseVoices } from '@/lib/tts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,6 +25,7 @@ const STORAGE_KEY = 'hsk-learning-storage'
 
 export default function SettingsSection() {
   const store = useLearningStore()
+  const { t, lang, setLang } = useI18n()
   const { theme, setTheme } = useTheme()
   const { status, isPaid, activateLicense, trialRemainingFormatted } = usePaywall()
 
@@ -151,10 +153,33 @@ export default function SettingsSection() {
       <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Sun className="w-4 h-4 text-primary" /> المظهر
+            <Sun className="w-4 h-4 text-primary" /> {t('المظهر', 'Appearance')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
+          {/* اللغة / Language */}
+          <div>
+            <label className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-1.5 mb-3">
+              🌐 {t('اللغة', 'Language')}
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {([['ar', 'العربية'], ['en', 'English']] as const).map(([lg, lbl]) => (
+                <button
+                  key={lg}
+                  onClick={() => setLang(lg)}
+                  className={
+                    'rounded-xl border p-3 text-sm font-bold transition-all ' +
+                    (lang === lg
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-[var(--line-default)] text-[var(--text-muted)] hover:border-primary/40')
+                  }
+                >
+                  {lbl}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-3 gap-2">
             {themeOptions.map((opt) => (
               <button

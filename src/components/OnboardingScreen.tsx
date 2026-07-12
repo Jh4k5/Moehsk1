@@ -2,19 +2,21 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Sparkles, Target } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Sparkles, Target } from 'lucide-react'
 import { useLearningStore, type UserProfile } from '@/lib/store'
+import { useI18n } from '@/lib/i18n'
 
 const AVATARS = ['🐼', '🐉', '🦊', '🐱', '🦁', '🐧', '🦉', '🐢', '🌸', '⭐', '🎋', '🏮']
 const GOALS = [
-  { value: 5, label: '٥ كلمات', desc: 'خفيف — 10 دقائق يومياً' },
-  { value: 10, label: '١٠ كلمات', desc: 'متوازن — 20 دقيقة يومياً' },
-  { value: 15, label: '١٥ كلمة', desc: 'جاد — 30 دقيقة يومياً' },
-  { value: 20, label: '٢٠ كلمة', desc: 'مكثف — 45 دقيقة يومياً' },
+  { value: 5, label: '٥ كلمات', labelEn: '5 words', desc: 'خفيف — 10 دقائق يومياً', descEn: 'Light — 10 min/day' },
+  { value: 10, label: '١٠ كلمات', labelEn: '10 words', desc: 'متوازن — 20 دقيقة يومياً', descEn: 'Balanced — 20 min/day' },
+  { value: 15, label: '١٥ كلمة', labelEn: '15 words', desc: 'جاد — 30 دقيقة يومياً', descEn: 'Serious — 30 min/day' },
+  { value: 20, label: '٢٠ كلمة', labelEn: '20 words', desc: 'مكثف — 45 دقيقة يومياً', descEn: 'Intense — 45 min/day' },
 ]
 
 export default function OnboardingScreen() {
   const setProfile = useLearningStore((s) => s.setProfile)
+  const { t, dir, lang, setLang } = useI18n()
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [avatar, setAvatar] = useState('🐼')
@@ -28,7 +30,6 @@ export default function OnboardingScreen() {
       createdAt: new Date().toISOString(),
     }
     setProfile(profile)
-    // تنظيف مفاتيح النظام القديم
     try {
       localStorage.removeItem('jisr_currentUser')
       localStorage.removeItem('mudann_currentUser')
@@ -36,10 +37,12 @@ export default function OnboardingScreen() {
     } catch {}
   }
 
+  const Forward = dir === 'rtl' ? ArrowLeft : ArrowRight
+
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      dir="rtl"
+      dir={dir}
       style={{ background: 'linear-gradient(135deg, #17111f 0%, #1e1430 40%, #2a1a4a 75%, #7c3aed 160%)' }}
     >
       {/* عناصر زخرفية */}
@@ -57,13 +60,31 @@ export default function OnboardingScreen() {
         className="relative w-full max-w-md rounded-3xl p-8 shadow-2xl border border-white/10"
         style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)' }}
       >
+        {/* مبدّل اللغة */}
+        <div className="flex justify-center mb-5">
+          <div className="flex items-center rounded-full bg-white/10 border border-white/15 p-0.5">
+            {([['ar', 'العربية'], ['en', 'English']] as const).map(([lg, lbl]) => (
+              <button
+                key={lg}
+                onClick={() => setLang(lg)}
+                className={
+                  'px-4 py-1.5 rounded-full text-xs font-bold transition-all ' +
+                  (lang === lg ? 'bg-gradient-to-r from-violet-500 to-fuchsia-600 text-white shadow' : 'text-white/50 hover:text-white')
+                }
+              >
+                {lbl}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* الشعار */}
         <div className="text-center mb-8">
           <div className="mx-auto mb-3 w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
             <span className="text-3xl font-bold text-white">桥</span>
           </div>
-          <h1 className="text-2xl font-extrabold text-white">جِسر</h1>
-          <p className="text-sm text-white/50 mt-1">جسرك إلى اللغة الصينية — HSK 1</p>
+          <h1 className="text-2xl font-extrabold text-white">{t('جِسر', 'JISR')}</h1>
+          <p className="text-sm text-white/50 mt-1">{t('جسرك إلى اللغة الصينية — HSK 1', 'Your bridge to Chinese — HSK 1')}</p>
         </div>
 
         <AnimatePresence mode="wait">
@@ -76,15 +97,15 @@ export default function OnboardingScreen() {
               className="space-y-6"
             >
               <div>
-                <label className="block text-sm font-bold text-white/80 mb-2">
-                  <Sparkles className="inline w-4 h-4 ml-1 text-fuchsia-300" />
-                  ما اسمك؟
+                <label className="flex items-center gap-1.5 text-sm font-bold text-white/80 mb-2">
+                  <Sparkles className="w-4 h-4 text-fuchsia-300" />
+                  {t('ما اسمك؟', 'What is your name?')}
                 </label>
                 <input
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError('') }}
-                  onKeyDown={(e) => e.key === 'Enter' && (name.trim() ? setStep(1) : setError('يرجى إدخال اسمك'))}
-                  placeholder="اكتب اسمك هنا..."
+                  onKeyDown={(e) => e.key === 'Enter' && (name.trim() ? setStep(1) : setError(t('يرجى إدخال اسمك', 'Please enter your name')))}
+                  placeholder={t('اكتب اسمك هنا...', 'Type your name here...')}
                   className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 transition-all"
                   autoFocus
                 />
@@ -92,7 +113,7 @@ export default function OnboardingScreen() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-white/80 mb-3">اختر رفيق رحلتك:</label>
+                <label className="block text-sm font-bold text-white/80 mb-3">{t('اختر رفيق رحلتك:', 'Choose your journey buddy:')}</label>
                 <div className="grid grid-cols-6 gap-2">
                   {AVATARS.map((a) => (
                     <button
@@ -112,11 +133,11 @@ export default function OnboardingScreen() {
               </div>
 
               <button
-                onClick={() => (name.trim() ? setStep(1) : setError('يرجى إدخال اسمك'))}
-                className="w-full rounded-xl bg-gradient-to-l from-violet-600 to-fuchsia-600 py-3.5 font-bold text-white shadow-lg shadow-violet-500/25 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                onClick={() => (name.trim() ? setStep(1) : setError(t('يرجى إدخال اسمك', 'Please enter your name')))}
+                className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-3.5 font-bold text-white shadow-lg shadow-violet-500/25 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
-                متابعة
-                <ArrowLeft className="w-4 h-4" />
+                {t('متابعة', 'Continue')}
+                <Forward className="w-4 h-4" />
               </button>
             </motion.div>
           ) : (
@@ -129,10 +150,10 @@ export default function OnboardingScreen() {
             >
               <div className="text-center">
                 <div className="text-4xl mb-2">{avatar}</div>
-                <h2 className="text-lg font-bold text-white">أهلاً {name.trim()}! 👋</h2>
-                <p className="text-sm text-white/50 mt-1">
-                  <Target className="inline w-4 h-4 ml-1" />
-                  كم كلمة جديدة تريد أن تتعلم يومياً؟
+                <h2 className="text-lg font-bold text-white">{t('أهلاً', 'Hi')} {name.trim()}! 👋</h2>
+                <p className="flex items-center justify-center gap-1.5 text-sm text-white/50 mt-1">
+                  <Target className="w-4 h-4" />
+                  {t('كم كلمة جديدة تريد أن تتعلم يومياً؟', 'How many new words per day?')}
                 </p>
               </div>
 
@@ -141,25 +162,26 @@ export default function OnboardingScreen() {
                   <button
                     key={g.value}
                     onClick={() => finish(g.value)}
-                    className="w-full rounded-xl bg-white/8 border border-white/10 px-4 py-3 text-right hover:bg-gradient-to-l hover:from-violet-600/40 hover:to-fuchsia-600/40 hover:border-violet-400/40 active:scale-[0.98] transition-all group"
+                    className="w-full rounded-xl bg-white/8 border border-white/10 px-4 py-3 hover:bg-gradient-to-r hover:from-violet-600/40 hover:to-fuchsia-600/40 hover:border-violet-400/40 active:scale-[0.98] transition-all group"
+                    style={{ textAlign: dir === 'rtl' ? 'right' : 'left' }}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-white">{g.label} يومياً</span>
-                      <span className="text-xs text-white/40 group-hover:text-white/70">{g.desc}</span>
+                      <span className="font-bold text-white">{t(g.label, g.labelEn)} {t('يومياً', '/ day')}</span>
+                      <span className="text-xs text-white/40 group-hover:text-white/70">{t(g.desc, g.descEn)}</span>
                     </div>
                   </button>
                 ))}
               </div>
 
               <button onClick={() => setStep(0)} className="w-full text-center text-xs text-white/40 hover:text-white/70 transition-colors">
-                → رجوع
+                {dir === 'rtl' ? '→ ' : '← '}{t('رجوع', 'Back')}
               </button>
             </motion.div>
           )}
         </AnimatePresence>
 
         <p className="text-center text-[10px] text-white/25 mt-6">
-          تقدمك يُحفظ على هذا الجهاز — يمكنك تصديره من الإعدادات في أي وقت
+          {t('تقدمك يُحفظ على هذا الجهاز — يمكنك تصديره من الإعدادات في أي وقت', 'Your progress is saved on this device — you can export it from Settings anytime')}
         </p>
       </motion.div>
     </div>

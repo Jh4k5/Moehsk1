@@ -168,10 +168,11 @@
   --shadow-glow-success: 0 4px 24px rgba(16, 185, 129, 0.30);
 
   /* ── التدرجات ── */
-  --gradient-primary: linear-gradient(135deg, var(--violet-600), var(--violet-800));
-  --gradient-hero:    linear-gradient(135deg, #1e0a3c 0%, #2e1065 40%, #1a0e3e 100%);
-  --gradient-sidebar: linear-gradient(180deg, #0d0b22 0%, #110e2a 50%, #0d0b22 100%);
+  --gradient-primary: linear-gradient(135deg, var(--violet-500), var(--fuchsia-600));
+  --gradient-hero:    linear-gradient(135deg, #2e1065 0%, #4c1d95 35%, #86198f 75%, #1a0e3e 100%);
+  --gradient-sidebar: linear-gradient(180deg, #0d0b22 0%, #170f38 50%, #0d0b22 100%);
   --gradient-card-back: linear-gradient(135deg, #231e52, #1a1640);
+  --gradient-accent:  linear-gradient(135deg, #f472b6, #fb923c);
 
   /* ── shadcn/ui متوافق ── */
   --background: oklch(0.12 0.03 290);
@@ -264,6 +265,7 @@
   --gradient-hero:    linear-gradient(135deg, var(--violet-600) 0%, var(--fuchsia-500) 55%, var(--orange-400) 130%);
   --gradient-sidebar: linear-gradient(180deg, #7c3aed 0%, #a21caf 100%);
   --gradient-card-back: linear-gradient(135deg, var(--violet-100), var(--violet-50));
+  --gradient-accent:  linear-gradient(135deg, #ec4899, #fb923c);
 
   /* ── shadcn/ui متوافق ── */
   --background: #f5f2ff;
@@ -360,12 +362,12 @@
   border: 1px solid var(--line-default);
   border-radius: 1rem;
   box-shadow: var(--shadow-sm);
-  transition: all 0.22s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.15, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .j-card:hover {
-  border-color: var(--line-subtle);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  border-color: var(--clr-primary);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(139, 92, 246, 0.12), 0 8px 24px -8px rgba(139, 92, 246, 0.35);
+  transform: translateY(-2px);
 }
 
 /* ── البطاقة البارزة (كلمة اليوم / Hero) ── */
@@ -532,7 +534,7 @@
   border-radius: 0.75rem;
   margin: 0 0.5rem;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
   color: rgba(255,255,255,0.50);
   font-family: 'Tajawal', sans-serif;
   font-size: 0.875rem;
@@ -540,13 +542,17 @@
   position: relative;
 }
 .j-nav-item:hover {
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.9);
+  transform: translateX(-2px);
+}
+[dir="ltr"] .j-nav-item:hover {
+  transform: translateX(2px);
 }
 .j-nav-item.active {
-  background: linear-gradient(135deg, rgba(124,58,237,0.30), rgba(124,58,237,0.15));
-  color: var(--violet-300);
-  border: 1px solid rgba(139,92,246,0.25);
+  background: linear-gradient(135deg, rgba(124,58,237,0.32), rgba(217,70,239,0.14));
+  color: #e9d5ff;
+  border: 1px solid rgba(168,85,247,0.35);
 }
 .j-nav-item.active::before {
   content: '';

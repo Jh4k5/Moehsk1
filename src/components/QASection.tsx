@@ -1,6 +1,8 @@
 'use client'
 
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
+import { useActiveLevel } from '@/lib/levels'
+import { dailyQA2 } from '@/data/hsk2/qa2'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -85,7 +87,7 @@ interface QACategory {
   questions: QAQuestion[]
 }
 
-const dailyQA: QACategory[] = [
+const DEFAULT_DAILY_QA: QACategory[] = [
   {
     category: "🛒 في المتجر",
     icon: "🛒",
@@ -273,11 +275,6 @@ const dailyQA: QACategory[] = [
   },
 ]
 
-// ─── Flat all questions with category reference ──────────────────
-const allQuestions = dailyQA.flatMap(cat =>
-  cat.questions.map(q => ({ category: cat.category, color: cat.color, ...q }))
-)
-
 import { speak } from '@/lib/tts'
 
 // ─── Fisher-Yates Shuffle ─────────────────────────────────────
@@ -325,7 +322,11 @@ function splitChineseWords(sentence: string): string[] {
 }
 
 // ─── Quiz question generator (quizzes over dailyQA categories) ──
-function generateQuizQuestions(count: number = 10) {
+function generateQuizQuestions(
+  count: number = 10,
+  allQ: Array<QAQuestion & { category: string; color: string }>,
+  dailyQ: QACategory[],
+) {
   const questions: Array<{
     questionZh: string;
     questionPinyin: string;
@@ -335,10 +336,10 @@ function generateQuizQuestions(count: number = 10) {
     correctIndex: number;
   }> = []
 
-  const shuffled = shuffleArray(allQuestions).slice(0, count)
+  const shuffled = shuffleArray(allQ).slice(0, count)
 
   for (const ex of shuffled) {
-    const wrongOptions = dailyQA
+    const wrongOptions = dailyQ
       .filter(c => c.category !== ex.category)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3)
@@ -482,6 +483,15 @@ function FlashcardPractice({ question, category }: {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════
 export default function QASection() {
+  const { level } = useActiveLevel()
+  const dailyQA = useMemo<QACategory[]>(
+    () => (level === 1 ? DEFAULT_DAILY_QA : (dailyQA2 as unknown as QACategory[])),
+    [level],
+  )
+  const allQuestions = useMemo(
+    () => dailyQA.flatMap(cat => cat.questions.map(q => ({ category: cat.category, color: cat.color, ...q }))),
+    [dailyQA],
+  )
   // ─── State ──────────────────────────────────────────────────
   const [revealedAnswers, setRevealedAnswers] = useState<Set<string>>(new Set())
   const [activeFlashcard, setActiveFlashcard] = useState<string | null>(null)
@@ -594,14 +604,14 @@ export default function QASection() {
 
   // ─── Quiz logic ─────────────────────────────────────────────
   const startQuiz = useCallback(() => {
-    setQuizQuestions(generateQuizQuestions(10))
+    setQuizQuestions(generateQuizQuestions(10, allQuestions, dailyQA))
     setQuizCurrent(0)
     setQuizAnswer(null)
     setQuizScore(0)
     setQuizFinished(false)
     setQuizStarted(true)
     setQuizTimer(30)
-  }, [])
+  }, [allQuestions, dailyQA])
 
   useEffect(() => {
     if (!quizStarted || quizFinished || quizAnswer !== null) {

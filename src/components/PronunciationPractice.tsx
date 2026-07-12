@@ -12,6 +12,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { useActiveLevel } from '@/lib/levels'
+import { categories } from '@/data/categories'
 
 // ─── Levenshtein Distance ───────────────────────────────────
 function levenshteinDistance(a: string, b: string): number {
@@ -96,7 +98,7 @@ interface PracticeWord {
   category: string
 }
 
-const practiceWords: PracticeWord[] = [
+const DEFAULT_PRACTICE_WORDS: PracticeWord[] = [
   // Easy - single syllable
   { zh: '你好', pinyin: 'nǐ hǎo', meaning: 'مرحباً', difficulty: 'easy', category: 'تحيات' },
   { zh: '谢谢', pinyin: 'xièxie', meaning: 'شكراً', difficulty: 'easy', category: 'تحيات' },
@@ -165,6 +167,17 @@ interface SpeechRecognitionResultList {
 
 // ─── Main Component ─────────────────────────────────────────
 export default function PronunciationPractice() {
+  const { vocabulary, level } = useActiveLevel()
+  const practiceWords = useMemo<PracticeWord[]>(() => {
+    if (level === 1) return DEFAULT_PRACTICE_WORDS
+    return vocabulary.map((w) => ({
+      zh: w.zh,
+      pinyin: w.pinyin,
+      meaning: w.meaning,
+      difficulty: w.difficulty,
+      category: categories.find((c) => c.value === w.pos)?.label || w.pos,
+    }))
+  }, [vocabulary, level])
   const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'easy' | 'medium' | 'hard'>('all')
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
@@ -184,7 +197,7 @@ export default function PronunciationPractice() {
   const filteredWords = useMemo(() => {
     if (difficultyFilter === 'all') return practiceWords
     return practiceWords.filter(w => w.difficulty === difficultyFilter)
-  }, [difficultyFilter])
+  }, [difficultyFilter, practiceWords])
 
   const currentWord = filteredWords[currentWordIndex]
 

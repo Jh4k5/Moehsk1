@@ -12,6 +12,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { useActiveLevel } from '@/lib/levels'
+import { ts } from '@/lib/i18n'
 
 // ─── Question Types ─────────────────────────────────────────
 interface ExamQuestion {
@@ -32,7 +34,7 @@ interface VocabItem {
   meaning: string
 }
 
-const examVocab: VocabItem[] = [
+const DEFAULT_EXAM_VOCAB: VocabItem[] = [
   { zh: '你好', pinyin: 'nǐ hǎo', meaning: 'مرحباً' },
   { zh: '再见', pinyin: 'zàijiàn', meaning: 'مع السلامة' },
   { zh: '谢谢', pinyin: 'xièxie', meaning: 'شكراً' },
@@ -91,7 +93,7 @@ const examVocab: VocabItem[] = [
   { zh: '知道', pinyin: 'zhīdào', meaning: 'يعلم' },
 ]
 
-const sentencePool = [
+const DEFAULT_SENTENCE_POOL = [
   { zh: '我是学生。', pinyin: 'Wǒ shì xuéshēng.', meaning: 'أنا طالب.' },
   { zh: '他是中国人。', pinyin: 'Tā shì Zhōngguó rén.', meaning: 'هو صيني.' },
   { zh: '我有一个朋友。', pinyin: 'Wǒ yǒu yí gè péngyou.', meaning: 'لدي صديق.' },
@@ -115,18 +117,18 @@ const sentencePool = [
 ]
 
 // ─── Exam Generation ────────────────────────────────────────
-function generateListeningQuestions(count: number): ExamQuestion[] {
+function generateListeningQuestions(count: number, pool: VocabItem[]): ExamQuestion[] {
   const questions: ExamQuestion[] = []
-  const shuffled = [...examVocab].sort(() => Math.random() - 0.5)
+  const shuffled = [...pool].sort(() => Math.random() - 0.5)
 
   for (let i = 0; i < count && i < shuffled.length; i++) {
     const correct = shuffled[i]
-    const wrongs = examVocab.filter(v => v.zh !== correct.zh).sort(() => Math.random() - 0.5).slice(0, 3)
+    const wrongs = pool.filter(v => v.zh !== correct.zh).sort(() => Math.random() - 0.5).slice(0, 3)
     const options = [...wrongs, correct].sort(() => Math.random() - 0.5)
     questions.push({
       type: 'listening',
       subType: 'choice',
-      question: 'استمع واختر المعنى الصحيح:',
+      question: ts('استمع واختر المعنى الصحيح:', 'Listen and choose the correct meaning:'),
       options: options.map(o => o.meaning),
       correctIndex: options.indexOf(correct),
       audioText: correct.zh,
@@ -137,18 +139,18 @@ function generateListeningQuestions(count: number): ExamQuestion[] {
   return questions
 }
 
-function generateReadingQuestions(count: number): ExamQuestion[] {
+function generateReadingQuestions(count: number, pool: VocabItem[]): ExamQuestion[] {
   const questions: ExamQuestion[] = []
-  const shuffled = [...examVocab].sort(() => Math.random() - 0.5)
+  const shuffled = [...pool].sort(() => Math.random() - 0.5)
 
   for (let i = 0; i < count && i < shuffled.length; i++) {
     const correct = shuffled[i]
-    const wrongs = examVocab.filter(v => v.zh !== correct.zh).sort(() => Math.random() - 0.5).slice(0, 3)
+    const wrongs = pool.filter(v => v.zh !== correct.zh).sort(() => Math.random() - 0.5).slice(0, 3)
     const options = [...wrongs, correct].sort(() => Math.random() - 0.5)
     questions.push({
       type: 'reading',
       subType: 'choice',
-      question: `ما معنى "${correct.zh}"؟`,
+      question: ts(`ما معنى "${correct.zh}"؟`, `What does "${correct.zh}" mean?`),
       options: options.map(o => o.meaning),
       correctIndex: options.indexOf(correct),
       pinyin: correct.pinyin,
@@ -158,20 +160,20 @@ function generateReadingQuestions(count: number): ExamQuestion[] {
   return questions
 }
 
-function generateTrueFalseQuestions(count: number): ExamQuestion[] {
+function generateTrueFalseQuestions(count: number, sentences: { zh: string; pinyin: string; meaning: string }[]): ExamQuestion[] {
   const questions: ExamQuestion[] = []
-  const shuffledSentences = [...sentencePool].sort(() => Math.random() - 0.5).slice(0, count)
+  const shuffledSentences = [...sentences].sort(() => Math.random() - 0.5).slice(0, count)
 
   for (const s of shuffledSentences) {
     const isCorrect = Math.random() > 0.5
-    const wrongMeaning = sentencePool.find(sp => sp.zh !== s.zh && sp.meaning !== s.meaning)
+    const wrongMeaning = sentences.find(sp => sp.zh !== s.zh && sp.meaning !== s.meaning)
     questions.push({
       type: 'reading',
       subType: 'trueFalse',
-      question: `${s.zh} — هل معناها:`,
+      question: ts(`${s.zh} — هل معناها:`, `${s.zh} — does it mean:`),
       options: [
-        isCorrect ? s.meaning : (wrongMeaning?.meaning || 'معنى خاطئ'),
-        isCorrect ? (wrongMeaning?.meaning || 'معنى خاطئ') : s.meaning,
+        isCorrect ? s.meaning : (wrongMeaning?.meaning || ts('معنى خاطئ', 'wrong meaning')),
+        isCorrect ? (wrongMeaning?.meaning || ts('معنى خاطئ', 'wrong meaning')) : s.meaning,
       ],
       correctIndex: isCorrect ? 0 : 1,
       pinyin: s.pinyin,
@@ -194,6 +196,24 @@ type ExamPhase = 'start' | 'exam' | 'results'
 
 // ─── Main Component ─────────────────────────────────────────
 export default function ExamSimulator() {
+  const { vocabulary, level } = useActiveLevel()
+  const examVocab = useMemo<VocabItem[]>(() => {
+    if (level === 1) return DEFAULT_EXAM_VOCAB
+    return vocabulary.map((w) => ({ zh: w.zh, pinyin: w.pinyin, meaning: w.meaning }))
+  }, [vocabulary, level])
+  const sentencePool = useMemo(() => {
+    if (level === 1) return DEFAULT_SENTENCE_POOL
+    const seen = new Set<string>()
+    const pool: { zh: string; pinyin: string; meaning: string }[] = []
+    for (const w of vocabulary) {
+      const s = w.sentences?.[0]
+      if (s && !seen.has(s.zh)) {
+        seen.add(s.zh)
+        pool.push({ zh: s.zh, pinyin: s.pinyin, meaning: s.ar })
+      }
+    }
+    return pool
+  }, [vocabulary, level])
   const [examPhase, setExamPhase] = useState<ExamPhase>('start')
   const [examType, setExamType] = useState<ExamType>('full')
   const [questions, setQuestions] = useState<ExamQuestion[]>([])
@@ -226,9 +246,9 @@ export default function ExamSimulator() {
 
   // Start exam
   const startExam = useCallback(() => {
-    const listeningQs = generateListeningQuestions(examConfig.listening)
-    const readingQs = generateReadingQuestions(examConfig.reading)
-    const tfQs = generateTrueFalseQuestions(examConfig.tf)
+    const listeningQs = generateListeningQuestions(examConfig.listening, examVocab)
+    const readingQs = generateReadingQuestions(examConfig.reading, examVocab)
+    const tfQs = generateTrueFalseQuestions(examConfig.tf, sentencePool)
     const allQs = [...listeningQs, ...readingQs, ...tfQs]
     setQuestions(allQs)
     setAnswers(new Array(allQs.length).fill(null))
@@ -236,7 +256,7 @@ export default function ExamSimulator() {
     setTimeLeft(examConfig.time)
     setExamPhase('exam')
     setShowAnswerFeedback(false)
-  }, [examConfig])
+  }, [examConfig, examVocab, sentencePool])
 
   // Answer question
   const answerQuestion = (optionIndex: number) => {

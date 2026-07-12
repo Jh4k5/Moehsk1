@@ -1,6 +1,6 @@
 // ─── Tutor knowledge index built from the platform's own data ───────────────
-import { vocabulary, type VocabWord } from '@/data/vocabulary'
-import { grammarRules, type GrammarRule } from '@/data/grammar'
+import { vocabulary as vocabulary1, type VocabWord } from '@/data/vocabulary'
+import { grammarRules as grammarRules1, type GrammarRule } from '@/data/grammar'
 import { normalizeArabic, stripPinyinTones } from './normalize'
 
 export interface TutorSentence {
@@ -20,10 +20,17 @@ export interface TutorIndex {
   sentences: TutorSentence[]
 }
 
-let cached: TutorIndex | null = null
+const cacheByLevel = new Map<number, TutorIndex>()
 
-export function getTutorIndex(): TutorIndex {
-  if (cached) return cached
+export function getTutorIndex(
+  level: number = 1,
+  vocab: VocabWord[] = vocabulary1,
+  grammar: GrammarRule[] = grammarRules1,
+): TutorIndex {
+  const hit = cacheByLevel.get(level)
+  if (hit) return hit
+  const vocabulary = vocab
+  const grammarRules = grammar
 
   const hanziMap = new Map<string, VocabWord>()
   const pinyinMap = new Map<string, VocabWord[]>()
@@ -80,8 +87,9 @@ export function getTutorIndex(): TutorIndex {
     return { rule, keywords, particles }
   })
 
-  cached = { hanziMap, maxHanziLen, pinyinMap, arabicIndex, englishMap, grammarKeywords, sentences }
-  return cached
+  const built = { hanziMap, maxHanziLen, pinyinMap, arabicIndex, englishMap, grammarKeywords, sentences }
+  cacheByLevel.set(level, built)
+  return built
 }
 
 /** تقطيع مقطع هانزي إلى كلمات معجمية بأسلوب أطول-تطابق أولاً */

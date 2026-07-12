@@ -201,6 +201,10 @@ interface LearningStore
   // Hydration flag (avoids onboarding flash before localStorage loads)
   _hasHydrated: boolean;
   setHasHydrated: (v: boolean) => void;
+
+  // Active HSK level (1 or 2)
+  currentLevel: 1 | 2;
+  setLevel: (level: 1 | 2) => void;
 }
 
 export type { Section, QuizQuestion, MemoryCard, ChatMessage };
@@ -436,6 +440,10 @@ export const useLearningStore = create<LearningStore>()(
       _hasHydrated: false,
       setHasHydrated: (v) => set({ _hasHydrated: v }),
 
+      // ── Active HSK level ───────────────────────────────────────────────
+      currentLevel: 1,
+      setLevel: (level) => set({ currentLevel: level }),
+
       // ── Exam ──────────────────────────────────────────────────────────
       examStarted: false,
       examType: null,
@@ -468,6 +476,7 @@ export const useLearningStore = create<LearningStore>()(
         bookmarkedWords: state.bookmarkedWords,
         profile: state.profile,
         settings: state.settings,
+        currentLevel: state.currentLevel,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

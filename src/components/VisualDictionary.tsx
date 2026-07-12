@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { VISUAL_DICT_CATEGORIES } from '@/data/visualDict'
+import { useActiveLevel } from '@/lib/levels'
 import type { VisualDictWord } from '@/data/visualDict'
 import { vocabulary } from '@/data/vocabulary'
 import { Button } from '@/components/ui/button'
@@ -95,6 +95,7 @@ interface QuizQuestion {
 
 // ── Component ───────────────────────────────────────────────────────────────
 export default function VisualDictionary() {
+  const VISUAL_DICT_CATEGORIES = useActiveLevel().visualDict
   const [activeCategory, setActiveCategory] = useState(
     VISUAL_DICT_CATEGORIES[0].key,
   )

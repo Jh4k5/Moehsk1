@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import { conversations, type Conversation, type ConversationTurn } from '@/data/conversations'
+import { type Conversation, type ConversationTurn } from '@/data/conversations'
+import { useActiveLevel } from '@/lib/levels'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -45,8 +46,9 @@ function buildOptions(
   correctTurn: ConversationTurn,
   correctIdx: number,
   conversationId: number,
+  allConversations: Conversation[],
 ): string[] {
-  const allOther = conversations
+  const allOther: string[] = allConversations
     .filter(c => c.id !== conversationId)
     .flatMap(c => c.turns)
     .map(t => t.hanzi)
@@ -68,7 +70,7 @@ interface QuizState {
   finished: boolean
 }
 
-function createQuizState(conv: Conversation): QuizState {
+function createQuizState(conv: Conversation, allConversations: Conversation[]): QuizState {
   const quizTurnIndices = pickQuizTurns(conv.turns)
   const answers: Record<number, number | null> = {}
   const options: Record<number, string[]> = {}
@@ -76,7 +78,7 @@ function createQuizState(conv: Conversation): QuizState {
 
   for (const idx of quizTurnIndices) {
     answers[idx] = null
-    options[idx] = buildOptions(conv.turns[idx], idx, conv.id)
+    options[idx] = buildOptions(conv.turns[idx], idx, conv.id, allConversations)
     revealed[idx] = false
   }
 
@@ -124,6 +126,7 @@ const cardVariants: Variants = {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
 export default function ConversationsSection() {
+  const { conversations } = useActiveLevel()
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [showPinyin, setShowPinyin] = useState(true)
   const [showArabic, setShowArabic] = useState(true)
@@ -182,8 +185,8 @@ export default function ConversationsSection() {
   // ─── Quiz Handlers ─────────────────────────────────────────
   const startQuiz = useCallback(() => {
     if (!selectedConversation) return
-    setQuiz(createQuizState(selectedConversation))
-  }, [selectedConversation])
+    setQuiz(createQuizState(selectedConversation, conversations))
+  }, [selectedConversation, conversations])
 
   const handleQuizAnswer = useCallback(
     (turnIdx: number, optIdx: number) => {

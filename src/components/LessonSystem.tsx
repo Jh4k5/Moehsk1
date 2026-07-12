@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState, useMemo, useCallback } from 'react'
-import { lessons } from '@/data/lessons'
-import { vocabulary, type VocabWord } from '@/data/vocabulary'
-import { grammarRules, type GrammarRule } from '@/data/grammar'
+import { type VocabWord } from '@/data/vocabulary'
+import { type GrammarRule } from '@/data/grammar'
 import { useLearningStore } from '@/lib/store'
+import { useActiveLevel } from '@/lib/levels'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -52,6 +52,7 @@ type ExerciseAnswer = number | string | null
 // ═══════════════════════════════════════════════════════════
 export default function LessonSystem() {
   const store = useLearningStore()
+  const { lessons, vocabulary, grammarRules } = useActiveLevel()
   const { learnedWords, toggleLearned } = store
 
   // ─── Local State ─────────────────────────────────────────

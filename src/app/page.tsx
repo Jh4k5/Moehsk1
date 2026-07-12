@@ -49,6 +49,7 @@ import { isDueForReview, getDifficultyLabel, getWeakWords } from '@/lib/srs'
 // ─── AI Tutor Engine + TTS ──────────────────────────────────
 import { answerMessage, type TutorQuiz } from '@/lib/tutor/engine'
 import { speak } from '@/lib/tts'
+import { useActiveLevel } from '@/lib/levels'
 
 // ═══ Error Boundary ═══
 class SectionErrorBoundary extends React.Component<
@@ -443,23 +444,23 @@ const grammarPracticeQuestions: Record<number, { zh: string; options: string[]; 
 }
 
 // ─── Build sentences from vocabulary ─────────────────────────
-function buildAllSentences(): { zh: string; pinyin: string; ar: string; wordZh: string }[] {
+function buildAllSentences(vocab: VocabWord[]): { zh: string; pinyin: string; ar: string; wordZh: string }[] {
   const seen = new Set<string>()
   const result: { zh: string; pinyin: string; ar: string; wordZh: string }[] = []
-  for (const w of vocabulary) {
+  for (const w of vocab) {
     const add = (zh: string, py: string, ar: string) => {
-      if (!seen.has(zh)) {
+      if (zh && !seen.has(zh)) {
         seen.add(zh)
         result.push({ zh, pinyin: py, ar, wordZh: w.zh })
       }
     }
+    for (const s of (w.sentences || [])) add(s.zh, s.pinyin, s.ar)
     add(w.exZh, w.exPinyin, w.exEn)
     if (w.s2) add(w.s2.zh, w.s2.py, w.s2.ar)
     if (w.s3) add(w.s3.zh, w.s3.py, w.s3.ar)
   }
   return result
 }
-const allSentences = buildAllSentences()
 
 // ═══════════════════════════════════════════════════════════
 // MAIN COMPONENT
@@ -469,6 +470,8 @@ type Section = 'dashboard' | 'vocabulary' | 'grammar' | 'practice' | 'games' | '
 
 export default function Home() {
   const store = useLearningStore()
+  const activeLevel = useActiveLevel()
+  const { vocabulary } = activeLevel
   const { currentSection, setCurrentSection, learnedWords, toggleLearned, incrementStreak, srsCards } = store
   const [hideMastered, setHideMastered] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -510,6 +513,17 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.style.setProperty('--hanzi-scale', String(store.settings.hanziFontScale))
   }, [store.settings.hanziFontScale])
+
+  // عند تبديل المستوى: إعادة ضبط المؤشرات لتجنّب الخروج عن النطاق
+  useEffect(() => {
+    store.setFlashcardIndex(0)
+    setSentenceIndex(0)
+    setActiveStory(0)
+    setSearchQuery('')
+    setSelectedCategory('all')
+    setQuizAnswer(null)
+    setQuizFinished(false)
+  }, [store.currentLevel])
 
   // Hard mode timer
   useEffect(() => {
@@ -570,7 +584,7 @@ export default function Home() {
       const matchCat = selectedCategory === 'all' || w.pos === selectedCategory
       return matchSearch && matchCat
     })
-  }, [searchQuery, selectedCategory, hideMastered, isWordMastered])
+  }, [searchQuery, selectedCategory, hideMastered, isWordMastered, vocabulary])
 
   // ─── Quiz Generation (30 questions) ──────────────────────
   const sessionSeed = useMemo(() => Date.now(), [])
@@ -644,7 +658,8 @@ export default function Home() {
   // ─── Stats ────────────────────────────────────────────────
   const stats = useMemo(() => {
     const total = vocabulary.length
-    const learned = learnedWords.length
+    const idSet = new Set(vocabulary.map(w => w.id))
+    const learned = learnedWords.filter(id => idSet.has(id)).length
     const progress = total > 0 ? Math.round((learned / total) * 100) : 0
     const byCategory = categories.slice(1).map(cat => ({
       ...cat,
@@ -652,7 +667,7 @@ export default function Home() {
       learned: vocabulary.filter(w => w.pos === cat.value && learnedWords.includes(w.id)).length,
     }))
     return { total, learned, progress, byCategory }
-  }, [learnedWords])
+  }, [learnedWords, vocabulary])
 
   // ═══════════════════════════════════════════════════════════
   // ONBOARDING GUARD
@@ -686,14 +701,31 @@ export default function Home() {
             </div>
             <div className="j-logo-text">
               <span className="j-logo-ar">جِسر</span>
-              <span className="j-logo-en">JISR · HSK 1</span>
+              <span className="j-logo-en">JISR · {activeLevel.label}</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold" style={{color: "var(--text-primary)"}}>جِسر — تعلم الصينية HSK 1</h1>
-              <p className="text-xs text-[var(--text-tertiary)]">{stats.total} كلمة • 26 قاعدة • مستوى مبتدئ</p>
+              <h1 className="text-lg font-bold" style={{color: "var(--text-primary)"}}>جِسر — تعلم الصينية {activeLevel.label}</h1>
+              <p className="text-xs text-[var(--text-tertiary)]">{stats.total} كلمة • {activeLevel.grammarRules.length} قاعدة • {activeLevel.level === 1 ? 'مستوى مبتدئ' : 'مستوى ثانٍ'}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* ─── Level switcher (HSK1 / HSK2) ─── */}
+            <div className="flex items-center rounded-full bg-[var(--surface-card-h)] border border-[var(--line-default)] p-0.5 shadow-sm">
+              {([1, 2] as const).map((lv) => (
+                <button
+                  key={lv}
+                  onClick={() => store.setLevel(lv)}
+                  className={
+                    "px-3 py-1 rounded-full text-xs font-bold transition-all " +
+                    (store.currentLevel === lv
+                      ? "bg-primary text-white shadow"
+                      : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]")
+                  }
+                >
+                  HSK {lv}
+                </button>
+              ))}
+            </div>
             <ThemeToggle />
             <Badge className="hidden sm:flex gap-1 bg-[var(--clr-warning-bg)] text-[var(--clr-warning)] border-[var(--clr-warning)]/30">
               <Flame className="w-3 h-3" />
@@ -1171,6 +1203,7 @@ function DashboardSection({ stats, onNavigate }: {
 
 // ─── Weak Words Component ─────────────────────────────────────
 function WeakWordsSection({ onNavigate }: { onNavigate: (s: Section) => void }) {
+  const { vocabulary } = useActiveLevel()
   const store = useLearningStore()
   const { srsCards } = store
   const weakWordIds = getWeakWords(
@@ -1236,6 +1269,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
   setHideMastered: (v: boolean | ((prev: boolean) => boolean)) => void
 }) {
   const store = useLearningStore()
+  const { vocabulary } = useActiveLevel()
   const [activeMode, setActiveMode] = useState<'cards' | 'learn' | 'test' | 'match'>('cards')
   const [shuffledVocab, setShuffledVocab] = useState<VocabWord[]>([])
   const [sessionSeen, setSessionSeen] = useState<Set<number>>(new Set())
@@ -2290,6 +2324,7 @@ function formatTime(seconds: number): string {
 // GRAMMAR SECTION (Enhanced with Practice Questions)
 // ═══════════════════════════════════════════════════════════
 function GrammarSection() {
+  const { grammarRules } = useActiveLevel()
   const [grammarAnswers, setGrammarAnswers] = useState<Record<string, Record<number, number>>>({})
 
   return (
@@ -2434,6 +2469,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
   setHardTimer: (t: number) => void
 }) {
   const store = useLearningStore()
+  const { vocabulary, grammarRules } = useActiveLevel()
   const { quizQuestions, quizScore, quizTotal, currentQuizQuestion, answerQuiz, nextQuizQuestion, resetQuiz, incrementStreak } = store
   const [fillBlankWord, setFillBlankWord] = useState<VocabWord | null>(null)
   const [fillAnswer, setFillAnswer] = useState('')
@@ -2819,6 +2855,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
   setToneRound: React.Dispatch<React.SetStateAction<number>>
 }) {
   const store = useLearningStore()
+  const { vocabulary, tonePairs } = useActiveLevel()
   const { memoryCards, memoryMoves, memoryPairs, incrementStreak } = store
   const [selectedMemoryLevel, setSelectedMemoryLevel] = useState(1)
 
@@ -3074,6 +3111,8 @@ function SentencesSection({ sentenceFlipped, setSentenceFlipped, sentenceIndex, 
   sentenceIndex: number
   setSentenceIndex: (i: number) => void
 }) {
+  const { vocabulary } = useActiveLevel()
+  const allSentences = useMemo(() => buildAllSentences(vocabulary), [vocabulary])
   const sentence = allSentences[sentenceIndex]
 
   // Word breakdown from vocabulary
@@ -3206,6 +3245,7 @@ function StoriesSection({ activeStory, setActiveStory, storyAnswers, setStoryAns
   setStoryAnswers: (a: Record<number, number>) => void
 }) {
   const store = useLearningStore()
+  const { stories } = useActiveLevel()
   const story = stories[activeStory]
 
   // Split Chinese text into clickable spans
@@ -3346,6 +3386,8 @@ function StoriesSection({ activeStory, setActiveStory, storyAnswers, setStoryAns
 // ═══════════════════════════════════════════════════════════
 function ChatSection() {
   const store = useLearningStore()
+  const activeLevelBundle = useActiveLevel()
+  const { vocabulary, level } = activeLevelBundle
   const [input, setInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
   const [isTyping, setIsTyping] = useState(false)
@@ -3378,6 +3420,10 @@ function ChatSection() {
         dailyStreak: store.dailyStreak,
         dailyGoal: store.profile?.dailyGoal ?? 10,
         pendingQuiz: pendingQuizRef.current,
+        level,
+        vocabulary,
+        grammarRules: activeLevelBundle.grammarRules,
+        grammarPractice: activeLevelBundle.grammarPractice,
       })
       if (reply.quiz !== undefined) pendingQuizRef.current = reply.quiz
       store.addChatMessage({ role: 'assistant', content: reply.text })
@@ -3512,6 +3558,7 @@ function ChatSection() {
 // ═══════════════════════════════════════════════════════════
 function RoadmapSection() {
   const store = useLearningStore()
+  const { vocabulary, grammarRules, roadmapUnits } = useActiveLevel()
 
   return (
     <div className="space-y-4">

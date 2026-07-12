@@ -1,9 +1,16 @@
 // ─── محرك المعلم الذكي: فهم النية + توليد الرد من بيانات المنصة ─────────────
-import { vocabulary, type VocabWord } from '@/data/vocabulary'
-import { grammarPracticeQuestions } from '@/data/grammarPracticeQuestions'
+import { vocabulary as vocabulary1, type VocabWord } from '@/data/vocabulary'
+import { grammarPracticeQuestions as grammarPractice1 } from '@/data/grammarPracticeQuestions'
+import { grammarRules as grammarRules1 } from '@/data/grammar'
 import { categories } from '@/data/categories'
 import { getTutorIndex, segmentHanzi } from './index'
 import { normalizeArabic, stripPinyinTones, extractHanzi, contentTokens, tokenize } from './normalize'
+
+// المستوى النشط: تُضبط في بداية answerMessage من ctx (آمنة لأن المعالجة متزامنة)
+let _level = 1
+let _vocab: VocabWord[] = vocabulary1
+let _grammarRules: any[] = grammarRules1
+let _grammarPractice: Record<number, { zh: string; options: string[]; correct: number }[]> = grammarPractice1
 
 export interface TutorQuiz {
   question: string
@@ -20,6 +27,10 @@ export interface TutorContext {
   dailyStreak: number
   dailyGoal: number
   pendingQuiz: TutorQuiz | null
+  level?: number
+  vocabulary?: VocabWord[]
+  grammarRules?: any[]
+  grammarPractice?: Record<number, { zh: string; options: string[]; correct: number }[]>
 }
 
 export interface TutorReply {
@@ -67,7 +78,7 @@ function wordCard(w: VocabWord, ctx: TutorContext): string {
 }
 
 function findWords(message: string): VocabWord[] {
-  const index = getTutorIndex()
+  const index = getTutorIndex(_level, _vocab, _grammarRules)
   const results: VocabWord[] = []
 
   // 1) هانزي مباشر
@@ -101,14 +112,14 @@ function findWords(message: string): VocabWord[] {
 function makeWordQuiz(ctx: TutorContext): TutorQuiz {
   const pool = ctx.weakWords.length
     ? ctx.weakWords
-    : vocabulary.filter((w) => !ctx.learnedWordIds.includes(w.id))
-  const target = (pool.length ? pool : vocabulary)[Math.floor(Math.random() * (pool.length ? pool.length : vocabulary.length))]
-  const distractors = vocabulary
+    : _vocab.filter((w) => !ctx.learnedWordIds.includes(w.id))
+  const target = (pool.length ? pool : _vocab)[Math.floor(Math.random() * (pool.length ? pool.length : _vocab.length))]
+  const distractors = _vocab
     .filter((w) => w.id !== target.id && w.pos === target.pos)
     .sort(() => Math.random() - 0.5)
     .slice(0, 3)
   while (distractors.length < 3) {
-    const r = vocabulary[Math.floor(Math.random() * vocabulary.length)]
+    const r = _vocab[Math.floor(Math.random() * _vocab.length)]
     if (r.id !== target.id && !distractors.includes(r)) distractors.push(r)
   }
   const options = [target, ...distractors].sort(() => Math.random() - 0.5)
@@ -150,9 +161,15 @@ function matchTriggers(normalized: string, triggers: string[]): boolean {
 }
 
 export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
+  // ضبط بيانات المستوى النشط لهذه المعالجة
+  _level = ctx.level ?? 1
+  _vocab = ctx.vocabulary ?? vocabulary1
+  _grammarRules = ctx.grammarRules ?? grammarRules1
+  _grammarPractice = ctx.grammarPractice ?? grammarPractice1
+
   const message = raw.trim()
   const normalized = normalizeArabic(message)
-  const index = getTutorIndex()
+  const index = getTutorIndex(_level, _vocab, _grammarRules)
 
   // ── 0) إجابة اختبار معلّق ──────────────────────────────────────────────
   if (ctx.pendingQuiz) {
@@ -222,7 +239,7 @@ export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
         lines.push(`  ${ex.pinyin} — ${ex.ar}`)
       }
       if (r.tips) lines.push('', `💡 ${r.tips}`)
-      const practice = grammarPracticeQuestions[r.id]
+      const practice = _grammarPractice[r.id]
       let quiz: TutorQuiz | undefined
       if (practice?.length) {
         const p = practice[Math.floor(Math.random() * practice.length)]
@@ -287,7 +304,7 @@ export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
   // ── 6) نصيحة دراسية مبنية على تقدم المستخدم ───────────────────────────
   if (matchTriggers(normalized, ADVICE_TRIGGERS)) {
     const learned = ctx.learnedWordIds.length
-    const total = vocabulary.length
+    const total = _vocab.length
     const pct = Math.round((learned / total) * 100)
     const lines = [
       `📊 تقدمك الحالي:`,

@@ -8,9 +8,10 @@ import { Volume2, Play, PenLine, RotateCcw, BookOpen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { useActiveLevel } from '@/lib/levels'
 
-// ─── HSK1 Character List (80+ characters) ───────────────────
-const HSK1_CHARS = [
+// ─── Fallback Character List (80+ characters) ───────────────────
+const HSK1_CHARS_DEFAULT = [
   '你','好','我','是','不','的','了','在','人','有',
   '他','这','中','大','来','上','国','个','到','说','们','为','子','和',
   '地','出','道','也','时','年','得','就','那','要','下','以','生','会',
@@ -117,7 +118,9 @@ const charInfoMap: Record<string, { pinyin: string; meaning: string }> = {
 
 // ─── Main Component ─────────────────────────────────────────
 export default function HanziSection() {
-  const [selectedChar, setSelectedChar] = useState<string>('你')
+  const active = useActiveLevel()
+  const HSK1_CHARS = active.hanziChars.length ? active.hanziChars : HSK1_CHARS_DEFAULT
+  const [selectedChar, setSelectedChar] = useState<string>(HSK1_CHARS[0] || '你')
   const [hanziWriterLoaded, setHanziWriterLoaded] = useState(() => {
     if (typeof window !== 'undefined') return !!(window as any).HanziWriter
     return false

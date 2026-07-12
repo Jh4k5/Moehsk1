@@ -1,0 +1,97 @@
+// HSK2 stories — authored with HSK2 vocabulary (New HSK Course 2).
+export const stories2 = [
+  {
+    id: 201,
+    title: 'رحلة إلى بكين',
+    titleZh: '去北京旅游',
+    content: [
+      { zh: '这是我第一次去北京旅游。', pinyin: 'Zhè shì wǒ dì-yī cì qù Běijīng lǚyóu.', ar: 'هذه أول مرة أسافر فيها إلى بكين.' },
+      { zh: '我是坐飞机去的。', pinyin: 'Wǒ shì zuò fēijī qù de.', ar: 'ذهبتُ بالطائرة.' },
+      { zh: '到了机场，朋友来接我。', pinyin: 'Dào le jīchǎng, péngyou lái jiē wǒ.', ar: 'عند وصولي المطار، جاء صديقي لاستقبالي.' },
+      { zh: '我们坐地铁去酒店。', pinyin: 'Wǒmen zuò dìtiě qù jiǔdiàn.', ar: 'ذهبنا إلى الفندق بالمترو.' },
+      { zh: '酒店离颐和园很近。', pinyin: 'Jiǔdiàn lí Yíhé Yuán hěn jìn.', ar: 'الفندق قريب من قصر الصيف.' },
+      { zh: '晚上我们去饭馆吃北京烤鸭。', pinyin: 'Wǎnshang wǒmen qù fànguǎn chī Běijīng Kǎoyā.', ar: 'في المساء ذهبنا للمطعم لأكل بطة بكين.' },
+      { zh: '北京烤鸭真好吃！', pinyin: 'Běijīng Kǎoyā zhēn hǎochī!', ar: 'بطة بكين لذيذة حقاً!' },
+      { zh: '虽然很累，但是我很高兴。', pinyin: 'Suīrán hěn lèi, dànshì wǒ hěn gāoxìng.', ar: 'رغم التعب، كنت سعيداً جداً.' },
+    ],
+    questions: [
+      { zh: '他是怎么去北京的？', options: ['坐地铁', '坐飞机', '坐公交车', '走路'], correct: 1 },
+      { zh: '酒店离什么地方很近？', options: ['机场', '学校', '颐和园', '商场'], correct: 2 },
+      { zh: '他们晚上吃了什么？', options: ['奶茶', '北京烤鸭', '鱼', '面'], correct: 1 },
+    ],
+  },
+  {
+    id: 202,
+    title: 'يوم مزدحم',
+    titleZh: '忙碌的一天',
+    content: [
+      { zh: '今天我很忙。', pinyin: 'Jīntiān wǒ hěn máng.', ar: 'اليوم أنا مشغول جداً.' },
+      { zh: '早上我跑步，然后洗手。', pinyin: 'Zǎoshang wǒ pǎobù, ránhòu xǐ shǒu.', ar: 'في الصباح ركضت ثم غسلت يديّ.' },
+      { zh: '我八点出门去学校。', pinyin: 'Wǒ bā diǎn chūmén qù xuéxiào.', ar: 'خرجت في الثامنة إلى المدرسة.' },
+      { zh: '快要考试了，我很紧张。', pinyin: 'Kuàiyào kǎoshì le, wǒ hěn jǐnzhāng.', ar: 'الامتحان على الأبواب وأنا متوتر.' },
+      { zh: '老师让我们准备考试。', pinyin: 'Lǎoshī ràng wǒmen zhǔnbèi kǎoshì.', ar: 'المعلّم طلب منّا الاستعداد للامتحان.' },
+      { zh: '下午我跟朋友一起打篮球。', pinyin: 'Xiàwǔ wǒ gēn péngyou yìqǐ dǎ lánqiú.', ar: 'بعد الظهر لعبت كرة السلة مع صديقي.' },
+      { zh: '因为运动，所以我很累。', pinyin: 'Yīnwèi yùndòng, suǒyǐ wǒ hěn lèi.', ar: 'بسبب الرياضة، أنا متعب.' },
+      { zh: '晚上我早点儿睡觉。', pinyin: 'Wǎnshang wǒ zǎo diǎnr shuìjiào.', ar: 'في المساء نمت مبكراً.' },
+    ],
+    questions: [
+      { zh: '他早上做了什么？', options: ['游泳', '跑步', '跳舞', '画画'], correct: 1 },
+      { zh: '老师让他们做什么？', options: ['跑步', '准备考试', '看电影', '打车'], correct: 1 },
+      { zh: '下午他跟朋友做什么？', options: ['打篮球', '踢足球', '游泳', '上网'], correct: 0 },
+    ],
+  },
+  {
+    id: 203,
+    title: 'التسوّق',
+    titleZh: '去商场买东西',
+    content: [
+      { zh: '周末我跟妈妈去商场。', pinyin: 'Zhōumò wǒ gēn māma qù shāngchǎng.', ar: 'في العطلة ذهبت مع أمي إلى المركز.' },
+      { zh: '我想买一条裤子。', pinyin: 'Wǒ xiǎng mǎi yì tiáo kùzi.', ar: 'أريد شراء بنطال.' },
+      { zh: '我喜欢黑色的，妈妈喜欢白色的。', pinyin: 'Wǒ xǐhuan hēisè de, māma xǐhuan báisè de.', ar: 'أحب الأسود، وأمي تحب الأبيض.' },
+      { zh: '这条比那条好看。', pinyin: 'Zhè tiáo bǐ nà tiáo hǎokàn.', ar: 'هذا أجمل من ذاك.' },
+      { zh: '妈妈还给我买了一个书包。', pinyin: 'Māma hái gěi wǒ mǎi le yí ge shūbāo.', ar: 'كما اشترت لي أمي حقيبة مدرسية.' },
+      { zh: '我们很高兴地回家了。', pinyin: 'Wǒmen hěn gāoxìng de huí jiā le.', ar: 'عدنا إلى البيت بسعادة.' },
+    ],
+    questions: [
+      { zh: '他想买什么？', options: ['书包', '裤子', '手表', '奶茶'], correct: 1 },
+      { zh: '妈妈喜欢什么颜色？', options: ['黑色', '红色', '白色', '绿色'], correct: 2 },
+      { zh: '妈妈给他买了什么？', options: ['裤子', '书包', '笔', '票'], correct: 1 },
+    ],
+  },
+  {
+    id: 204,
+    title: 'عند الطبيب',
+    titleZh: '看病',
+    content: [
+      { zh: '昨天我头疼，身体不舒服。', pinyin: 'Zuótiān wǒ tóu téng, shēntǐ bù shūfu.', ar: 'أمس كان رأسي يؤلمني ولم أكن بحالة جيدة.' },
+      { zh: '妈妈让我去医院。', pinyin: 'Māma ràng wǒ qù yīyuàn.', ar: 'طلبت مني أمي الذهاب للمستشفى.' },
+      { zh: '医生说我要多休息。', pinyin: 'Yīshēng shuō wǒ yào duō xiūxi.', ar: 'قال الطبيب إن عليّ الراحة أكثر.' },
+      { zh: '然后我去药店买药。', pinyin: 'Ránhòu wǒ qù yàodiàn mǎi yào.', ar: 'ثم ذهبت للصيدلية لشراء الدواء.' },
+      { zh: '吃了药以后，我好多了。', pinyin: 'Chī le yào yǐhòu, wǒ hǎo duō le.', ar: 'بعد تناول الدواء، تحسّنت كثيراً.' },
+      { zh: '现在我已经不疼了。', pinyin: 'Xiànzài wǒ yǐjīng bù téng le.', ar: 'الآن لم يعد يؤلمني.' },
+    ],
+    questions: [
+      { zh: '他哪里不舒服？', options: ['眼睛', '头', '手', '脚'], correct: 1 },
+      { zh: '他去哪儿买药？', options: ['商场', '药店', '饭馆', '酒店'], correct: 1 },
+      { zh: '医生让他做什么？', options: ['多运动', '多休息', '多吃肉', '多上网'], correct: 1 },
+    ],
+  },
+  {
+    id: 205,
+    title: 'هوايتي',
+    titleZh: '我的爱好',
+    content: [
+      { zh: '我的爱好是运动。', pinyin: 'Wǒ de àihào shì yùndòng.', ar: 'هوايتي هي الرياضة.' },
+      { zh: '我从小就喜欢踢足球。', pinyin: 'Wǒ cóngxiǎo jiù xǐhuan tī zúqiú.', ar: 'أحب لعب كرة القدم منذ صغري.' },
+      { zh: '我踢得很好。', pinyin: 'Wǒ tī de hěn hǎo.', ar: 'ألعبها جيداً.' },
+      { zh: '我也喜欢游泳和跑步。', pinyin: 'Wǒ yě xǐhuan yóuyǒng hé pǎobù.', ar: 'أحب أيضاً السباحة والجري.' },
+      { zh: '我最喜欢的运动是足球。', pinyin: 'Wǒ zuì xǐhuan de yùndòng shì zúqiú.', ar: 'رياضتي المفضّلة هي كرة القدم.' },
+      { zh: '运动让我很快乐。', pinyin: 'Yùndòng ràng wǒ hěn kuàilè.', ar: 'الرياضة تجعلني سعيداً.' },
+    ],
+    questions: [
+      { zh: '他从小喜欢什么？', options: ['跳舞', '踢足球', '画画', '唱歌'], correct: 1 },
+      { zh: '他最喜欢的运动是什么？', options: ['篮球', '游泳', '足球', '跑步'], correct: 2 },
+      { zh: '运动让他觉得怎么样？', options: ['很累', '很快乐', '不舒服', '很忙'], correct: 1 },
+    ],
+  },
+]

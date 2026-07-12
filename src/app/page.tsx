@@ -1806,12 +1806,12 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                             className="absolute top-3 left-3 z-10 flex items-center gap-1 px-3 py-1.5 rounded-full bg-[var(--surface-card)]/80 border border-[var(--line-default)] text-xs text-[var(--text-tertiary)] hover:text-primary hover:border-primary transition-all shadow-sm"
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
-                            قلب
+                            {ts('قلب', 'Flip')}
                           </button>
                           <CardContent className="flex flex-col p-5 sm:p-6 text-center gap-2">
                             {/* Meaning — Large */}
                             <div className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-1">
-                              {word.meaning}
+                              {tsPick(word.meaning, word.english)}
                             </div>
 
                             {/* Chinese character + pinyin (smaller) */}
@@ -1830,7 +1830,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                             {word.mnemonic && (
                               <div className="bg-[var(--clr-warning-bg)] border border-[var(--clr-warning)]/30 rounded-xl px-4 py-2 text-sm text-[var(--clr-warning)] flex items-start gap-2">
                                 <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0 text-[var(--clr-warning)]" />
-                                <span>تذكّر: {word.mnemonic}</span>
+                                <span>{ts('تذكّر', 'Tip')}: {word.mnemonic}</span>
                               </div>
                             )}
 
@@ -2344,7 +2344,8 @@ function formatTime(seconds: number): string {
 // GRAMMAR SECTION (Enhanced with Practice Questions)
 // ═══════════════════════════════════════════════════════════
 function GrammarSection() {
-  const { grammarRules } = useActiveLevel()
+  const activeLevel = useActiveLevel()
+  const { grammarRules } = activeLevel
   const [grammarAnswers, setGrammarAnswers] = useState<Record<string, Record<number, number>>>({})
 
   return (
@@ -2354,13 +2355,13 @@ function GrammarSection() {
           <GraduationCap className="w-6 h-6 text-primary" />
           {ts('القواعد النحوية','Grammar')}
         </h2>
-        <Badge variant="secondary">{ts('26 قاعدة','26 rules')}</Badge>
+        <Badge variant="secondary">{grammarRules.length} {ts('قاعدة','rules')}</Badge>
       </div>
-      <p className="text-[var(--text-muted)] text-sm">{ts('جميع القواعد النحوية المطلوبة للمستوى الأول (HSK 1)','All grammar rules required for HSK 1')}</p>
+      <p className="text-[var(--text-muted)] text-sm">{ts(`جميع القواعد النحوية المطلوبة لـ ${activeLevel.label}`,`All grammar rules required for ${activeLevel.label}`)}</p>
 
       <Accordion type="multiple" className="space-y-2">
         {grammarRules.map((rule) => {
-          const questions = grammarPracticeQuestions[rule.id] || []
+          const questions = activeLevel.grammarPractice[rule.id] || []
           const answers = grammarAnswers[String(rule.id)] || {}
 
           return (
@@ -2371,23 +2372,23 @@ function GrammarSection() {
                     {rule.id}
                   </div>
                   <div>
-                    <div className="font-medium text-[var(--text-primary)] text-sm">{rule.titleAr}</div>
+                    <div className="font-medium text-[var(--text-primary)] text-sm">{tsPick(rule.titleAr, rule.title)}</div>
                     <div className="text-xs text-[var(--text-muted)] font-ltr">{rule.title}</div>
                   </div>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pt-2 space-y-4">
-                <p className="text-sm text-[var(--text-secondary)]">{rule.description}</p>
+                <p className="text-sm text-[var(--text-secondary)]">{tsPick(rule.description, (rule as any).descriptionEn)}</p>
 
                 {/* Pattern */}
                 <div className="bg-[var(--surface-card-h)] rounded-lg p-3">
                   <div className="text-xs font-medium text-[var(--text-muted)] mb-1">{ts('الصيغة','Pattern')}</div>
-                  <div className="text-sm font-medium text-primary font-chinese-sans">{rule.pattern}</div>
+                  <div className="text-sm font-medium text-primary font-chinese-sans">{tsPick(rule.pattern, (rule as any).patternEn)}</div>
                 </div>
 
                 {/* Examples */}
                 <div className="space-y-2">
-                  <div className="text-xs font-medium text-[var(--text-muted)]">أمثلة:</div>
+                  <div className="text-xs font-medium text-[var(--text-muted)]">{ts('أمثلة:', 'Examples:')}</div>
                   {rule.examples.map((ex, i) => (
                     <div
                       key={i}
@@ -2398,7 +2399,7 @@ function GrammarSection() {
                       <div className="flex-1">
                         <div className="font-chinese-serif text-[var(--text-primary)]">{ex.zh}</div>
                         <div className="text-xs text-[var(--text-muted)] font-chinese-sans">{ex.pinyin}</div>
-                        <div className="text-sm text-[var(--text-secondary)]">{ex.ar}</div>
+                        <div className="text-sm text-[var(--text-secondary)]">{tsPick(ex.ar, (ex as any).en)}</div>
                       </div>
                     </div>
                   ))}
@@ -2409,9 +2410,9 @@ function GrammarSection() {
                   <div className="bg-[var(--clr-warning-bg)] border border-[var(--clr-warning)]/30 rounded-lg p-3">
                     <div className="text-xs font-medium text-[var(--clr-warning)] flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
-                      نصيحة
+                      {ts('نصيحة', 'Tip')}
                     </div>
-                    <div className="text-sm text-[var(--clr-warning)] mt-1">{rule.tips}</div>
+                    <div className="text-sm text-[var(--clr-warning)] mt-1">{tsPick(rule.tips, (rule as any).tipsEn)}</div>
                   </div>
                 )}
 
@@ -2420,7 +2421,7 @@ function GrammarSection() {
                   <div className="border-t border-[var(--line-default)] pt-3 space-y-3">
                     <div className="text-xs font-medium text-[var(--text-muted)] flex items-center gap-1">
                       <Brain className="w-3 h-3" />
-                      تمرين تفاعلي
+                      {ts('تمرين تفاعلي', 'Interactive practice')}
                     </div>
                     {questions.map((q, qi) => {
                       const selected = answers[qi]
@@ -3441,6 +3442,7 @@ function ChatSection() {
         dailyGoal: store.profile?.dailyGoal ?? 10,
         pendingQuiz: pendingQuizRef.current,
         level,
+        lang: store.lang,
         vocabulary,
         grammarRules: activeLevelBundle.grammarRules,
         grammarPractice: activeLevelBundle.grammarPractice,
@@ -3453,10 +3455,10 @@ function ChatSection() {
   }
 
   const quickQuestions = [
-    'ما معنى 你好؟',
-    'اختبرني',
-    'اشرح قاعدة 吗',
-    'ماذا أراجع اليوم؟',
+    ts('ما معنى 你好؟', 'What does 你好 mean?'),
+    ts('اختبرني', 'Quiz me'),
+    ts('اشرح قاعدة 吗', 'Explain the 吗 rule'),
+    ts('ماذا أراجع اليوم؟', 'What should I review today?'),
   ]
 
   return (

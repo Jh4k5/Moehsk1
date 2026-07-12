@@ -8,9 +8,15 @@ import { normalizeArabic, stripPinyinTones, extractHanzi, contentTokens, tokeniz
 
 // المستوى النشط: تُضبط في بداية answerMessage من ctx (آمنة لأن المعالجة متزامنة)
 let _level = 1
+let _lang: 'ar' | 'en' = 'ar'
 let _vocab: VocabWord[] = vocabulary1
 let _grammarRules: any[] = grammarRules1
 let _grammarPractice: Record<number, { zh: string; options: string[]; correct: number }[]> = grammarPractice1
+
+/** اختيار نص حسب اللغة النشطة للمعلم */
+const L = (ar: string, en: string) => (_lang === 'en' ? en : ar)
+/** معنى الكلمة حسب اللغة (إنجليزي في وضع EN) */
+const M = (w: VocabWord) => (_lang === 'en' && w.english ? w.english : w.meaning)
 
 export interface TutorQuiz {
   question: string
@@ -28,6 +34,7 @@ export interface TutorContext {
   dailyGoal: number
   pendingQuiz: TutorQuiz | null
   level?: number
+  lang?: 'ar' | 'en'
   vocabulary?: VocabWord[]
   grammarRules?: any[]
   grammarPractice?: Record<number, { zh: string; options: string[]; correct: number }[]>
@@ -40,39 +47,43 @@ export interface TutorReply {
 }
 
 const TONE_NAMES = ['محايدة', 'الأولى (ـ مسطحة عالية)', 'الثانية (↗ صاعدة)', 'الثالثة (∨ هابطة صاعدة)', 'الرابعة (↘ حادة هابطة)']
+const TONE_NAMES_EN = ['neutral', '1st (ˉ high flat)', '2nd (↗ rising)', '3rd (∨ dip-rising)', '4th (↘ sharp falling)']
 
 function posLabel(pos: string): string {
-  return categories.find((c) => c.value === pos)?.label || pos
+  const c = categories.find((c) => c.value === pos)
+  if (!c) return pos
+  return (_lang === 'en' && (c as any).labelEn) ? (c as any).labelEn : c.label
 }
 
 function toneLine(w: VocabWord): string {
   if (!w.tones?.length) return ''
-  const parts = w.tones.map((t) => TONE_NAMES[t] || `${t}`)
-  return `🎵 النبرات: ${parts.join(' ثم ')}`
+  const names = _lang === 'en' ? TONE_NAMES_EN : TONE_NAMES
+  const parts = w.tones.map((t) => names[t] || `${t}`)
+  return `🎵 ${L('النبرات', 'Tones')}: ${parts.join(L(' ثم ', ' then '))}`
 }
 
 function wordCard(w: VocabWord, ctx: TutorContext): string {
   const lines: string[] = []
-  lines.push(`📚 **${w.zh}** (${w.pinyin}) — ${w.meaning}`)
-  lines.push(`🏷️ ${posLabel(w.pos)} • ${w.strokeCount} ضربة${w.radicals?.length ? ` • الجذور: ${w.radicals.join(' ')}` : ''}`)
+  lines.push(`📚 **${w.zh}** (${w.pinyin}) — ${M(w)}`)
+  lines.push(`🏷️ ${posLabel(w.pos)} • ${w.strokeCount} ${L('ضربة', 'strokes')}${w.radicals?.length ? ` • ${L('الجذور', 'radicals')}: ${w.radicals.join(' ')}` : ''}`)
   const tl = toneLine(w)
   if (tl) lines.push(tl)
-  if (w.mnemonic) lines.push(`🧠 للحفظ: ${w.mnemonic}`)
+  if (w.mnemonic && _lang !== 'en') lines.push(`🧠 للحفظ: ${w.mnemonic}`)
   const examples = (w.sentences || []).slice(0, 2)
   if (examples.length) {
     lines.push('')
-    lines.push('📝 أمثلة:')
+    lines.push(L('📝 أمثلة:', '📝 Examples:'))
     for (const s of examples) {
       lines.push(`• ${s.zh}`)
-      lines.push(`  ${s.pinyin}${/[ء-ي]/.test(s.ar) ? ` — ${s.ar}` : ''}`)
+      lines.push(`  ${s.pinyin}${/[ء-ي]/.test(s.ar) && _lang !== 'en' ? ` — ${s.ar}` : ''}`)
     }
   }
   if (ctx.learnedWordIds.includes(w.id)) {
     lines.push('')
-    lines.push('✅ هذه الكلمة ضمن كلماتك المتعلمة — أحسنت!')
+    lines.push(L('✅ هذه الكلمة ضمن كلماتك المتعلمة — أحسنت!', '✅ This word is in your learned list — great!'))
   } else {
     lines.push('')
-    lines.push(`💡 أضفها لقائمتك من قسم المفردات لتدخل جدول مراجعاتك.`)
+    lines.push(L('💡 أضفها لقائمتك من قسم المفردات لتدخل جدول مراجعاتك.', '💡 Add it from the Vocabulary section to enter your review schedule.'))
   }
   return lines.join('\n')
 }
@@ -124,10 +135,10 @@ function makeWordQuiz(ctx: TutorContext): TutorQuiz {
   }
   const options = [target, ...distractors].sort(() => Math.random() - 0.5)
   return {
-    question: `ما معنى 「${target.zh}」 (${target.pinyin})؟`,
-    options: options.map((w) => w.meaning.split('/')[0].trim()),
+    question: L(`ما معنى 「${target.zh}」 (${target.pinyin})؟`, `What does 「${target.zh}」 (${target.pinyin}) mean?`),
+    options: options.map((w) => M(w).split('/')[0].trim()),
     correctIndex: options.indexOf(target),
-    explanation: `${target.zh} (${target.pinyin}) تعني: ${target.meaning}${target.mnemonic ? `\n🧠 ${target.mnemonic}` : ''}`,
+    explanation: L(`${target.zh} (${target.pinyin}) تعني: ${target.meaning}`, `${target.zh} (${target.pinyin}) means: ${target.english || target.meaning}`),
   }
 }
 
@@ -146,15 +157,15 @@ function parseQuizAnswer(message: string, quiz: TutorQuiz): number | null {
 
 function formatQuiz(q: TutorQuiz): string {
   const letters = ['1', '2', '3', '4']
-  return `🎯 ${q.question}\n\n${q.options.map((o, i) => `${letters[i]}. ${o}`).join('\n')}\n\nأجب برقم الخيار (1-4)`
+  return `🎯 ${q.question}\n\n${q.options.map((o, i) => `${letters[i]}. ${o}`).join('\n')}\n\n${L('أجب برقم الخيار (1-4)', 'Answer with the option number (1-4)')}`
 }
 
-const GRAMMAR_TRIGGERS = ['قاعده', 'قواعد', 'نحو', 'grammar', 'تركيب', 'صيغه']
-const TONE_TRIGGERS = ['نطق', 'انطق', 'نبره', 'نبرات', 'تون', 'tone', 'بينيين', 'pinyin', 'صوت']
-const QUIZ_TRIGGERS = ['اختبر', 'اختبار', 'كويز', 'quiz', 'امتحن', 'سؤال لي', 'اسالني', 'اسئلني']
-const ADVICE_TRIGGERS = ['اراجع', 'مراجعه', 'نصيحه', 'نصائح', 'خطه', 'تقدمي', 'اذاكر', 'ادرس', 'مستواي']
-const EXAMPLE_TRIGGERS = ['مثال', 'امثله', 'جمله', 'جمل']
-const NUMBER_TRIGGERS = ['رقم', 'ارقام', 'اعداد', 'عد ', 'الاعداد']
+const GRAMMAR_TRIGGERS = ['قاعده', 'قواعد', 'نحو', 'grammar', 'تركيب', 'صيغه', 'rule', 'explain']
+const TONE_TRIGGERS = ['نطق', 'انطق', 'نبره', 'نبرات', 'تون', 'tone', 'بينيين', 'pinyin', 'صوت', 'pronounce', 'pronunciation', 'say']
+const QUIZ_TRIGGERS = ['اختبر', 'اختبار', 'كويز', 'quiz', 'امتحن', 'سؤال لي', 'اسالني', 'اسئلني', 'test me']
+const ADVICE_TRIGGERS = ['اراجع', 'مراجعه', 'نصيحه', 'نصائح', 'خطه', 'تقدمي', 'اذاكر', 'ادرس', 'مستواي', 'review', 'advice', 'plan', 'progress', 'study']
+const EXAMPLE_TRIGGERS = ['مثال', 'امثله', 'جمله', 'جمل', 'example', 'sentence']
+const NUMBER_TRIGGERS = ['رقم', 'ارقام', 'اعداد', 'عد ', 'الاعداد', 'number', 'count']
 
 function matchTriggers(normalized: string, triggers: string[]): boolean {
   return triggers.some((t) => normalized.includes(t))
@@ -163,6 +174,7 @@ function matchTriggers(normalized: string, triggers: string[]): boolean {
 export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
   // ضبط بيانات المستوى النشط لهذه المعالجة
   _level = ctx.level ?? 1
+  _lang = ctx.lang ?? 'ar'
   _vocab = ctx.vocabulary ?? vocabulary1
   _grammarRules = ctx.grammarRules ?? grammarRules1
   _grammarPractice = ctx.grammarPractice ?? grammarPractice1
@@ -177,9 +189,9 @@ export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
     if (answer !== null) {
       const correct = answer === ctx.pendingQuiz.correctIndex
       const text = correct
-        ? `🎉 صحيح! أحسنت!\n\n${ctx.pendingQuiz.explanation}`
-        : `❌ ليست الإجابة الصحيحة. الجواب: **${ctx.pendingQuiz.options[ctx.pendingQuiz.correctIndex]}**\n\n${ctx.pendingQuiz.explanation}`
-      return { text, quiz: null, followUps: ['اختبرني مرة أخرى', 'ماذا أراجع اليوم؟'] }
+        ? L(`🎉 صحيح! أحسنت!\n\n${ctx.pendingQuiz.explanation}`, `🎉 Correct! Well done!\n\n${ctx.pendingQuiz.explanation}`)
+        : L(`❌ ليست الإجابة الصحيحة. الجواب: **${ctx.pendingQuiz.options[ctx.pendingQuiz.correctIndex]}**\n\n${ctx.pendingQuiz.explanation}`, `❌ Not correct. The answer is: **${ctx.pendingQuiz.options[ctx.pendingQuiz.correctIndex]}**\n\n${ctx.pendingQuiz.explanation}`)
+      return { text, quiz: null, followUps: [L('اختبرني مرة أخرى', 'Quiz me again'), L('ماذا أراجع اليوم؟', 'What should I review today?')] }
     }
     // ليست إجابة → يكمل التحليل الطبيعي مع مسح الاختبار
   }
@@ -337,17 +349,20 @@ export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
   }
 
   // ── 8) تحية / شكر ─────────────────────────────────────────────────────
-  if (/(مرحب|سلام|اهل|هلا|صباح|مساء|هاي|你好)/.test(normalized)) {
+  if (/(مرحب|سلام|اهل|هلا|صباح|مساء|هاي|你好|hello|hi|hey)/.test(normalized)) {
     return {
-      text: `你好！👋 أنا معلمك الشخصي (老师 lǎoshī).\n\nيمكنني:\n• شرح أي كلمة — اكتبها بالصيني أو البينيين أو العربي\n• شرح قواعد HSK 1 مع أمثلة وتمارين\n• اختبارك بأسئلة مبنية على نقاط ضعفك\n• اقتراح خطة مراجعة من تقدمك الفعلي\n\nجرّب: "ما معنى 你好؟" أو "اختبرني"! 😊`,
-      followUps: ['ما معنى 谢谢؟', 'اختبرني', 'ماذا أراجع اليوم؟'],
+      text: L(
+        `你好！👋 أنا معلمك الشخصي (老师 lǎoshī).\n\nيمكنني:\n• شرح أي كلمة — اكتبها بالصيني أو البينيين أو العربي\n• شرح قواعد HSK مع أمثلة وتمارين\n• اختبارك بأسئلة مبنية على نقاط ضعفك\n• اقتراح خطة مراجعة من تقدمك الفعلي\n\nجرّب: "ما معنى 你好؟" أو "اختبرني"! 😊`,
+        `你好！👋 I'm your personal tutor (老师 lǎoshī).\n\nI can:\n• Explain any word — type it in Chinese, pinyin, or English\n• Explain HSK grammar with examples and exercises\n• Quiz you based on your weak points\n• Suggest a review plan from your real progress\n\nTry: "what does 你好 mean?" or "quiz me"! 😊`),
+      followUps: [L('ما معنى 谢谢؟', 'What does 谢谢 mean?'), L('اختبرني', 'Quiz me'), L('ماذا أراجع اليوم؟', 'What should I review today?')],
       quiz: null,
     }
   }
-  if (/(شكر|ممتاز|رائع|جميل)/.test(normalized)) {
+  if (/(شكر|ممتاز|رائع|جميل|thank|thanks|great|nice)/.test(normalized)) {
     return {
-      text: '不客气 (bú kèqi) — على الرحب والسعة! 😊\n\n加油 (jiāyóu) — واصل التقدم! أنا هنا متى احتجتني.',
-      followUps: ['اختبرني', 'ماذا أراجع اليوم؟'],
+      text: L('不客气 (bú kèqi) — على الرحب والسعة! 😊\n\n加油 (jiāyóu) — واصل التقدم! أنا هنا متى احتجتني.',
+        '不客气 (bú kèqi) — you\'re welcome! 😊\n\n加油 (jiāyóu) — keep it up! I\'m here whenever you need me.'),
+      followUps: [L('اختبرني', 'Quiz me'), L('ماذا أراجع اليوم؟', 'What should I review today?')],
       quiz: null,
     }
   }
@@ -361,8 +376,10 @@ export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
 
   // ── 9) الرد الافتراضي ─────────────────────────────────────────────────
   return {
-    text: `لم أفهم سؤالك تماماً 🤔 — لكن يمكنني مساعدتك في:\n\n📚 **شرح الكلمات**: اكتب أي كلمة بالصيني (你好) أو البينيين (nihao) أو العربي (مرحبا)\n📐 **القواعد**: "اشرح قاعدة 吗" أو "قاعدة النفي"\n🎯 **اختبار**: "اختبرني" — أسئلة مبنية على كلماتك الضعيفة\n📊 **خطة مراجعة**: "ماذا أراجع اليوم؟"`,
-    followUps: ['ما معنى 你好؟', 'اختبرني', 'ماذا أراجع اليوم؟'],
+    text: L(
+      `لم أفهم سؤالك تماماً 🤔 — لكن يمكنني مساعدتك في:\n\n📚 **شرح الكلمات**: اكتب أي كلمة بالصيني (你好) أو البينيين (nihao) أو العربي (مرحبا)\n📐 **القواعد**: "اشرح قاعدة 吗" أو "قاعدة النفي"\n🎯 **اختبار**: "اختبرني" — أسئلة مبنية على كلماتك الضعيفة\n📊 **خطة مراجعة**: "ماذا أراجع اليوم؟"`,
+      `I didn't quite get that 🤔 — but I can help with:\n\n📚 **Word meanings**: type any word in Chinese (你好), pinyin (nihao), or English\n📐 **Grammar**: "explain the 吗 rule" or "negation rule"\n🎯 **Quiz**: "quiz me" — questions based on your weak words\n📊 **Review plan**: "what should I review today?"`),
+    followUps: [L('ما معنى 你好؟', 'What does 你好 mean?'), L('اختبرني', 'Quiz me'), L('ماذا أراجع اليوم؟', 'What should I review today?')],
     quiz: null,
   }
 }

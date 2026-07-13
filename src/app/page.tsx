@@ -556,7 +556,11 @@ export default function Home() {
   // ─── Lesson names for sidebar dropdown
   const lessonNames = ['مرحباً يا آي شياو يو', 'اسمي لي ون', 'أنا صيني', 'لدي طفلان', 'أنا أرتاح اليوم', 'ما رقم هاتفك؟', 'أنهي العمل الساعة 6:30 مساءً', 'أبي يعمل أيضاً في المستشفى', 'سأدرس في المدرسة غداً صباحاً', 'التفاح هنا رخيص حقاً!', 'أمطرت الثلوج أمس', 'أنا أدرس في الجامعة', 'من فضلك أعطني كوب شاي', 'شاهدت فيلماً', 'أراكم في مطار داشينغ!']
   const [lessonsOpen, setLessonsOpen] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  // يبدأ مغلقاً (آمن للجوال)، ثم يُفتح تلقائياً على الشاشات الكبيرة بعد التركيب
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  useEffect(() => {
+    if (window.innerWidth >= 1024) setSidebarOpen(true)
+  }, [])
 
   // ─── Filtered Vocab ────────────────────────────────────────
   // Check if a word is mastered (SRS reviewCount >= 3)
@@ -686,21 +690,23 @@ export default function Home() {
       <Paywall />
       {/* ─── Header ──────────────────────────────────────── */}
       <header className="j-header sticky top-0 z-50">
-        <div className="px-4 py-3 flex items-center justify-between max-w-[1600px] mx-auto w-full">
-          <div className="flex items-center gap-3">
-            <div className="j-logo-icon">
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 max-w-[1600px] mx-auto w-full pr-16 lg:pr-4">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="j-logo-icon shrink-0">
               <span className="j-logo-zh">桥</span>
             </div>
-            <div className="j-logo-text">
-              <span className="j-logo-ar">{t('جِسر', 'JISR')}</span>
-              <span className="j-logo-en">JISR · {activeLevel.label}</span>
+            <div className="hidden sm:block shrink-0">
+              <div className="j-logo-text">
+                <span className="j-logo-ar">{t('جِسر', 'JISR')}</span>
+                <span className="j-logo-en">JISR · {activeLevel.label}</span>
+              </div>
             </div>
-            <div>
-              <h1 className="text-lg font-bold" style={{color: "var(--text-primary)"}}>{t('جِسر — تعلم الصينية', 'JISR — Learn Chinese')} {activeLevel.label}</h1>
-              <p className="text-xs text-[var(--text-tertiary)]">{stats.total} {t('كلمة', 'words')} • {activeLevel.grammarRules.length} {t('قاعدة', 'rules')} • {activeLevel.level === 1 ? t('مستوى مبتدئ', 'Beginner') : t('مستوى ثانٍ', 'Elementary')}</p>
+            <div className="hidden md:block min-w-0">
+              <h1 className="text-lg font-bold truncate" style={{color: "var(--text-primary)"}}>{t('جِسر — تعلم الصينية', 'JISR — Learn Chinese')} {activeLevel.label}</h1>
+              <p className="text-xs text-[var(--text-tertiary)] truncate">{stats.total} {t('كلمة', 'words')} • {activeLevel.grammarRules.length} {t('قاعدة', 'rules')} • {activeLevel.level === 1 ? t('مستوى مبتدئ', 'Beginner') : t('مستوى ثانٍ', 'Elementary')}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* ─── Level switcher (HSK1 / HSK2) ─── */}
             <div className="flex items-center rounded-full bg-[var(--surface-card-h)] border border-[var(--line-default)] p-0.5 shadow-sm">
               {([1, 2] as const).map((lv) => (
@@ -708,7 +714,7 @@ export default function Home() {
                   key={lv}
                   onClick={() => store.setLevel(lv)}
                   className={
-                    "px-3 py-1 rounded-full text-xs font-bold transition-all " +
+                    "px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap " +
                     (store.currentLevel === lv
                       ? "bg-primary text-white shadow"
                       : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]")
@@ -726,7 +732,7 @@ export default function Home() {
                   onClick={() => store.setLang(lg)}
                   title={lg === 'ar' ? 'العربية' : 'English'}
                   className={
-                    "px-2.5 py-1 rounded-full text-xs font-bold transition-all " +
+                    "px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold transition-all " +
                     (store.lang === lg
                       ? "bg-[var(--clr-secondary)] text-white shadow"
                       : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]")

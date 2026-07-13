@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Crown, Clock, KeyRound, CreditCard, X, Shield, Sparkles, Check, Gift, Loader2 } from 'lucide-react'
+import { ts } from '@/lib/i18n'
 
 // ═══════════════════════════════════════════════════════════
 // Trial Banner — shows countdown at the top during trial
@@ -25,7 +26,7 @@ function TrialBanner() {
     >
       <div className="flex items-center gap-2 text-sm">
         <Gift className="h-4 w-4 shrink-0 text-amber-300" />
-        <span>تجربة مجانية:</span>
+        <span>{ts('تجربة مجانية:','Free trial:')}</span>
         <Badge className="border-0 bg-amber-500/20 px-2 py-0 font-bold text-amber-300 hover:bg-amber-500/20">
           <Clock className="ml-1 h-3 w-3" />
           {trialRemainingFormatted}
@@ -91,7 +92,6 @@ function PaywallOverlay() {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white text-center shadow-2xl"
-            dir="rtl"
           >
             {/* Success State */}
             {success ? (
@@ -104,9 +104,9 @@ function PaywallOverlay() {
                 >
                   <Check className="h-10 w-10 text-emerald-600" />
                 </motion.div>
-                <h3 className="text-xl font-bold text-gray-900">تم التفعيل بنجاح! 🎉</h3>
-                <p className="text-sm text-gray-500">مرحباً بك في جِسر — النسخة الكاملة</p>
-                <p className="text-xs text-gray-400">سيتم تحديث الصفحة تلقائياً...</p>
+                <h3 className="text-xl font-bold text-gray-900">{ts('تم التفعيل بنجاح! 🎉','Activated successfully! 🎉')}</h3>
+                <p className="text-sm text-gray-500">{ts('مرحباً بك في جِسر — النسخة الكاملة','Welcome to JISR — Full Version')}</p>
+                <p className="text-xs text-gray-400">{ts('سيتم تحديث الصفحة تلقائياً...','The page will refresh automatically...')}</p>
               </div>
             ) : (
               <>
@@ -118,9 +118,9 @@ function PaywallOverlay() {
                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm">
                       <Crown className="h-8 w-8 text-amber-300" />
                     </div>
-                    <h3 className="mb-1 text-2xl font-bold text-white">انتهت فترة التجربة</h3>
+                    <h3 className="mb-1 text-2xl font-bold text-white">{ts('انتهت فترة التجربة','Your free trial has ended')}</h3>
                     <p className="text-sm text-blue-200">
-                      احصل على وصول كامل لـ <strong className="text-amber-300">411 كلمة</strong> و <strong className="text-amber-300">دروس تفاعلية</strong>
+                      احصل على وصول كامل لـ <strong className="text-amber-300">{ts('600+ كلمة','600+ words')}</strong> و <strong className="text-amber-300">{ts('دروس تفاعلية','Interactive lessons')}</strong>
                     </p>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ function PaywallOverlay() {
                   {/* Divider */}
                   <div className="flex items-center gap-3">
                     <div className="h-px flex-1 bg-gray-200" />
-                    <span className="text-xs text-gray-400">أو أدخل مفتاح الترخيص</span>
+                    <span className="text-xs text-gray-400">{ts('أو أدخل مفتاح الترخيص','Or enter your license key')}</span>
                     <div className="h-px flex-1 bg-gray-200" />
                   </div>
 
@@ -206,9 +206,9 @@ function PaywallOverlay() {
                       دفع آمن
                     </div>
                     <div className="h-1 w-1 rounded-full bg-gray-300" />
-                    <div className="text-[11px] text-gray-400">وصول مدى الحياة</div>
+                    <div className="text-[11px] text-gray-400">{ts('وصول مدى الحياة','Lifetime access')}</div>
                     <div className="h-1 w-1 rounded-full bg-gray-300" />
-                    <div className="text-[11px] text-gray-400">تحديثات مجانية</div>
+                    <div className="text-[11px] text-gray-400">{ts('تحديثات مجانية','Free updates')}</div>
                   </div>
                 </div>
               </>

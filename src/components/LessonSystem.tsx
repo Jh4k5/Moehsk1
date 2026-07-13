@@ -22,6 +22,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { ts } from '@/lib/i18n'
 
 // ─── Lesson color palette ──────────────────────────────────
 const lessonColors: Record<number, string> = {
@@ -187,8 +188,7 @@ export default function LessonSystem() {
 
     return (
       <motion.div
-        dir="rtl"
-        initial="enter"
+          initial="enter"
         animate="center"
         exit="exit"
         variants={pageVariants}
@@ -338,7 +338,7 @@ export default function LessonSystem() {
                             onClick={(e) => { e.stopPropagation(); toggleLearned(word.id) }}
                           >
                             {isLearned ? (
-                              <><Check className="h-3 w-3 ml-1" /> تم الحفظ</>
+                              <><Check className="h-3 w-3 ml-1" /> {ts('تم الحفظ','Saved')}</>
                             ) : (
                               <><Play className="h-3 w-3 ml-1" /> تعلّم</>
                             )}
@@ -744,7 +744,6 @@ export default function LessonSystem() {
 
   return (
     <motion.div
-      dir="rtl"
       initial="enter"
       animate="center"
       exit="exit"
@@ -772,25 +771,25 @@ export default function LessonSystem() {
         <Card className="j-card border-0 shadow-sm">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-[var(--clr-info)]">{lessons.length}</div>
-            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>إجمالي الدروس</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>{ts('إجمالي الدروس','Total lessons')}</div>
           </CardContent>
         </Card>
         <Card className="j-card border-0 shadow-sm">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-[var(--clr-success)]">{completedCount}</div>
-            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>دروس مكتملة</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>{ts('دروس مكتملة','Lessons completed')}</div>
           </CardContent>
         </Card>
         <Card className="j-card border-0 shadow-sm">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-[var(--clr-warning)]">{totalVocabLearned}</div>
-            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>كلمة تم حفظها</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>{ts('كلمة تم حفظها','Words learned')}</div>
           </CardContent>
         </Card>
         <Card className="j-card border-0 shadow-sm">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-[var(--clr-primary)]">{totalVocab - totalVocabLearned}</div>
-            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>كلمة متبقية</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontFamily: 'Tajawal, sans-serif' }}>{ts('كلمة متبقية','Words remaining')}</div>
           </CardContent>
         </Card>
       </div>

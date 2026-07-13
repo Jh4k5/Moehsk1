@@ -8,6 +8,7 @@ import { Volume2, Play, PenLine, RotateCcw, BookOpen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { ts } from '@/lib/i18n'
 import { useActiveLevel } from '@/lib/levels'
 
 // ─── Fallback Character List (80+ characters) ───────────────────
@@ -235,14 +236,14 @@ export default function HanziSection() {
   const charInfo = charInfoMap[selectedChar]
 
   return (
-    <div dir="rtl" className="space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
         <h2 className="text-3xl font-bold text-[var(--clr-danger)] flex items-center justify-center gap-3">
           <BookOpen className="w-8 h-8" />
           إتقان الحروف الصينية
         </h2>
-        <p className="text-[var(--text-tertiary)]">تعلّم كتابة الحروف الصينية خطوة بخطوة</p>
+        <p className="text-[var(--text-tertiary)]">{ts('تعلّم كتابة الحروف الصينية خطوة بخطوة','Learn to write Chinese characters stroke by stroke')}</p>
         <Badge variant="outline" className="text-sm">
           {HSK1_CHARS.length} حرف من HSK1
         </Badge>
@@ -385,7 +386,7 @@ export default function HanziSection() {
                   className="bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80 text-white gap-1.5"
                 >
                   <Play className="w-4 h-4" />
-                  <span className="text-sm">رسم تلقائي</span>
+                  <span className="text-sm">{ts('رسم تلقائي','Auto-draw')}</span>
                 </Button>
                 <Button
                   onClick={startQuiz}
@@ -398,7 +399,7 @@ export default function HanziSection() {
                   }
                 >
                   <PenLine className="w-4 h-4" />
-                  <span className="text-sm">وضع الاختبار</span>
+                  <span className="text-sm">{ts('وضع الاختبار','Quiz mode')}</span>
                 </Button>
                 <Button
                   onClick={resetCharacter}
@@ -407,7 +408,7 @@ export default function HanziSection() {
                   className="border-[var(--clr-danger)]/40 text-[var(--clr-danger)] hover:bg-[var(--clr-danger-bg)] gap-1.5"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  <span className="text-sm">إعادة</span>
+                  <span className="text-sm">{ts('إعادة','Reset')}</span>
                 </Button>
               </div>
 
@@ -430,9 +431,9 @@ export default function HanziSection() {
               <div className="flex items-start gap-2">
                 <span className="text-lg">💡</span>
                 <div className="text-xs text-[var(--text-tertiary)] space-y-1">
-                  <p><strong className="text-[var(--clr-danger)]">رسم تلقائي:</strong> شاهد كيف يُكتب الحرف خطوة بخطوة</p>
-                  <p><strong className="text-[var(--clr-danger)]">وضع الاختبار:</strong> ارسم الحرف بنفسك وتحقق من صحتك</p>
-                  <p><strong className="text-[var(--clr-danger)]">إعادة:</strong> أعد تهيئة منطقة الرسم</p>
+                  <p><strong className="text-[var(--clr-danger)]">{ts('رسم تلقائي:','Auto-draw:')}</strong> {ts('شاهد كيف يُكتب الحرف خطوة بخطوة','watch the character drawn stroke by stroke')}</p>
+                  <p><strong className="text-[var(--clr-danger)]">{ts('وضع الاختبار:','Quiz mode:')}</strong> {ts('ارسم الحرف بنفسك وتحقق من صحتك','draw it yourself and get checked')}</p>
+                  <p><strong className="text-[var(--clr-danger)]">{ts('إعادة:','Reset:')}</strong> {ts('أعد تهيئة منطقة الرسم','reset the drawing area')}</p>
                 </div>
               </div>
             </CardContent>

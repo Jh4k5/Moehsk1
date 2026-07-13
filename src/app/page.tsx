@@ -84,18 +84,8 @@ class SectionErrorBoundary extends React.Component<
   }
 }
 
-// ─── Categories ─────────────────────────────────────────────
-const categories = [
-  { value: 'all', label: 'الكل' },
-  { value: 'noun', label: 'أسماء' },
-  { value: 'verb', label: 'أفعال' },
-  { value: 'adjective', label: 'صفات' },
-  { value: 'pronoun', label: 'ضمائر' },
-  { value: 'numeral', label: 'أعداد' },
-  { value: 'particle', label: 'أدوات' },
-  { value: 'adverb', label: 'ظروف' },
-  { value: 'fixed', label: 'تعبيرات ثابتة' },
-]
+// ─── Categories (بيانات مشتركة مع labelEn للترجمة) ──────────
+import { categories } from '@/data/categories'
 
 // ─── Roadmap Data ───────────────────────────────────────────
 const roadmapUnits = [
@@ -473,7 +463,7 @@ export default function Home() {
   const store = useLearningStore()
   const activeLevel = useActiveLevel()
   const { vocabulary } = activeLevel
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
   const { currentSection, setCurrentSection, learnedWords, toggleLearned, incrementStreak, srsCards } = store
   const [hideMastered, setHideMastered] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -691,7 +681,7 @@ export default function Home() {
   // RENDER
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen flex flex-col" dir="rtl">
+    <div className="min-h-screen flex flex-col" dir={dir}>
       {/* ─── License gate: trial banner + expiry overlay ── */}
       <Paywall />
       {/* ─── Header ──────────────────────────────────────── */}
@@ -1096,10 +1086,11 @@ export default function Home() {
 // DASHBOARD SECTION
 // ═══════════════════════════════════════════════════════════
 function DashboardSection({ stats, onNavigate }: {
-  stats: { total: number; learned: number; progress: number; byCategory: { value: string; label: string; count: number; learned: number }[] }
+  stats: { total: number; learned: number; progress: number; byCategory: { value: string; label: string; labelEn?: string; count: number; learned: number }[] }
   onNavigate: (s: Section) => void
 }) {
   const store = useLearningStore()
+  const dashLevel = useActiveLevel()
   const todayKey = new Date().toDateString()
   const todayWords = store.dailyActivity[todayKey]?.wordsLearned || 0
   const dailyGoal = store.profile?.dailyGoal || 10
@@ -1110,12 +1101,12 @@ function DashboardSection({ stats, onNavigate }: {
         <div>
           <h2 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
             <span className="text-2xl">{store.profile?.avatarEmoji || '🐼'}</span>
-            أهلاً {store.profile?.name || 'بك'}!
+            {ts('أهلاً', 'Welcome,')} {store.profile?.name || ts('بك', 'friend')}!
           </h2>
           <p className="text-[var(--text-muted)] mt-1">
             {goalPct >= 100
-              ? '🎉 أنجزت هدفك اليومي — استمر إن أردت المزيد!'
-              : `هدف اليوم: ${todayWords} من ${dailyGoal} كلمات جديدة`}
+              ? ts('🎉 أنجزت هدفك اليومي — استمر إن أردت المزيد!', '🎉 Daily goal reached — keep going if you like!')
+              : ts(`هدف اليوم: ${todayWords} من ${dailyGoal} كلمات جديدة`, `Today's goal: ${todayWords} of ${dailyGoal} new words`)}
           </p>
         </div>
         {/* حلقة تقدم الهدف اليومي */}
@@ -1131,21 +1122,23 @@ function DashboardSection({ stats, onNavigate }: {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards — stat tiles: hero number + label in text ink, icon chip carries the hue */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'كلمة محفوظة', value: stats.learned, total: stats.total, icon: BookOpen, color: 'from-[var(--clr-primary)] to-[var(--clr-primary-h)]' },
-          { label: 'قاعدة نحوية', value: 26, total: 26, icon: GraduationCap, color: 'from-[var(--clr-warning)] to-[var(--amber-600)]' },
-          { label: 'أيام متتالية', value: store.dailyStreak, icon: Flame, color: 'from-[var(--clr-energy)] to-[var(--orange-400)]' },
-          { label: 'مستوى التقدم', value: `${stats.progress}%`, icon: Trophy, color: 'from-[var(--clr-success)] to-[var(--emerald-600)]' },
+          { label: ts('كلمة محفوظة', 'Words learned'), value: stats.learned, total: stats.total, icon: BookOpen, color: 'from-[var(--clr-primary)] to-[var(--clr-primary-h)]' },
+          { label: ts('قاعدة نحوية', 'Grammar rules'), value: dashLevel.grammarRules.length, icon: GraduationCap, color: 'from-[var(--clr-warning)] to-[var(--amber-600)]' },
+          { label: ts('أيام متتالية', 'Day streak'), value: store.dailyStreak, icon: Flame, color: 'from-[var(--clr-energy)] to-[var(--orange-400)]' },
+          { label: ts('مستوى التقدم', 'Progress'), value: `${stats.progress}%`, icon: Trophy, color: 'from-[var(--clr-success)] to-[var(--emerald-600)]' },
         ].map((stat, i) => (
           <Card key={i} className="j-stat-card card-hover border-0">
-            <CardContent className="p-4">
+            <CardContent className="p-4 flex flex-col items-center text-center gap-1.5">
               <div className={"j-stat-icon bg-gradient-to-br " + stat.color}>
                 <stat.icon className="w-5 h-5 text-white" />
               </div>
-              <div className="j-stat-number">{stat.value}</div>
-              {stat.total && <div className="text-xs text-[var(--text-muted)]">من {stat.total}</div>}
+              <div className="j-stat-number leading-none">
+                {stat.value}
+                {stat.total ? <span className="text-sm font-semibold text-[var(--text-muted)]"> / {stat.total}</span> : null}
+              </div>
               <div className="j-stat-label">{stat.label}</div>
             </CardContent>
           </Card>
@@ -1160,13 +1153,13 @@ function DashboardSection({ stats, onNavigate }: {
         <CardContent className="space-y-3">
           {stats.byCategory.map((cat) => (
             <div key={cat.value} className="flex items-center gap-3">
-              <span className="text-sm w-20 text-[var(--text-secondary)] text-left">{cat.label}</span>
+              <span className="text-sm w-28 shrink-0 text-[var(--text-secondary)] text-start truncate">{tsPick(cat.label, cat.labelEn)}</span>
               <div className="flex-1">
                 <div className="j-progress-bar">
                   <div className="j-progress-fill" style={{ width: `${cat.count > 0 ? (cat.learned / cat.count) * 100 : 0}%` }} />
                 </div>
               </div>
-              <span className="text-xs text-[var(--text-muted)] w-16 text-left">{cat.learned}/{cat.count}</span>
+              <span className="text-xs text-[var(--text-muted)] w-14 shrink-0 text-end tabular-nums" dir="ltr">{cat.learned}/{cat.count}</span>
             </div>
           ))}
         </CardContent>
@@ -1177,7 +1170,7 @@ function DashboardSection({ stats, onNavigate }: {
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-sm">🍅</span>
-            مؤقت بومودورو
+            {ts('مؤقت بومودورو', 'Pomodoro Timer')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -1193,25 +1186,25 @@ function DashboardSection({ stats, onNavigate }: {
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <span className="w-8 h-8 rounded-lg bg-[var(--clr-success-bg)] flex items-center justify-center text-sm">📋</span>
-            خطة اليوم
+            {ts('خطة اليوم', "Today's Plan")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-2">
             {[
-              { label: 'راجع البطاقات المستحقة', icon: '🔄', section: 'vocabulary' as Section, done: false },
-              { label: 'أكمل تمرين واحد', icon: '✏️', section: 'practice' as Section, done: false },
-              { label: 'اقرأ قصة قصيرة', icon: '📖', section: 'stories' as Section, done: false },
-              { label: 'تدرّب على المحادثات', icon: '💬', section: 'conversations' as Section, done: false },
+              { label: ts('راجع البطاقات المستحقة', 'Review due flashcards'), icon: '🔄', section: 'vocabulary' as Section, done: false },
+              { label: ts('أكمل تمرين واحد', 'Complete one exercise'), icon: '✏️', section: 'practice' as Section, done: false },
+              { label: ts('اقرأ قصة قصيرة', 'Read a short story'), icon: '📖', section: 'stories' as Section, done: false },
+              { label: ts('تدرّب على المحادثات', 'Practice conversations'), icon: '💬', section: 'conversations' as Section, done: false },
             ].map((task) => (
               <button
                 key={task.label}
                 onClick={() => onNavigate(task.section)}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-card-h)] hover:bg-[var(--clr-primary)]/10 transition-colors text-right"
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-card-h)] hover:bg-[var(--clr-primary)]/10 transition-colors text-start"
               >
                 <span className="text-lg">{task.icon}</span>
                 <span className="text-sm font-medium text-[var(--text-secondary)]">{task.label}</span>
-                <span className="mr-auto text-xs text-[var(--text-muted)]">→</span>
+                <span className="ms-auto text-xs text-[var(--text-muted)]">{ts('←', '→')}</span>
               </button>
             ))}
           </div>
@@ -1238,12 +1231,12 @@ function WeakWordsSection({ onNavigate }: { onNavigate: (s: Section) => void }) 
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <span className="w-8 h-8 rounded-lg bg-[var(--clr-warning-bg)] flex items-center justify-center text-sm">🎯</span>
-            كلمات تحتاج مراجعة
+            {ts('كلمات تحتاج مراجعة','Words to review')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-[var(--text-muted)] text-center py-4">
-            لا توجد كلمات ضعيفة بعد! استمر في التعلم 🌟
+            {ts('لا توجد كلمات ضعيفة بعد! استمر في التعلم 🌟','No weak words yet! Keep learning 🌟')}
           </p>
         </CardContent>
       </Card>
@@ -1255,7 +1248,7 @@ function WeakWordsSection({ onNavigate }: { onNavigate: (s: Section) => void }) 
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <span className="w-8 h-8 rounded-lg bg-[var(--clr-warning-bg)] flex items-center justify-center text-sm">🎯</span>
-          كلمات تحتاج انتباهك
+          {ts('كلمات تحتاج انتباهك','Words needing attention')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -1267,7 +1260,7 @@ function WeakWordsSection({ onNavigate }: { onNavigate: (s: Section) => void }) 
               className="px-3 py-2 rounded-xl bg-[var(--clr-warning-bg)] border border-[var(--clr-warning)]/30 text-sm hover:bg-[var(--clr-warning)]/20 transition-colors flex items-center gap-2"
             >
               <span className="font-chinese-serif font-bold text-[var(--text-primary)]">{w.zh}</span>
-              <span className="text-xs text-[var(--text-muted)]">{w.meaning}</span>
+              <span className="text-xs text-[var(--text-muted)]">{tsPick(w.meaning, w.english)}</span>
             </button>
           ))}
         </div>
@@ -1647,7 +1640,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant={hideMastered ? 'default' : 'outline'} className="cursor-pointer text-xs" onClick={() => setHideMastered(v => !v)}>
-            {hideMastered ? '✓ إخفاء المحفوظ' : 'إخفاء المحفوظ'}
+            {hideMastered ? ts('✓ إخفاء المحفوظ','✓ Hide mastered') : ts('إخفاء المحفوظ','Hide mastered')}
           </Badge>
           <Badge variant="secondary">{filteredVocab.length} كلمة</Badge>
         </div>
@@ -1658,7 +1651,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
         <div className="relative flex-1">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
           <Input
-            placeholder="ابحث بالصينية أو البنيني أو العربية..."
+            placeholder={ts('ابحث بالصينية أو البنيني أو العربية...','Search Chinese, pinyin, or English...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pr-10"
@@ -1670,7 +1663,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
           </SelectTrigger>
           <SelectContent>
             {categories.map(c => (
-              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+              <SelectItem key={c.value} value={c.value}>{tsPick(c.label, (c as any).labelEn)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -1691,29 +1684,29 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
             <TabsList className="grid grid-cols-4 w-full sm:w-auto">
               <TabsTrigger value="cards" className="text-xs sm:text-sm gap-1">
                 <BookOpen className="w-3.5 h-3.5 hidden sm:inline" />
-                البطاقات
+                {ts('البطاقات','Cards')}
               </TabsTrigger>
               <TabsTrigger value="learn" className="text-xs sm:text-sm gap-1">
                 <Brain className="w-3.5 h-3.5 hidden sm:inline" />
-                تعلّم
+                {ts('تعلّم','Learn')}
               </TabsTrigger>
               <TabsTrigger value="test" className="text-xs sm:text-sm gap-1">
                 <Target className="w-3.5 h-3.5 hidden sm:inline" />
-                اختبار
+                {ts('اختبار','Test')}
               </TabsTrigger>
               <TabsTrigger value="match" className="text-xs sm:text-sm gap-1">
                 <Gamepad2 className="w-3.5 h-3.5 hidden sm:inline" />
-                مطابقة
+                {ts('مطابقة','Match')}
               </TabsTrigger>
             </TabsList>
             <div className="flex items-center gap-2">
               <Button size="sm" variant="outline" onClick={doShuffle} className="text-xs gap-1">
                 <RotateCcw className="w-3.5 h-3.5" />
-                إعادة ترتيب
+                {ts('إعادة ترتيب','Shuffle')}
               </Button>
               <Button size="sm" variant="outline" onClick={doReset} className="text-xs gap-1">
                 <RotateCcw className="w-3.5 h-3.5" />
-                إعادة تعيين
+                {ts('إعادة تعيين','Reset')}
               </Button>
               {/* Session stats */}
               <div className="hidden sm:flex items-center gap-1.5 text-xs text-[var(--text-muted)] mr-2">
@@ -1732,7 +1725,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                 <div className="space-y-1">
                   <Progress value={progressPercent} className="h-2" />
                   <div className="flex justify-between text-xs text-[var(--text-muted)]">
-                    <span>{store.flashcardIndex + 1} من {deck.length}</span>
+                    <span>{store.flashcardIndex + 1} {ts('من','of')} {deck.length}</span>
                     <span>{sessionSeen.size > 0 ? 'شوهد ' + sessionSeen.size : ''}</span>
                   </div>
                 </div>
@@ -1782,7 +1775,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                             <Badge variant="outline" className="text-xs">{word.pos}</Badge>
                             {/* Hint */}
                             <div className="text-xs text-[var(--text-muted)] mt-2">
-                              ─────── اضغط للقلب ──────
+                              ─────── {ts('اضغط للقلب','tap to flip')} ──────
                             </div>
                           </CardContent>
                         </Card>
@@ -1928,7 +1921,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     className="rounded-xl"
                   >
                     <ChevronRight className="w-4 h-4" />
-                    السابق
+                    {ts('السابق','Previous')}
                   </Button>
                   <div className="flex items-center gap-2">
                     <Button
@@ -1947,7 +1940,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     disabled={store.flashcardIndex >= deck.length - 1}
                     className="rounded-xl"
                   >
-                    التالي
+                    {ts('التالي','Next')}
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
                 </div>
@@ -1957,7 +1950,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                   <Accordion type="single" collapsible>
                     <AccordionItem value="list" className="border-0">
                       <AccordionTrigger className="py-3 text-sm font-medium text-[var(--text-secondary)]">
-                        قائمة الكلمات ({deck.length})
+                        {ts('قائمة الكلمات','Word list')} ({deck.length})
                       </AccordionTrigger>
                       <AccordionContent>
                         <div className="max-h-96 overflow-y-auto custom-scrollbar space-y-1">
@@ -1994,7 +1987,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
               <div className="space-y-1">
                 <Progress value={deck.length > 0 ? (learnCompleted / deck.length) * 100 : 0} className="h-2" />
                 <div className="flex justify-between text-xs text-[var(--text-muted)]">
-                  <span>السؤال {learnIndex + 1} من {deck.length}</span>
+                  <span>{ts('السؤال','Question')} {learnIndex + 1} {ts('من','of')} {deck.length}</span>
                   <span>✓ {sessionCorrect} | ✗ {sessionIncorrect}</span>
                 </div>
               </div>
@@ -2030,7 +2023,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                         {/* Input */}
                         <div className="max-w-md mx-auto space-y-3">
                           <Input
-                            placeholder="اكتب المعنى بالعربية..."
+                            placeholder={ts('اكتب المعنى بالعربية...','Type the meaning...')}
                             value={learnInput}
                             onChange={(e) => setLearnInput(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter') checkLearnAnswer() }}
@@ -2107,9 +2100,9 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     <Trophy className="w-16 h-16 text-[var(--clr-warning)] mx-auto" />
                     <h3 className="text-2xl font-bold text-[var(--text-primary)]">{ts('انتهى التعلّم! 🎉','Learning complete! 🎉')}</h3>
                     <div className="text-[var(--text-muted)] space-y-1">
-                      <p>✓ صحيح: <span className="text-[var(--clr-success)] font-bold">{sessionCorrect}</span></p>
-                      <p>✗ خاطئ: <span className="text-[var(--clr-danger)] font-bold">{sessionIncorrect}</span></p>
-                      <p>النسبة: <span className="text-primary font-bold">{deck.length > 0 ? Math.round((sessionCorrect / deck.length) * 100) : 0}%</span></p>
+                      <p>✓ {ts('صحيح','Correct')}: <span className="text-[var(--clr-success)] font-bold">{sessionCorrect}</span></p>
+                      <p>✗ {ts('خاطئ','Wrong')}: <span className="text-[var(--clr-danger)] font-bold">{sessionIncorrect}</span></p>
+                      <p>{ts('النسبة','Accuracy')}: <span className="text-primary font-bold">{deck.length > 0 ? Math.round((sessionCorrect / deck.length) * 100) : 0}%</span></p>
                     </div>
                     <Button onClick={initLearn} className="bg-primary hover:brightness-110 rounded-xl">
                       ابدأ من جديد
@@ -2143,7 +2136,7 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     <h3 className="text-2xl font-bold text-[var(--text-primary)]">{ts('نتيجة الاختبار 🎉','Quiz Result 🎉')}</h3>
                     <div className="text-[var(--text-muted)] space-y-1">
                       <p className="text-3xl font-bold text-primary">{testScore} / {testQuestions.length}</p>
-                      <p>النسبة: {Math.round((testScore / testQuestions.length) * 100)}%</p>
+                      <p>{ts('النسبة','Accuracy')}: {Math.round((testScore / testQuestions.length) * 100)}%</p>
                     </div>
                     <div className="flex gap-2 justify-center">
                       <Button onClick={initTest} className="bg-primary hover:brightness-110 rounded-xl">
@@ -2258,8 +2251,8 @@ function VocabularySection({ filteredVocab, searchQuery, setSearchQuery, selecte
                     <Trophy className="w-16 h-16 text-[var(--clr-warning)] mx-auto" />
                     <h3 className="text-2xl font-bold text-[var(--text-primary)]">{ts('أحسنت! 🎉','Well done! 🎉')}</h3>
                     <div className="text-[var(--text-muted)] space-y-1">
-                      <p>⏱ الوقت: <span className="font-bold">{formatTime(matchTimer)}</span></p>
-                      <p>🎯 المحاولات: <span className="font-bold">{matchMoves}</span></p>
+                      <p>⏱ {ts('الوقت','Time')}: <span className="font-bold">{formatTime(matchTimer)}</span></p>
+                      <p>🎯 {ts('المحاولات','Moves')}: <span className="font-bold">{matchMoves}</span></p>
                     </div>
                     <div className="flex gap-2 justify-center">
                       <Button onClick={initMatch} className="bg-primary hover:brightness-110 rounded-xl">
@@ -2373,7 +2366,9 @@ function GrammarSection() {
                   </div>
                   <div>
                     <div className="font-medium text-[var(--text-primary)] text-sm">{tsPick(rule.titleAr, rule.title)}</div>
-                    <div className="text-xs text-[var(--text-muted)] font-ltr">{rule.title}</div>
+                    {tsPick(rule.titleAr, rule.title) !== rule.title && (
+                      <div className="text-xs text-[var(--text-muted)] font-ltr">{rule.title}</div>
+                    )}
                   </div>
                 </div>
               </AccordionTrigger>
@@ -2720,13 +2715,13 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
                 </div>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="{ts('اكتب الكلمة الصينية','Type the Chinese word')} أو البينيين..."
+                    placeholder={ts('اكتب الكلمة الصينية أو البينيين...','Type the Chinese word or pinyin...')}
                     value={fillAnswer}
                     onChange={(e) => setFillAnswer(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && checkFillAnswer()}
                     className="text-lg font-chinese-serif"
                   />
-                  <Button onClick={checkFillAnswer} className="bg-primary hover:brightness-110">تحقق</Button>
+                  <Button onClick={checkFillAnswer} className="bg-primary hover:brightness-110">{ts('تحقق','Check')}</Button>
                 </div>
                 {fillResult && (
                   <div className={fillResult === 'correct' ? "p-3 rounded-lg text-center font-medium bg-[var(--clr-success-bg)] text-[var(--clr-success)]" : "p-3 rounded-lg text-center font-medium bg-[var(--clr-danger-bg)] text-[var(--clr-danger)]"}>
@@ -2796,7 +2791,7 @@ function PracticeSection({ quizAnswer, setQuizAnswer, quizFinished, setQuizFinis
               {matchedItems.size === matchPairs.length * 2 && (
                 <div className="text-center space-y-3 p-6 bg-[var(--clr-success-bg)] rounded-xl">
                   <Trophy className="w-12 h-12 text-[var(--clr-warning)] mx-auto" />
-                  <div className="text-xl font-bold text-[var(--clr-success)]">أحسنت! طابقت جميع الأزواج! 🎉</div>
+                  <div className="text-xl font-bold text-[var(--clr-success)]">{ts('أحسنت! طابقت جميع الأزواج! 🎉','Great! You matched all pairs! 🎉')}</div>
                   <Button onClick={startMatchGame} variant="outline">{ts('العب مرة أخرى','Play again')}</Button>
                 </div>
               )}
@@ -3029,7 +3024,7 @@ function GamesSection({ memoryFlipped, handleMemoryClick, startMemoryGame, toneA
               {memoryPairs === currentPairCount && (
                 <div className="text-center space-y-3 p-6 bg-[var(--clr-success-bg)] rounded-xl">
                   <Trophy className="w-12 h-12 text-[var(--clr-warning)] mx-auto" />
-                  <div className="text-xl font-bold text-[var(--clr-success)]">فزت! 🎉</div>
+                  <div className="text-xl font-bold text-[var(--clr-success)]">{ts('فزت! 🎉','You won! 🎉')}</div>
                   <div className="text-sm text-[var(--clr-success)]">أكملت اللعبة في {memoryMoves} محاولة</div>
                   <div className="flex gap-2 justify-center">
                     <Button onClick={() => startMemoryGame(selectedMemoryLevel)} variant="outline">{ts('العب مرة أخرى','Play again')}</Button>
@@ -3228,7 +3223,7 @@ function SentencesSection({ sentenceFlipped, setSentenceFlipped, sentenceIndex, 
           disabled={sentenceIndex === 0}
         >
           <ChevronRight className="w-4 h-4" />
-          السابقة
+          {ts('السابقة','Previous')}
         </Button>
         <Button
           variant="outline"
@@ -3244,7 +3239,7 @@ function SentencesSection({ sentenceFlipped, setSentenceFlipped, sentenceIndex, 
           onClick={() => { setSentenceIndex(Math.min(allSentences.length - 1, sentenceIndex + 1)); setSentenceFlipped(false) }}
           disabled={sentenceIndex >= allSentences.length - 1}
         >
-          التالية
+          {ts('التالية','Next')}
           <ChevronLeft className="w-4 h-4" />
         </Button>
       </div>
@@ -3282,7 +3277,7 @@ function StoriesSection({ activeStory, setActiveStory, storyAnswers, setStoryAns
           key={i}
           className="font-chinese-serif text-[var(--text-primary)] cursor-pointer hover:text-primary hover:bg-primary/10 rounded px-0.5 transition-colors"
           onClick={() => speak(char)}
-          title="اضغط للنطق"
+          title={ts('اضغط للنطق','Tap to pronounce')}
         >
           {char}
         </span>
@@ -3517,7 +3512,7 @@ function ChatSection() {
                   {msg.role === 'assistant' && (
                     <div className="flex items-center gap-1 mb-1">
                       <Bot className="w-3 h-3 text-primary" />
-                      <span className="text-xs font-medium text-primary">المعلم</span>
+                      <span className="text-xs font-medium text-primary">{ts('المعلم','Tutor')}</span>
                     </div>
                   )}
                   <div className="text-sm whitespace-pre-line leading-relaxed">{msg.content}</div>
@@ -3560,7 +3555,7 @@ function ChatSection() {
       {/* Input */}
       <div className="flex gap-2">
         <Input
-          placeholder="اكتب سؤالك هنا... (عربي أو صيني)"
+          placeholder={ts('اكتب سؤالك هنا... (عربي أو صيني)','Type your question... (English or Chinese)')}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}

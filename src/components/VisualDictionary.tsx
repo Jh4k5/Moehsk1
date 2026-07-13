@@ -15,6 +15,7 @@ import {
 import { useLearningStore } from '@/lib/store'
 
 import { speak } from '@/lib/tts'
+import { ts } from '@/lib/i18n'
 
 // Load voices early (some browsers populate them asynchronously)
 if (typeof window !== 'undefined') {
@@ -529,8 +530,8 @@ export default function VisualDictionary() {
         <div className="space-y-4">
           {!pronSupported ? (
             <div className="bg-[var(--clr-warning-bg)] border border-[var(--clr-warning)]/30 rounded-xl p-4 text-center">
-              <p className="text-[var(--clr-warning)] font-medium">المتصفح لا يدعم التعرف على الصوت</p>
-              <p className="text-[var(--clr-warning)] text-sm mt-1">يرجى استخدام Chrome أو Edge لهذه الميزة</p>
+              <p className="text-[var(--clr-warning)] font-medium">{ts('المتصفح لا يدعم التعرف على الصوت','Your browser does not support speech recognition')}</p>
+              <p className="text-[var(--clr-warning)] text-sm mt-1">{ts('يرجى استخدام Chrome أو Edge لهذه الميزة','Please use Chrome or Edge for this feature')}</p>
             </div>
           ) : (
             <>
@@ -756,11 +757,11 @@ export default function VisualDictionary() {
                             </div>
                             <div className="bg-[var(--surface-card-h)] rounded-lg p-3 text-sm space-y-1">
                               <div className="flex justify-between">
-                                <span className="text-[var(--text-muted)]">ما قلته:</span>
+                                <span className="text-[var(--text-muted)]">{ts('ما قلته:','You said:')}</span>
                                 <span className="font-chinese-sans">{pronResult.spoken}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-[var(--text-muted)]">الصحيح:</span>
+                                <span className="text-[var(--text-muted)]">{ts('الصحيح:','Expected:')}</span>
                                 <span className="font-chinese-sans font-bold text-[var(--clr-danger)]">
                                   {filteredPronWords[pronounceWordIdx].hanzi}
                                 </span>
@@ -891,7 +892,7 @@ export default function VisualDictionary() {
                       className="text-[var(--text-muted)] hover:text-[var(--clr-danger)] gap-1"
                     >
                       <Volume2 className="h-4 w-4" />
-                      <span className="text-xs">استمع</span>
+                      <span className="text-xs">{ts('استمع','Listen')}</span>
                     </Button>
                   </div>
 

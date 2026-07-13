@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { ts } from '@/lib/i18n'
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -227,13 +228,13 @@ export default function ConversationsSection() {
   // ═══════════════════════════════════════════════════════════
   if (!selectedConversation) {
     return (
-      <div dir="rtl">
+      <div>
         <div className="flex items-center gap-3 mb-6">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
             <MessageCircle className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">المحادثات</h2>
+            <h2 className="text-xl font-bold">{ts('المحادثات','Conversations')}</h2>
             <p className="text-sm text-muted-foreground font-arabic">
               تدرب على المحادثات الصينية اليومية
             </p>
@@ -301,7 +302,7 @@ export default function ConversationsSection() {
   const diff = getDifficulty(selectedConversation.lesson)
 
   return (
-    <div dir="rtl">
+    <div>
       {/* ─── Header ──────────────────────────────────────── */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -401,7 +402,7 @@ export default function ConversationsSection() {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <Headphones className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-bold font-arabic">وضع الاختبار</span>
+                        <span className="text-sm font-bold font-arabic">{ts('وضع الاختبار','Quiz mode')}</span>
                       </div>
                       <span className="text-xs text-muted-foreground font-arabic">
                         أجب عن {quiz.total} أسئلة

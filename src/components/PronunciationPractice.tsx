@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { ts } from '@/lib/i18n'
 import { useActiveLevel } from '@/lib/levels'
 import { categories } from '@/data/categories'
 
@@ -344,14 +345,14 @@ export default function PronunciationPractice() {
   const wordAttempts = attempts[currentWordIndex]
 
   return (
-    <div dir="rtl" className="space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
         <h2 className="text-3xl font-bold text-[var(--clr-danger)] flex items-center justify-center gap-3">
           <Mic className="w-8 h-8" />
           تمارين النطق
         </h2>
-        <p className="text-[var(--text-tertiary)]">تدرّب على نطق الصينية وحسّن لهجتك</p>
+        <p className="text-[var(--text-tertiary)]">{ts('تدرّب على نطق الصينية وحسّن لهجتك','Practice Chinese pronunciation and improve your accent')}</p>
       </div>
 
       {/* Not supported warning */}
@@ -360,8 +361,8 @@ export default function PronunciationPractice() {
           <CardContent className="p-4 flex items-start gap-3">
             <XCircle className="w-5 h-5 text-[var(--clr-danger)] shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-[var(--clr-danger)]">المتصفح لا يدعم التعرف على الصوت</p>
-              <p className="text-xs text-[var(--clr-danger)] mt-1">يرجى استخدام Google Chrome أو Microsoft Edge لهذه الميزة.</p>
+              <p className="text-sm font-medium text-[var(--clr-danger)]">{ts('المتصفح لا يدعم التعرف على الصوت','Your browser does not support speech recognition')}</p>
+              <p className="text-xs text-[var(--clr-danger)] mt-1">{ts('يرجى استخدام Google Chrome أو Microsoft Edge لهذه الميزة.','Please use Google Chrome or Microsoft Edge for this feature.')}</p>
             </div>
           </CardContent>
         </Card>
@@ -537,20 +538,20 @@ export default function PronunciationPractice() {
                         {/* Details */}
                         <div className="bg-[var(--surface-card-h)] rounded-lg p-4 text-sm space-y-2">
                           <div className="flex justify-between">
-                            <span className="text-[var(--text-muted)]">ما قلته:</span>
+                            <span className="text-[var(--text-muted)]">{ts('ما قلته:','You said:')}</span>
                             <span className="font-chinese-sans">{result.spoken}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-[var(--text-muted)]">الصحيح:</span>
+                            <span className="text-[var(--text-muted)]">{ts('الصحيح:','Expected:')}</span>
                             <span className="font-chinese-sans font-bold text-[var(--clr-danger)]">{currentWord.zh}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-[var(--text-muted)]">ثقة المحرك:</span>
+                            <span className="text-[var(--text-muted)]">{ts('ثقة المحرك:','Engine confidence:')}</span>
                             <span>{Math.round(result.confidence * 100)}%</span>
                           </div>
                           {wordAttempts && (
                             <div className="flex justify-between">
-                              <span className="text-[var(--text-muted)]">أفضل نتيجة:</span>
+                              <span className="text-[var(--text-muted)]">{ts('أفضل نتيجة:','Best score:')}</span>
                               <span style={{ color: wordAttempts.best >= 85 ? 'var(--clr-success)' : wordAttempts.best >= 60 ? '#f97316' : 'var(--clr-danger)' }}>
                                 {wordAttempts.best}/100
                               </span>
@@ -606,13 +607,13 @@ export default function PronunciationPractice() {
           {/* Overall Stats */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">إحصائيات النطق</CardTitle>
+              <CardTitle className="text-base">{ts('إحصائيات النطق','Pronunciation stats')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-[var(--clr-danger-bg)] rounded-lg p-3 text-center">
                   <div className="text-2xl font-bold text-[var(--clr-danger)]">{overallStats.totalAttempts}</div>
-                  <div className="text-xs text-[var(--text-muted)]">محاولات</div>
+                  <div className="text-xs text-[var(--text-muted)]">{ts('محاولات','attempts')}</div>
                 </div>
                 <div className="bg-[var(--clr-success-bg)] rounded-lg p-3 text-center">
                   <div className="text-2xl font-bold text-[var(--clr-success)]">{overallStats.excellent}</div>
@@ -621,7 +622,7 @@ export default function PronunciationPractice() {
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-[var(--text-muted)]">المتوسط العام</span>
+                  <span className="text-[var(--text-muted)]">{ts('المتوسط العام','Overall average')}</span>
                   <span className="font-bold">{overallStats.avg}%</span>
                 </div>
                 <Progress value={overallStats.avg} className="h-2" />
@@ -666,7 +667,7 @@ export default function PronunciationPractice() {
           {/* Recent attempts */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">آخر المحاولات</CardTitle>
+              <CardTitle className="text-base">{ts('آخر المحاولات','Recent attempts')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-48 overflow-y-auto">

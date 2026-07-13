@@ -5,13 +5,14 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Play, Pause, RotateCcw, Coffee, Brain, Flame, Volume2, VolumeX } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ts } from '@/lib/i18n'
 
 type PomodoroMode = 'focus' | 'short-break' | 'long-break'
 
 const MODES: Record<PomodoroMode, { label: string; minutes: number; color: string; bg: string; icon: React.ReactNode }> = {
-  'focus': { label: 'تركيز', minutes: 25, color: '#1CB0F6', bg: '#E0F6FF', icon: <Brain className="w-5 h-5" /> },
-  'short-break': { label: 'استراحة قصيرة', minutes: 5, color: '#58CC02', bg: '#E5F9DB', icon: <Coffee className="w-5 h-5" /> },
-  'long-break': { label: 'استراحة طويلة', minutes: 15, color: '#CE82FF', bg: '#F3E5FF', icon: <Coffee className="w-5 h-5" /> },
+  'focus': { label: ts('تركيز','Focus'), minutes: 25, color: '#1CB0F6', bg: '#E0F6FF', icon: <Brain className="w-5 h-5" /> },
+  'short-break': { label: ts('استراحة قصيرة','Short break'), minutes: 5, color: '#58CC02', bg: '#E5F9DB', icon: <Coffee className="w-5 h-5" /> },
+  'long-break': { label: ts('استراحة طويلة','Long break'), minutes: 15, color: '#CE82FF', bg: '#F3E5FF', icon: <Coffee className="w-5 h-5" /> },
 }
 
 export default function PomodoroTimer() {
@@ -219,14 +220,14 @@ export default function PomodoroTimer() {
             <div className="text-xl font-bold" style={{ color: currentMode.color }}>
               {sessionsCompleted}
             </div>
-            <div className="text-[10px] text-[var(--text-muted)]">جلسات مكتملة</div>
+            <div className="text-[10px] text-[var(--text-muted)]">{ts('جلسات مكتملة','Sessions done')}</div>
           </CardContent>
         </Card>
         <Card className="j-card border-0 shadow-sm text-center">
           <CardContent className="p-3">
             <div className="text-lg mb-1">⏱️</div>
             <div className="text-xl font-bold text-[var(--text-secondary)]">{totalMinutesFocused}</div>
-            <div className="text-[10px] text-[var(--text-muted)]">دقائق تركيز</div>
+            <div className="text-[10px] text-[var(--text-muted)]">{ts('دقائق تركيز','Focus minutes')}</div>
           </CardContent>
         </Card>
         <Card className="j-card border-0 shadow-sm text-center">
@@ -235,7 +236,7 @@ export default function PomodoroTimer() {
             <div className="text-xl font-bold text-[var(--text-secondary)]">
               {sessionsCompleted > 0 ? Math.round((sessionsCompleted / 4) * 100) : 0}%
             </div>
-            <div className="text-[10px] text-[var(--text-muted)]">تقدم الدورة</div>
+            <div className="text-[10px] text-[var(--text-muted)]">{ts('تقدم الدورة','Cycle progress')}</div>
           </CardContent>
         </Card>
       </div>

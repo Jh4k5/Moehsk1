@@ -9,6 +9,7 @@ import { Volume2, Headphones, BookOpen, Info, AlertCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { useI18n } from '@/lib/i18n'
 
 // ─── Tone Data ──────────────────────────────────────────────
 interface ToneData {
@@ -388,8 +389,9 @@ function SpeakButton({ text, size = 'sm' }: { text: string; size?: 'sm' | 'md' }
 
 // ─── Main Component ─────────────────────────────────────────
 export default function PinyinHub() {
+  const { t, dir } = useI18n()
   return (
-    <div dir="rtl" className="space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <motion.div
         className="text-center space-y-2"
@@ -398,12 +400,12 @@ export default function PinyinHub() {
       >
         <h2 className="text-3xl font-bold text-[var(--clr-danger)] flex items-center justify-center gap-3">
           <Headphones className="w-8 h-8" />
-          مركز تعلّم البينيين
+          {t('مركز تعلّم البينيين', 'Pinyin Learning Hub')}
         </h2>
-        <p className="text-[var(--text-muted)] text-sm">تعلّم أصوات ونبرات اللغة الصينية بطريقة تفاعلية ومرئية</p>
+        <p className="text-[var(--text-muted)] text-sm">{t('تعلّم أصوات ونبرات اللغة الصينية بطريقة تفاعلية ومرئية', 'Learn Chinese sounds and tones interactively and visually')}</p>
       </motion.div>
 
-      <Tabs defaultValue="tones" className="w-full" dir="rtl">
+      <Tabs defaultValue="tones" className="w-full" dir={dir}>
         <TabsList className="grid grid-cols-4 gap-1 h-auto p-1 bg-[var(--clr-danger-bg)]">
           <TabsTrigger value="tones" className="text-xs sm:text-sm data-[state=active]:bg-[var(--clr-danger)] data-[state=active]:text-white">
             <span className="hidden sm:inline ml-1">🎵</span>

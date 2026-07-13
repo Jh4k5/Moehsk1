@@ -224,9 +224,9 @@ export default function ExamSimulator() {
 
   const examConfig = useMemo(() => {
     switch (examType) {
-      case 'listening': return { time: 1200, listening: 20, reading: 0, tf: 0, label: 'الاستماع (20 دقيقة)' }
-      case 'reading': return { time: 1020, listening: 0, reading: 20, tf: 10, label: 'القراءة (17 دقيقة)' }
-      case 'full': return { time: 2220, listening: 20, reading: 15, tf: 10, label: 'الامتحان الكامل (37 دقيقة)' }
+      case 'listening': return { time: 1200, listening: 20, reading: 0, tf: 0, label: ts('الاستماع (20 دقيقة)','Listening (20 min)') }
+      case 'reading': return { time: 1020, listening: 0, reading: 20, tf: 10, label: ts('القراءة (17 دقيقة)','Reading (17 min)') }
+      case 'full': return { time: 2220, listening: 20, reading: 15, tf: 10, label: ts('الامتحان الكامل (37 دقيقة)','Full exam (37 min)') }
     }
   }, [examType])
 
@@ -325,14 +325,14 @@ export default function ExamSimulator() {
   const currentQ = questions[currentQuestion]
 
   return (
-    <div dir="rtl" className="space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
         <h2 className="text-3xl font-bold text-[var(--clr-danger)] flex items-center justify-center gap-3">
           <Trophy className="w-8 h-8" />
-          محاكي امتحان HSK 1
+          {ts('محاكي امتحان HSK','HSK Exam Simulator')}
         </h2>
-        <p className="text-[var(--text-tertiary)]">تدرّب على امتحان HSK المستوى الأول</p>
+        <p className="text-[var(--text-tertiary)]">{ts('تدرّب على امتحان HSK','Practice the HSK exam')}</p>
       </div>
 
       {/* ─── Start Screen ──────────────────────────────────── */}
@@ -340,13 +340,13 @@ export default function ExamSimulator() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="max-w-lg mx-auto">
             <CardHeader>
-              <CardTitle className="text-center text-xl">اختر نوع الامتحان</CardTitle>
+              <CardTitle className="text-center text-xl">{ts('اختر نوع الامتحان','Choose exam type')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {([
-                { type: 'listening' as ExamType, icon: Headphones, label: 'قسم الاستماع', time: '20 دقيقة', desc: '20 سؤال استماع', color: 'text-[var(--clr-danger)]' },
-                { type: 'reading' as ExamType, icon: BookOpen, label: 'قسم القراءة', time: '17 دقيقة', desc: '20 سؤال قراءة', color: 'text-[var(--clr-energy)]' },
-                { type: 'full' as ExamType, icon: Trophy, label: 'الامتحان الكامل', time: '37 دقيقة', desc: '45 سؤال (استماع + قراءة)', color: 'text-[var(--clr-danger)]' },
+                { type: 'listening' as ExamType, icon: Headphones, label: ts('قسم الاستماع','Listening section'), time: ts('20 دقيقة','20 min'), desc: ts('20 سؤال استماع','20 listening questions'), color: 'text-[var(--clr-danger)]' },
+                { type: 'reading' as ExamType, icon: BookOpen, label: ts('قسم القراءة','Reading section'), time: ts('17 دقيقة','17 min'), desc: ts('20 سؤال قراءة','20 reading questions'), color: 'text-[var(--clr-energy)]' },
+                { type: 'full' as ExamType, icon: Trophy, label: ts('الامتحان الكامل','Full exam'), time: ts('37 دقيقة','37 min'), desc: ts('45 سؤال (استماع + قراءة)','45 questions (listening + reading)'), color: 'text-[var(--clr-danger)]' },
               ]).map(opt => (
                 <Card
                   key={opt.type}
@@ -370,12 +370,12 @@ export default function ExamSimulator() {
                 <CardContent className="p-4 flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-[var(--clr-warning)] shrink-0 mt-0.5" />
                   <div className="text-sm text-[var(--clr-warning)]">
-                    <p className="font-bold mb-1">ملاحظات مهمة:</p>
+                    <p className="font-bold mb-1">{ts('ملاحظات مهمة:','Important notes:')}</p>
                     <ul className="list-disc list-inside space-y-1">
-                      <li>درجة النجاح: 120 من 200 (60%)</li>
-                      <li>الاستماع: 100 نقطة | القراءة: 100 نقطة</li>
-                      <li>استخدم سماعات لقسم الاستماع</li>
-                      <li>الوقت يبدأ عند الضغط على &quot;ابدأ&quot;</li>
+                      <li>{ts('درجة النجاح: 120 من 200 (60%)','Passing score: 120 of 200 (60%)')}</li>
+                      <li>{ts('الاستماع: 100 نقطة | القراءة: 100 نقطة','Listening: 100 pts | Reading: 100 pts')}</li>
+                      <li>{ts('استخدم سماعات لقسم الاستماع','Use headphones for the listening part')}</li>
+                      <li>{ts('الوقت يبدأ عند الضغط على "ابدأ"','The timer starts when you press Start')}</li>
                     </ul>
                   </div>
                 </CardContent>
@@ -386,7 +386,7 @@ export default function ExamSimulator() {
                 className="w-full bg-[var(--clr-danger)] hover:bg-[var(--clr-danger)]/80 text-lg h-14"
               >
                 <Play className="w-5 h-5 ml-2" />
-                ابدأ الامتحان: {examConfig.label}
+                {ts('ابدأ الامتحان','Start exam')}: {examConfig.label}
               </Button>
             </CardContent>
           </Card>
@@ -402,7 +402,7 @@ export default function ExamSimulator() {
               <CardContent className="p-3 flex items-center gap-3">
                 <Clock className={`w-6 h-6 ${timeLeft <= 60 ? 'text-[var(--clr-danger)]' : 'text-[var(--text-tertiary)]'}`} />
                 <div>
-                  <div className="text-xs text-[var(--text-muted)]">الوقت المتبقي</div>
+                  <div className="text-xs text-[var(--text-muted)]">{ts('الوقت المتبقي','Time left')}</div>
                   <div className={`text-xl font-bold font-mono ${timeLeft <= 60 ? 'text-[var(--clr-danger)]' : ''}`}>
                     {formatTime(timeLeft)}
                   </div>
@@ -422,7 +422,7 @@ export default function ExamSimulator() {
             </Card>
             <Card>
               <CardContent className="p-3">
-                <div className="text-xs text-[var(--text-muted)] mb-1">التقدم</div>
+                <div className="text-xs text-[var(--text-muted)] mb-1">{ts('التقدم','Progress')}</div>
                 <Progress value={((currentQuestion + 1) / questions.length) * 100} className="h-2" />
               </CardContent>
             </Card>
@@ -442,7 +442,7 @@ export default function ExamSimulator() {
                   >
                     <Volume2 className="w-8 h-8 text-[var(--clr-danger)]" />
                   </Button>
-                  <p className="text-sm text-[var(--text-muted)]">اضغط للاستماع</p>
+                  <p className="text-sm text-[var(--text-muted)]">{ts('اضغط للاستماع','Tap to listen')}</p>
                   {currentQ.pinyin && (
                     <p className="text-xs text-[var(--text-muted)] font-chinese-sans">({currentQ.pinyin})</p>
                   )}
@@ -506,7 +506,7 @@ export default function ExamSimulator() {
                     }`}
                   >
                     {answers[currentQuestion] === currentQ.correctIndex ? (
-                      <><CheckCircle className="w-5 h-5" /> إجابة صحيحة!</>
+                      <><CheckCircle className="w-5 h-5" /> {ts('إجابة صحيحة!','Correct!')}</>
                     ) : (
                       <><XCircle className="w-5 h-5" /> إجابة خاطئة. الإجابة الصحيحة: {currentQ.options[currentQ.correctIndex]}</>
                     )}
@@ -585,7 +585,7 @@ export default function ExamSimulator() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Headphones className="w-5 h-5 text-[var(--clr-danger)]" />
-                        <span className="text-sm text-[var(--text-muted)]">الاستماع</span>
+                        <span className="text-sm text-[var(--text-muted)]">{ts('الاستماع','Listening')}</span>
                       </div>
                       <div className="text-2xl font-bold">{scores.listening}</div>
                       <div className="text-xs text-[var(--text-muted)]">من 100</div>
@@ -595,7 +595,7 @@ export default function ExamSimulator() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <BookOpen className="w-5 h-5 text-[var(--clr-danger)]" />
-                        <span className="text-sm text-[var(--text-muted)]">القراءة</span>
+                        <span className="text-sm text-[var(--text-muted)]">{ts('القراءة','Reading')}</span>
                       </div>
                       <div className="text-2xl font-bold">{scores.reading}</div>
                       <div className="text-xs text-[var(--text-muted)]">من 100</div>

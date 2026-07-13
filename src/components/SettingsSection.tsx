@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { useLearningStore } from '@/lib/store'
-import { useI18n } from '@/lib/i18n'
+import { useI18n, ts } from '@/lib/i18n'
 import { usePaywall, CONFIG } from '@/lib/paywall-context'
 import { speak, getChineseVoices } from '@/lib/tts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -63,14 +63,14 @@ export default function SettingsSection() {
         const parsed = JSON.parse(String(reader.result))
         const state = parsed?.state
         if (!state || !Array.isArray(state.learnedWords)) {
-          setImportMsg('❌ الملف غير صالح — تأكد أنه ملف تقدم مُصدَّر من جِسر')
+          setImportMsg(ts('❌ الملف غير صالح — تأكد أنه ملف تقدم مُصدَّر من جِسر','❌ Invalid file — make sure it is a JISR-exported progress file'))
           return
         }
         localStorage.setItem(STORAGE_KEY, String(reader.result))
-        setImportMsg('✅ تم الاستيراد! جارٍ إعادة التحميل...')
+        setImportMsg(ts('✅ تم الاستيراد! جارٍ إعادة التحميل...','✅ Imported! Reloading...'))
         setTimeout(() => location.reload(), 800)
       } catch {
-        setImportMsg('❌ تعذر قراءة الملف — ليس ملف JSON صالحاً')
+        setImportMsg(ts('❌ تعذر قراءة الملف — ليس ملف JSON صالحاً','❌ Could not read the file — not valid JSON'))
       }
     }
     reader.readAsText(file)
@@ -89,28 +89,28 @@ export default function SettingsSection() {
     const result = await activateLicense(key)
     setLicenseLoading(false)
     setLicenseMsg(result.success
-      ? { ok: true, text: 'تم التفعيل بنجاح! 🎉' }
-      : { ok: false, text: result.error || 'مفتاح غير صالح' })
+      ? { ok: true, text: ts('تم التفعيل بنجاح! 🎉','Activated successfully! 🎉') }
+      : { ok: false, text: result.error || ts('مفتاح غير صالح','Invalid key') })
   }
 
   const themeOptions = [
-    { value: 'light', label: 'فاتح', icon: Sun },
-    { value: 'dark', label: 'داكن', icon: Moon },
-    { value: 'system', label: 'تلقائي', icon: Monitor },
+    { value: 'light', label: ts('فاتح','Light'), icon: Sun },
+    { value: 'dark', label: ts('داكن','Dark'), icon: Moon },
+    { value: 'system', label: ts('تلقائي','Auto'), icon: Monitor },
   ]
 
   return (
     <div className="space-y-5 max-w-3xl">
       <h2 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
         <SettingsIcon className="w-6 h-6 text-primary" />
-        الإعدادات
+        {t('الإعدادات','Settings')}
       </h2>
 
       {/* ── الملف الشخصي ── */}
       <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <User className="w-4 h-4 text-primary" /> الملف الشخصي
+            <User className="w-4 h-4 text-primary" /> {t('الملف الشخصي','Profile')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -121,17 +121,17 @@ export default function SettingsSection() {
             <div className="flex-1">
               <div className="font-bold text-[var(--text-primary)]">{store.profile?.name || '—'}</div>
               <div className="text-xs text-[var(--text-muted)]">
-                عضو منذ {store.profile?.createdAt ? new Date(store.profile.createdAt).toLocaleDateString('ar') : '—'}
+                {t('عضو منذ','Member since')} {store.profile?.createdAt ? new Date(store.profile.createdAt).toLocaleDateString(lang === 'en' ? 'en' : 'ar') : '—'}
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => store.clearProfile()}>
-              تبديل الملف الشخصي
+              {t('تبديل الملف الشخصي','Switch profile')}
             </Button>
           </div>
 
           <div>
             <label className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-1.5 mb-2">
-              <Target className="w-4 h-4 text-primary" /> الهدف اليومي: {store.profile?.dailyGoal || 10} كلمات
+              <Target className="w-4 h-4 text-primary" /> {t('الهدف اليومي','Daily goal')}: {store.profile?.dailyGoal || 10} {t('كلمات','words')}
             </label>
             <div className="flex gap-2">
               {[5, 10, 15, 20].map((g) => (
@@ -201,7 +201,7 @@ export default function SettingsSection() {
           <div>
             <label className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-1.5 mb-3">
               <Type className="w-4 h-4 text-primary" />
-              حجم الحروف الصينية: {Math.round(store.settings.hanziFontScale * 100)}%
+              {t('حجم الحروف الصينية','Hanzi font size')}: {Math.round(store.settings.hanziFontScale * 100)}%
             </label>
             <Slider
               value={[store.settings.hanziFontScale * 100]}
@@ -222,12 +222,12 @@ export default function SettingsSection() {
       <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Volume2 className="w-4 h-4 text-primary" /> الصوت والنطق
+            <Volume2 className="w-4 h-4 text-primary" /> {t('الصوت والنطق','Audio & speech')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           <div>
-            <label className="text-sm font-medium text-[var(--text-primary)] mb-2 block">الصوت الصيني</label>
+            <label className="text-sm font-medium text-[var(--text-primary)] mb-2 block">{t('الصوت الصيني','Chinese voice')}</label>
             {voices.length ? (
               <Select
                 value={store.settings.ttsVoiceURI || 'auto'}
@@ -237,7 +237,7 @@ export default function SettingsSection() {
                   <SelectValue placeholder="تلقائي" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="auto">تلقائي (صوت النظام)</SelectItem>
+                  <SelectItem value="auto">{t('تلقائي (صوت النظام)','Auto (system voice)')}</SelectItem>
                   {voices.map((v) => (
                     <SelectItem key={v.voiceURI} value={v.voiceURI}>
                       {v.name} ({v.lang})
@@ -247,14 +247,14 @@ export default function SettingsSection() {
               </Select>
             ) : (
               <p className="text-xs text-[var(--text-muted)]">
-                لا توجد أصوات صينية مثبتة في متصفحك — سيُستخدم الصوت الافتراضي. يمكنك تثبيت صوت صيني من إعدادات نظامك.
+                {t('لا توجد أصوات صينية مثبتة في متصفحك — سيُستخدم الصوت الافتراضي. يمكنك تثبيت صوت صيني من إعدادات نظامك.','No Chinese voices installed in your browser — the default voice will be used. You can install a Chinese voice from your system settings.')}
               </p>
             )}
           </div>
 
           <div>
             <label className="text-sm font-medium text-[var(--text-primary)] mb-3 block">
-              سرعة النطق: {store.settings.ttsRate.toFixed(1)}×
+              {t('سرعة النطق','Speech rate')}: {store.settings.ttsRate.toFixed(1)}×
             </label>
             <Slider
               value={[store.settings.ttsRate * 10]}
@@ -267,7 +267,7 @@ export default function SettingsSection() {
           </div>
 
           <Button variant="outline" size="sm" onClick={() => speak('你好！我是你的中文老师。')}>
-            <Volume2 className="w-4 h-4 ml-1.5" /> جرّب الصوت
+            <Volume2 className="w-4 h-4 ml-1.5" /> {t('جرّب الصوت','Test voice')}
           </Button>
         </CardContent>
       </Card>
@@ -276,14 +276,14 @@ export default function SettingsSection() {
       <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-500" /> الترخيص
+            <Crown className="w-4 h-4 text-amber-500" /> {t('الترخيص','License')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {isPaid ? (
             <div className="flex items-center gap-2 text-emerald-500">
               <Check className="w-5 h-5" />
-              <span className="font-bold">النسخة الكاملة مفعّلة — وصول مدى الحياة</span>
+              <span className="font-bold">{ts('النسخة الكاملة مفعّلة — وصول مدى الحياة','Full version active — lifetime access')}</span>
             </div>
           ) : (
             <>
@@ -297,20 +297,20 @@ export default function SettingsSection() {
                   rel="noreferrer"
                   className="text-xs text-primary hover:underline"
                 >
-                  شراء النسخة الكاملة — {CONFIG.PRICE}
+                  {t('شراء النسخة الكاملة','Buy the full version')} — {CONFIG.PRICE}
                 </a>
               </div>
               <div className="flex gap-2">
                 <Input
                   value={licenseKey}
                   onChange={(e) => { setLicenseKey(e.target.value); setLicenseMsg(null) }}
-                  placeholder="أدخل مفتاح الترخيص"
+                  placeholder={t('أدخل مفتاح الترخيص','Enter license key')}
                   dir="ltr"
                   className="flex-1 text-center tracking-wider"
                 />
                 <Button onClick={handleActivate} disabled={licenseLoading || !licenseKey.trim()}>
                   {licenseLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <KeyRound className="w-4 h-4" />}
-                  <span className="mr-1">تفعيل</span>
+                  <span className="mr-1">{ts('تفعيل','Activate')}</span>
                 </Button>
               </div>
               {licenseMsg && (
@@ -325,19 +325,19 @@ export default function SettingsSection() {
       <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Download className="w-4 h-4 text-primary" /> بياناتك
+            <Download className="w-4 h-4 text-primary" /> {t('بياناتك','Your data')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-xs text-[var(--text-muted)]">
-            تقدمك محفوظ على هذا الجهاز فقط. صدّر نسخة احتياطية بانتظام، ويمكنك استيرادها على أي جهاز آخر.
+            {t('تقدمك محفوظ على هذا الجهاز فقط. صدّر نسخة احتياطية بانتظام، ويمكنك استيرادها على أي جهاز آخر.','Your progress is saved on this device only. Export a backup regularly — you can import it on any other device.')}
           </p>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleExport}>
-              <Download className="w-4 h-4 ml-1.5" /> تصدير التقدم
+              <Download className="w-4 h-4 ml-1.5" /> {t('تصدير التقدم','Export progress')}
             </Button>
             <Button variant="outline" size="sm" onClick={() => importInputRef.current?.click()}>
-              <Upload className="w-4 h-4 ml-1.5" /> استيراد التقدم
+              <Upload className="w-4 h-4 ml-1.5" /> {t('استيراد التقدم','Import progress')}
             </Button>
             <input
               ref={importInputRef}
@@ -349,18 +349,18 @@ export default function SettingsSection() {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" size="sm" className="text-red-500 border-red-500/30 hover:bg-red-500/10">
-                  <Trash2 className="w-4 h-4 ml-1.5" /> تصفير كل التقدم
+                  <Trash2 className="w-4 h-4 ml-1.5" /> {t('تصفير كل التقدم','Reset all progress')}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent dir="rtl">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
+                  <AlertDialogTitle>{ts('هل أنت متأكد؟','Are you sure?')}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    سيُحذف كل تقدمك نهائياً: الكلمات المتعلمة، المراجعات، الإنجازات، والسلسلة اليومية. لا يمكن التراجع — صدّر نسخة احتياطية أولاً إن أردت.
+                    {t('سيُحذف كل تقدمك نهائياً: الكلمات المتعلمة، المراجعات، الإنجازات، والسلسلة اليومية. لا يمكن التراجع — صدّر نسخة احتياطية أولاً إن أردت.','All your progress will be permanently deleted: learned words, reviews, achievements, and your streak. This cannot be undone — export a backup first if you wish.')}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                  <AlertDialogCancel>{ts('إلغاء','Cancel')}</AlertDialogCancel>
                   <AlertDialogAction onClick={handleReset} className="bg-red-600 hover:bg-red-700">
                     نعم، احذف كل شيء
                   </AlertDialogAction>

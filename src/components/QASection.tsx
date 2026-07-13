@@ -668,7 +668,7 @@ export default function QASection() {
   // RENDER
   // ═══════════════════════════════════════════════════════════════
   return (
-    <div dir="rtl" className="w-full space-y-6">
+    <div className="w-full space-y-6">
 
       {/* ─── Section Header ─────────────────────────────────── */}
       <motion.div

@@ -202,9 +202,9 @@ interface LearningStore
   _hasHydrated: boolean;
   setHasHydrated: (v: boolean) => void;
 
-  // Active HSK level (1 or 2)
-  currentLevel: 1 | 2;
-  setLevel: (level: 1 | 2) => void;
+  // Active HSK level (1, 2 or 3)
+  currentLevel: 1 | 2 | 3;
+  setLevel: (level: 1 | 2 | 3) => void;
 
   // UI language ('ar' Arabic default | 'en' English)
   lang: 'ar' | 'en';

@@ -17,9 +17,18 @@ import { VISUAL_DICT_CATEGORIES_2 } from '@/data/hsk2/visualDict2'
 import { roadmapUnits2 } from '@/data/hsk2/roadmap2'
 import { stories2 } from '@/data/hsk2/stories2'
 
+import { vocabulary3 } from '@/data/hsk3/vocabulary3'
+import { grammarRules3 } from '@/data/hsk3/grammar3'
+import { grammarPracticeQuestions3 } from '@/data/hsk3/grammarPracticeQuestions3'
+import { lessons3 } from '@/data/hsk3/lessons3'
+import { conversations3 } from '@/data/hsk3/conversations3'
+import { VISUAL_DICT_CATEGORIES_3 } from '@/data/hsk3/visualDict3'
+import { roadmapUnits3 } from '@/data/hsk3/roadmap3'
+import { stories3 } from '@/data/hsk3/stories3'
+
 import { useLearningStore } from '@/lib/store'
 
-export type HskLevel = 1 | 2
+export type HskLevel = 1 | 2 | 3
 
 function uniqueChars(words: VocabWord[]): string[] {
   const set = new Set<string>()
@@ -73,6 +82,21 @@ export const LEVEL_BUNDLES: Record<HskLevel, LevelBundle> = {
     visualDict: VISUAL_DICT_CATEGORIES_2,
     hanziChars: uniqueChars(vocabulary2),
     vocabIdRange: [2000, 3000],
+  },
+  3: {
+    level: 3,
+    label: 'HSK 3',
+    vocabulary: vocabulary3,
+    grammarRules: grammarRules3,
+    grammarPractice: grammarPracticeQuestions3,
+    lessons: lessons3 as unknown as typeof lessons,
+    conversations: conversations3,
+    roadmapUnits: roadmapUnits3 as unknown as typeof roadmapUnits,
+    stories: stories3,
+    tonePairs,
+    visualDict: VISUAL_DICT_CATEGORIES_3,
+    hanziChars: uniqueChars(vocabulary3),
+    vocabIdRange: [3000, 4000],
   },
 }
 

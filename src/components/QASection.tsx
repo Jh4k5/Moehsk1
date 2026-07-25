@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useActiveLevel } from '@/lib/levels'
 import { dailyQA2 } from '@/data/hsk2/qa2'
+import { dailyQA3 } from '@/data/hsk3/qa3'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -485,7 +486,11 @@ function FlashcardPractice({ question, category }: {
 export default function QASection() {
   const { level } = useActiveLevel()
   const dailyQA = useMemo<QACategory[]>(
-    () => (level === 1 ? DEFAULT_DAILY_QA : (dailyQA2 as unknown as QACategory[])),
+    () => ({
+      1: DEFAULT_DAILY_QA,
+      2: dailyQA2 as unknown as QACategory[],
+      3: dailyQA3 as unknown as QACategory[],
+    }[level] ?? DEFAULT_DAILY_QA),
     [level],
   )
   const allQuestions = useMemo(

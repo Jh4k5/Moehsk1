@@ -553,8 +553,11 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handler)
   }, [currentSection, store.flashcardIndex])
 
-  // ─── Lesson names for sidebar dropdown
-  const lessonNames = ['مرحباً يا آي شياو يو', 'اسمي لي ون', 'أنا صيني', 'لدي طفلان', 'أنا أرتاح اليوم', 'ما رقم هاتفك؟', 'أنهي العمل الساعة 6:30 مساءً', 'أبي يعمل أيضاً في المستشفى', 'سأدرس في المدرسة غداً صباحاً', 'التفاح هنا رخيص حقاً!', 'أمطرت الثلوج أمس', 'أنا أدرس في الجامعة', 'من فضلك أعطني كوب شاي', 'شاهدت فيلماً', 'أراكم في مطار داشينغ!']
+  // ─── Lesson names for sidebar dropdown (من دروس المستوى النشط)
+  const lessonNames = useMemo(
+    () => activeLevel.lessons.map((l) => tsPick(l.title, (l as { titleEn?: string }).titleEn)),
+    [activeLevel, store.lang],
+  )
   const [lessonsOpen, setLessonsOpen] = useState(false)
   // يبدأ مغلقاً (آمن للجوال)، ثم يُفتح تلقائياً على الشاشات الكبيرة بعد التركيب
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -703,13 +706,13 @@ export default function Home() {
             </div>
             <div className="hidden md:block min-w-0">
               <h1 className="text-lg font-bold truncate" style={{color: "var(--text-primary)"}}>{t('جِسر — تعلم الصينية', 'JISR — Learn Chinese')} {activeLevel.label}</h1>
-              <p className="text-xs text-[var(--text-tertiary)] truncate">{stats.total} {t('كلمة', 'words')} • {activeLevel.grammarRules.length} {t('قاعدة', 'rules')} • {activeLevel.level === 1 ? t('مستوى مبتدئ', 'Beginner') : t('مستوى ثانٍ', 'Elementary')}</p>
+              <p className="text-xs text-[var(--text-tertiary)] truncate">{stats.total} {t('كلمة', 'words')} • {activeLevel.grammarRules.length} {t('قاعدة', 'rules')} • {activeLevel.level === 1 ? t('مستوى مبتدئ', 'Beginner') : activeLevel.level === 2 ? t('مستوى ثانٍ', 'Elementary') : t('مستوى متوسط', 'Intermediate')}</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* ─── Level switcher (HSK1 / HSK2) ─── */}
             <div className="flex items-center rounded-full bg-[var(--surface-card-h)] border border-[var(--line-default)] p-0.5 shadow-sm">
-              {([1, 2] as const).map((lv) => (
+              {([1, 2, 3] as const).map((lv) => (
                 <button
                   key={lv}
                   onClick={() => store.setLevel(lv)}
@@ -3470,7 +3473,7 @@ function ChatSection() {
           {ts('المساعد الذكي','AI Tutor')}
         </h2>
         <Button variant="ghost" size="sm" onClick={store.clearChatMessages}>
-          <RotateCcw className="w-4 h-4 ml-1" /> مسح
+          <RotateCcw className="w-4 h-4 me-1" /> {ts('مسح', 'Clear')}
         </Button>
       </div>
       <p className="text-[var(--text-muted)] text-sm">{ts('اسألني عن أي كلمة صينية أو احصل على نصائح للتعلم!','Ask me about any Chinese word or get study tips!')}</p>

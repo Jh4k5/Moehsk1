@@ -1,0 +1,702 @@
+<title>تشريح منصة جِسر</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --paper:#F5F7F5; --surface:#FFFFFF; --surface-2:#EEF2EF;
+  --ink:#16201D; --ink-soft:#55635E; --ink-faint:#8A968F;
+  --line:#DCE4DF; --line-soft:#E9EEEB;
+  --jade:#0F7D63; --jade-deep:#0A5946; --jade-wash:#E4F0EB;
+  --crit:#AE3427; --crit-wash:#F8E9E6;
+  --warn:#8E6410; --warn-wash:#F8F0DE;
+  --ok:#2C7A50; --ok-wash:#E6F1EA;
+  --shadow:0 1px 2px rgba(20,35,30,.05), 0 8px 24px -16px rgba(20,35,30,.28);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C1211; --surface:#131A18; --surface-2:#182120;
+    --ink:#E7EEEA; --ink-soft:#93A29C; --ink-faint:#6B7A74;
+    --line:#243029; --line-soft:#1C2622;
+    --jade:#43BB97; --jade-deep:#7ED6B6; --jade-wash:#112A23;
+    --crit:#E2796A; --crit-wash:#2A1815;
+    --warn:#D2A24C; --warn-wash:#282016;
+    --ok:#5FC28E; --ok-wash:#13251B;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C1211; --surface:#131A18; --surface-2:#182120;
+  --ink:#E7EEEA; --ink-soft:#93A29C; --ink-faint:#6B7A74;
+  --line:#243029; --line-soft:#1C2622;
+  --jade:#43BB97; --jade-deep:#7ED6B6; --jade-wash:#112A23;
+  --crit:#E2796A; --crit-wash:#2A1815;
+  --warn:#D2A24C; --warn-wash:#282016;
+  --ok:#5FC28E; --ok-wash:#13251B;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans Arabic","Noto Sans Arabic","Segoe UI",Tahoma,"Geeza Pro",system-ui,sans-serif;
+  font-size:16.5px; line-height:1.75; direction:rtl;
+  font-feature-settings:"kern";
+}
+.wrap{max-width:1120px; margin:0 auto; padding:0 24px 96px}
+.prose{max-width:70ch}
+
+/* ── type ─────────────────────────────────────────── */
+h1,h2,h3,h4{
+  font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
+  text-wrap:balance; margin:0; line-height:1.35;
+}
+h1{font-size:clamp(2.1rem,5.2vw,3.1rem); font-weight:800; letter-spacing:-.02em}
+h2{font-size:clamp(1.45rem,3vw,1.95rem); font-weight:700; letter-spacing:-.015em}
+h3{font-size:1.12rem; font-weight:700}
+p{margin:0}
+a{color:var(--jade)}
+strong{font-weight:700; color:var(--ink)}
+code,.mono,.num{
+  font-family:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Mono",Consolas,monospace;
+  font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate;
+}
+code{background:var(--surface-2); border:1px solid var(--line-soft); border-radius:4px;
+  padding:.08em .38em; font-size:.85em}
+
+.eyebrow{
+  font-family:ui-monospace,"SF Mono",Consolas,monospace;
+  font-size:.68rem; letter-spacing:.19em; text-transform:uppercase;
+  color:var(--ink-faint); direction:ltr; unicode-bidi:isolate;
+}
+
+/* ── masthead ─────────────────────────────────────── */
+.mast{border-bottom:1px solid var(--line); background:var(--surface); margin-bottom:56px}
+.mast-in{max-width:1120px; margin:0 auto; padding:52px 24px 44px;
+  display:flex; flex-direction:column; gap:20px}
+.mast-top{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.seal{
+  width:46px; height:46px; flex:none; display:grid; place-items:center;
+  border-radius:9px; background:var(--jade); color:#fff;
+  font-size:1.5rem; font-weight:700; line-height:1;
+  font-family:"Noto Sans SC","Songti SC",serif;
+}
+.mast h1{margin-top:4px}
+.lede{font-size:1.12rem; color:var(--ink-soft); max-width:64ch}
+.mast-meta{display:flex; gap:22px; flex-wrap:wrap; padding-top:8px;
+  border-top:1px solid var(--line-soft); margin-top:6px}
+.mast-meta div{display:flex; flex-direction:column; gap:2px}
+.mast-meta .k{font-size:.74rem; color:var(--ink-faint)}
+.mast-meta .v{font-size:.9rem; font-weight:600}
+
+/* ── verdict ──────────────────────────────────────── */
+.verdict{
+  background:var(--surface); border:1px solid var(--line);
+  border-inline-start:4px solid var(--crit);
+  border-radius:10px; padding:26px 28px; box-shadow:var(--shadow);
+  display:flex; flex-direction:column; gap:12px;
+}
+.verdict .head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+.verdict h2{font-size:1.3rem}
+
+/* ── sections ─────────────────────────────────────── */
+section{margin-top:72px}
+.sec-head{display:flex; flex-direction:column; gap:8px; margin-bottom:26px;
+  padding-bottom:14px; border-bottom:1px solid var(--line)}
+.sec-head p{color:var(--ink-soft); max-width:68ch}
+
+/* ── scorecard ────────────────────────────────────── */
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(196px,1fr)); gap:14px}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:10px;
+  padding:18px 20px; display:flex; flex-direction:column; gap:5px}
+.card .k{font-size:.78rem; color:var(--ink-soft)}
+.card .v{font-size:1.85rem; font-weight:700; line-height:1.15;
+  font-family:ui-monospace,"SF Mono",Consolas,monospace; font-variant-numeric:tabular-nums;
+  direction:ltr; text-align:start}
+.card .n{font-size:.76rem; color:var(--ink-faint); line-height:1.5}
+.card.hot .v{color:var(--crit)}
+.card.warm .v{color:var(--warn)}
+.card.good .v{color:var(--ok)}
+
+/* ── findings ─────────────────────────────────────── */
+.findings{display:flex; flex-direction:column; gap:14px}
+.f{background:var(--surface); border:1px solid var(--line); border-radius:10px;
+  border-inline-start:4px solid var(--line); padding:20px 22px;
+  display:flex; flex-direction:column; gap:9px}
+.f.crit{border-inline-start-color:var(--crit)}
+.f.warn{border-inline-start-color:var(--warn)}
+.f.opp{border-inline-start-color:var(--jade)}
+.f-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.f-id{font-family:ui-monospace,Consolas,monospace; font-size:.74rem;
+  color:var(--ink-faint); direction:ltr}
+.f h3{flex:1 1 auto; min-width:min(100%,22ch)}
+.f p{color:var(--ink-soft)}
+.f .impact{
+  font-size:.87rem; padding:9px 13px; border-radius:7px;
+  background:var(--surface-2); border:1px solid var(--line-soft); color:var(--ink);
+}
+.f .impact b{color:var(--ink)}
+
+.chip{
+  display:inline-flex; align-items:center; gap:5px; flex:none;
+  font-size:.7rem; font-weight:700; letter-spacing:.02em;
+  padding:3px 9px; border-radius:100px; border:1px solid transparent;
+}
+.chip.crit{background:var(--crit-wash); color:var(--crit); border-color:var(--crit)}
+.chip.warn{background:var(--warn-wash); color:var(--warn); border-color:var(--warn)}
+.chip.opp{background:var(--jade-wash); color:var(--jade); border-color:var(--jade)}
+.chip.ok{background:var(--ok-wash); color:var(--ok); border-color:var(--ok)}
+.chip.mute{background:var(--surface-2); color:var(--ink-soft); border-color:var(--line)}
+
+/* ── tables ───────────────────────────────────────── */
+.scroll{overflow-x:auto; border:1px solid var(--line); border-radius:10px;
+  background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:640px; font-size:.92rem}
+th,td{text-align:start; padding:11px 15px; border-bottom:1px solid var(--line-soft);
+  vertical-align:top}
+thead th{
+  font-size:.72rem; letter-spacing:.06em; color:var(--ink-soft); font-weight:700;
+  background:var(--surface-2); border-bottom:1px solid var(--line); white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td.n{font-family:ui-monospace,Consolas,monospace; font-variant-numeric:tabular-nums;
+  direction:ltr; text-align:start; white-space:nowrap}
+td.sec{font-weight:600; white-space:nowrap}
+caption{caption-side:bottom; padding:11px 15px; font-size:.78rem;
+  color:var(--ink-faint); text-align:start; border-top:1px solid var(--line-soft)}
+
+/* ── roadmap ──────────────────────────────────────── */
+.phases{display:grid; grid-template-columns:repeat(auto-fit,minmax(268px,1fr)); gap:16px}
+.phase{background:var(--surface); border:1px solid var(--line); border-radius:10px;
+  padding:20px 22px; display:flex; flex-direction:column; gap:12px}
+.phase-top{display:flex; align-items:baseline; gap:10px;
+  padding-bottom:10px; border-bottom:1px solid var(--line-soft)}
+.phase-n{font-family:ui-monospace,Consolas,monospace; font-size:1.4rem; font-weight:700;
+  color:var(--jade); line-height:1; direction:ltr}
+.phase h3{font-size:1.02rem}
+.phase ul{margin:0; padding-inline-start:1.15em; display:flex; flex-direction:column; gap:8px}
+.phase li{font-size:.92rem; color:var(--ink-soft)}
+.phase li b{color:var(--ink)}
+
+/* ── misc ─────────────────────────────────────────── */
+ul.plain{margin:0; padding-inline-start:1.15em; display:flex; flex-direction:column; gap:9px}
+ul.plain li{color:var(--ink-soft)}
+ul.plain li b{color:var(--ink)}
+.stack{display:flex; flex-direction:column; gap:18px}
+.note{font-size:.86rem; color:var(--ink-faint); border-inline-start:2px solid var(--line);
+  padding-inline-start:13px}
+.foot{margin-top:80px; padding-top:22px; border-top:1px solid var(--line);
+  font-size:.85rem; color:var(--ink-faint); max-width:70ch}
+
+:focus-visible{outline:2px solid var(--jade); outline-offset:2px; border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+@media (max-width:640px){
+  body{font-size:16px}
+  .mast-in{padding:38px 20px 32px}
+  .wrap{padding:0 20px 72px}
+  section{margin-top:56px}
+}
+</style>
+
+<header class="mast">
+  <div class="mast-in">
+    <div class="mast-top">
+      <div class="seal" aria-hidden="true">桥</div>
+      <div>
+        <div class="eyebrow">Business teardown</div>
+        <h1>تشريح منصة جِسر</h1>
+      </div>
+    </div>
+    <p class="lede">
+      قراءة المنصة كما يقرأها صاحب عمل، لا كما يقرأها مبرمج: أين المال؟ أين يتسرّب؟
+      وما الذي يستحق البناء بعده. المراجعة مبنية على فحص الكود بالكامل، وتشغيل المنصة
+      محلياً، والمرور على كل قسم من أقسامها التسعة عشر.
+    </p>
+    <div class="mast-meta">
+      <div><span class="k">المنتج</span><span class="v">جِسر — تعلّم الصينية للناطقين بالعربية</span></div>
+      <div><span class="k">المستويات</span><span class="v">HSK 1 · 2 · 3</span></div>
+      <div><span class="k">حالة البناء</span><span class="v">يبني وينشر بنجاح</span></div>
+      <div><span class="k">تاريخ المراجعة</span><span class="v mono">2026-08-17</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="verdict">
+    <div class="head">
+      <span class="chip crit">الحكم</span>
+      <h2>منتج جاهز، وعمل غير موجود</h2>
+    </div>
+    <p>
+      بنيتَ منتجاً تعليمياً حقيقياً: <strong>١٬٠٨٥ كلمة</strong> كلها مزوّدة بجمل أمثلة وتعبير حفظ
+      وجذور الحروف، و<strong>٢٠٧ قاعدة نحوية</strong>، و<strong>٨١ درساً</strong>، وواجهة عربية
+      متقنة تعمل على الجوال والحاسوب بلا أخطاء في وحدة التحكم. هذا أصل حقيقي يستحق التقدير.
+    </p>
+    <p>
+      لكن <strong>المنصة اليوم لا تستطيع تحصيل ريال واحد</strong>. زر الشراء يشير إلى رابط وهمي،
+      وبوابة الدفع تُتجاوَز بسطر واحد في المتصفح، وكل المحتوى يُشحن للزائر قبل أي دفع، ولا يوجد
+      حساب ولا بريد إلكتروني ولا رقم واحد عن سلوك المستخدمين. بعبارة تجارية: أنت تملك
+      <strong>منتجاً</strong>، ولا تملك <strong>نشاطاً تجارياً</strong> بعد. الفجوة بينهما
+      أسبوعان من العمل، لا سنة.
+    </p>
+  </div>
+
+  <!-- ═══ SCORECARD ═══ -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">01 · Scorecard</span>
+      <h2>بطاقة الحالة</h2>
+      <p>الأرقام التي تحدّد قيمة المنصة اليوم، مأخوذة من الكود مباشرة لا من الوصف التسويقي.</p>
+    </div>
+    <div class="cards">
+      <div class="card hot"><span class="k">قنوات تحصيل تعمل</span><span class="v">0</span><span class="n">رابط الشراء وهمي، وتكامل الدفع معطّل داخل الكود</span></div>
+      <div class="card hot"><span class="k">ثواني لتجاوز البوابة</span><span class="v">~2</span><span class="n">تم إثبات التجاوز عملياً بثلاث طرق مختلفة</span></div>
+      <div class="card hot"><span class="k">بريد إلكتروني محفوظ</span><span class="v">0</span><span class="n">لا يمكنك مراسلة أي مستخدم بعد مغادرته</span></div>
+      <div class="card hot"><span class="k">مؤشرات استخدام</span><span class="v">0</span><span class="n">لا تعرف عدد الزوار ولا نسبة إكمال التسجيل</span></div>
+      <div class="card good"><span class="k">إجمالي المفردات</span><span class="v">1,085</span><span class="n">411 + 195 + 479 عبر المستويات الثلاثة</span></div>
+      <div class="card good"><span class="k">تغطية بيانات الكلمة</span><span class="v">100%</span><span class="n">كل كلمة: جمل + تعبير حفظ + جذور</span></div>
+      <div class="card warm"><span class="k">حجم أول تحميل</span><span class="v">627 KB</span><span class="n">جافاسكربت مضغوط، منها ملف واحد بـ 431 KB</span></div>
+      <div class="card warm"><span class="k">أصوات صينية مضمونة</span><span class="v">0</span><span class="n">الصوت يعتمد كلياً على جهاز المستخدم</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ BLOCKERS ═══ -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">02 · Blockers</span>
+      <h2>ما يمنع المنصة من أن تكون تجارة</h2>
+      <p>ستة أعطال. أولها وحده كافٍ ليجعل الإيراد المتوقع صفراً مهما بلغ عدد الزوار.</p>
+    </div>
+    <div class="findings">
+
+      <div class="f crit">
+        <div class="f-top"><span class="f-id">B-01</span><span class="chip crit">حرج</span>
+          <h3>زر الشراء يقود إلى لا مكان</h3></div>
+        <p>
+          الرابط المسجّل في إعدادات البوابة هو <code>https://gumroad.com/l/YOUR_PRODUCT</code> —
+          قيمة افتراضية لم تُستبدل. العميل الذي يقتنع بعد التجربة ويضغط
+          «احصل على الوصول الكامل — ‎$9» يصل إلى صفحة غير موجودة.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> معدل التحويل مقفل على صفر بنيوياً. أي إنفاق تسويقي اليوم هو إنفاق مهدور
+          بالكامل، لا مجرد إنفاق ضعيف العائد.
+        </p>
+      </div>
+
+      <div class="f crit">
+        <div class="f-top"><span class="f-id">B-02</span><span class="chip crit">حرج</span>
+          <h3>البوابة زينة لا قفل</h3></div>
+        <p>
+          حالة الدفع كلها مخزّنة في متصفح المستخدم. جرّبتُ ثلاث طرق للتجاوز، ونجحت كلها:
+          كتابة <code>localStorage.setItem('pw_ok','1')</code> في وحدة التحكم، أو حذف مفتاح
+          <code>pw_t</code> لإعادة تشغيل التجربة المجانية من الصفر، أو ببساطة فتح نافذة تصفح خفي.
+          لا يوجد أي تحقّق على الخادم.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> حتى بعد إصلاح رابط الدفع، من يدفع هو فقط من لا يعرف كيف يتجاوز — وهي
+          الشريحة الأقل في جمهور يتعلّم لغة عبر الإنترنت. سعر ‎$9 لا يبرّر عناء التجاوز لدى
+          الأغلبية، لكنه يبرّره تماماً لدى من ينشر الطريقة في مجموعة واتساب واحدة.
+        </p>
+      </div>
+
+      <div class="f crit">
+        <div class="f-top"><span class="f-id">B-03</span><span class="chip crit">حرج</span>
+          <h3>كل المحتوى يُسلَّم قبل الدفع</h3></div>
+        <p>
+          المستويات الثلاثة — المفردات والدروس والقواعد والقصص والمحادثات — كلها مضمّنة داخل ملف
+          جافاسكربت واحد حجمه <span class="num">1.63 MB</span> يُحمَّل عند فتح الصفحة الأولى، قبل
+          التسجيل وقبل أي دفع. تأكّدتُ من ذلك بالبحث عن نصوص المفردات داخل الملف المنشور.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> البوابة تحجب <em>الواجهة</em> لا <em>المنتج</em>. أي شخص يريد المحتوى
+          يأخذه كاملاً. وهذا يعني أيضاً أن منافساً يستطيع نسخ قاعدة بياناتك — أثمن ما بنيتَه —
+          في دقائق.
+        </p>
+      </div>
+
+      <div class="f crit">
+        <div class="f-top"><span class="f-id">B-04</span><span class="chip crit">حرج</span>
+          <h3>مفاتيح تفعيل دائمة مكتوبة داخل الكود</h3></div>
+        <p>
+          نقطة التحقق من التراخيص تقبل ستة مفاتيح ثابتة مثل <code>JISR-TEST-KEY-0001</code> و
+          <code>MUDANN-BETA-LAUNCH</code>. تعمل لأي شخص، على أي جهاز، بلا حد ولا انتهاء. تكامل
+          Gumroad الحقيقي موجود في الملف لكنه <strong>معطّل داخل تعليق</strong> ولم يُفعَّل قط.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> مفتاح واحد يتسرّب = وصول مجاني دائم للجميع، بلا أي وسيلة لإبطاله لأن لا
+          سجل ولا قاعدة بيانات.
+        </p>
+      </div>
+
+      <div class="f crit">
+        <div class="f-top"><span class="f-id">B-05</span><span class="chip crit">حرج</span>
+          <h3>لا حسابات، ولا بريد، ولا ذاكرة</h3></div>
+        <p>
+          «تسجيل الدخول» في المنصة ليس تسجيل دخول: شاشة تسأل عن الاسم والأفاتار والهدف اليومي،
+          ثم تحفظها في المتصفح. لا خادم، ولا قاعدة بيانات، ولا بريد إلكتروني. تقدّم المستخدم
+          يعيش في <code>localStorage</code> فقط.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> ثلاث خسائر متتالية — <b>(١)</b> المستخدم يفقد شهور دراسته بمسح الكاش أو
+          تغيير الجهاز، وهذا أقسى سبب لهجر منتج تعليمي؛ <b>(٢)</b> لا يمكنك استرجاع مستخدم
+          متوقّف أو إرسال تذكير أو عرض ترقية — قناة التسويق الأرخص لديك مغلقة؛ <b>(٣)</b> لا
+          يمكن بيع اشتراك متعدد الأجهزة، وهو الشكل الذي يتوقعه السوق اليوم.
+        </p>
+      </div>
+
+      <div class="f crit">
+        <div class="f-top"><span class="f-id">B-06</span><span class="chip crit">حرج</span>
+          <h3>تدير المنتج وأنت أعمى</h3></div>
+        <p>
+          لا توجد أي أداة قياس في المشروع — لا إحصاءات Vercel ولا أي بديل. ملف
+          <code>analytics.ts</code> الموجود يحسب إحصاءات <em>للمستخدم</em> ويخزّنها في جهازه، ولا
+          يرسل شيئاً إليك.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> لا تعرف كم زائراً وصل، ولا كم أكمل شاشة التسجيل، ولا في أي قسم يتوقفون،
+          ولا كم وصل أصلاً إلى شاشة انتهاء التجربة. كل قرار قادم سيكون تخميناً. هذا أرخص عطل في
+          القائمة إصلاحاً وأغلاها ثمناً إن بقي.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ PRODUCT RISKS ═══ -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">03 · Product risk</span>
+      <h2>مخاطر في المنتج نفسه</h2>
+      <p>أعطال لا تمنع البيع، لكنها تُفقدك العميل بعد أن يدفع — وهو أغلى أنواع الفقد.</p>
+    </div>
+    <div class="findings">
+
+      <div class="f warn">
+        <div class="f-top"><span class="f-id">R-01</span><span class="chip warn">مهم</span>
+          <h3>الصوت قد لا يعمل أصلاً عند عميلك</h3></div>
+        <p>
+          كل النطق في المنصة — المفردات، القصص، المحادثات، بل وقسم «الاستماع» في محاكي الامتحان —
+          يعتمد على أصوات مثبّتة في جهاز المستخدم عبر Web Speech API. في متصفح نظيف اختبرتُه:
+          <strong>صفر أصوات صينية</strong>. شاشة الإعدادات نفسها تعرض التحذير:
+          «لا توجد أصوات صينية مثبتة في متصفحك».
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> على أجهزة أندرويد وويندوز في السوق العربي بلا حزمة لغة صينية، يشتري
+          العميل «منصة نطق» فيجد النطق صامتاً أو بلكنة خاطئة. هذا سبب استرداد مباشر، وتقييم سلبي،
+          وهو غير مرئي لك تماماً لأنه لا يوجد قياس.
+        </p>
+      </div>
+
+      <div class="f warn">
+        <div class="f-top"><span class="f-id">R-02</span><span class="chip warn">مهم</span>
+          <h3>تدريب النطق لا يعمل على آيفون</h3></div>
+        <p>
+          قسم تدريب النطق مبني على <code>SpeechRecognition</code>، وهي واجهة غير مدعومة في
+          Safari على iOS ولا في فايرفوكس. القسم يعرض رسالة عدم دعم بدلاً من التمرين.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> شريحة آيفون في الخليج مرتفعة جداً، وهي غالباً الشريحة الأعلى استعداداً
+          للدفع. تبيع لها ميزة لا تعمل عندها.
+        </p>
+      </div>
+
+      <div class="f warn">
+        <div class="f-top"><span class="f-id">R-03</span><span class="chip warn">مهم</span>
+          <h3>المستوى الثاني هو الحلقة الأضعف</h3></div>
+        <p>
+          HSK 2 يحتوي <span class="num">195</span> كلمة و<span class="num">15</span> درساً و
+          <span class="num">6</span> محادثات، مقابل HSK 3 بـ<span class="num">479</span> كلمة و
+          <span class="num">18</span> درساً و<span class="num">18</span> محادثة. المستوى الأوسط
+          أنحف من المستوى الذي يليه ومن الذي يسبقه.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> HSK 2 هو بالضبط الموضع الذي يقرر فيه المتعلّم إن كان سيكمل. أن يجده أفقر
+          مما سبقه يعني أن تسربك سيتركز حيث تسربك أغلى — بعد أن دفع.
+        </p>
+      </div>
+
+      <div class="f warn">
+        <div class="f-top"><span class="f-id">R-04</span><span class="chip warn">مهم</span>
+          <h3>محاكي الامتحان يتجاهل بنك الأسئلة المبني له</h3></div>
+        <p>
+          ملف <code>examBank.ts</code> يحتوي <span class="num">40</span> سؤالاً مصمّماً بعناية على
+          نمط HSK الحقيقي (صح/خطأ، حوارات، ملء فراغات، مطابقة صور) مع شرح لكل إجابة —
+          <strong>وهو غير مستورد في أي مكان</strong>. المحاكي يولّد أسئلته آلياً من قائمة مفردات
+          داخلية بدلاً منه.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> «محاكي الامتحان» هو أقوى ورقة بيع لديك — المتعلّم يدفع ليجتاز اختباراً، لا
+          ليتسلّى. أنت تعرض نسخة أضعف من التي بنيتَها فعلاً. إصلاح هذا ربط استيراد، لا بناء محتوى.
+        </p>
+      </div>
+
+      <div class="f warn">
+        <div class="f-top"><span class="f-id">R-05</span><span class="chip warn">مهم</span>
+          <h3>«المعلم الذكي» ليس ذكاءً اصطناعياً</h3></div>
+        <p>
+          المحرك يطابق كلمات مفتاحية (اختبرني، قاعدة، نطق، مراجعة…) ثم يجيب من بيانات المنصة.
+          لا نموذج لغوي ولا واجهة خارجية. وفي وضع الإنجليزية، ردود القواعد والنبرات والأرقام
+          تخرج <strong>بالعربية فقط</strong> لأنها مكتوبة نصاً ثابتاً.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> وجهان. الميزة: تكلفة تشغيل صفر وهامش ربح كامل وعمل دون إنترنت — وهذه
+          ميزة حقيقية يجب أن تُسوَّق كما هي («مساعد يعمل بلا إنترنت وبلا اشتراك API»). الخطر:
+          كلمة «ذكي» ترفع التوقع إلى مستوى ChatGPT، والفجوة بين التوقع والتجربة هي تعريف الاسترداد.
+        </p>
+      </div>
+
+      <div class="f warn">
+        <div class="f-top"><span class="f-id">R-06</span><span class="chip warn">مهم</span>
+          <h3>أرقامك المعروضة متناقضة</h3></div>
+        <p>
+          شاشة انتهاء التجربة تَعِد بـ«600+ كلمة»، والترويسة تقول «410 كلمة»، والعدد الحقيقي عبر
+          المستويات <span class="num">1,085</span>. ملف الوصف يذكر «HSK 1» فقط بينما المنصة ثلاثة
+          مستويات. كما أن محرك الإحصاءات يقسم التقدم على <code>410</code> ثابتة مهما كان المستوى،
+          فتظهر نسب خاطئة لمن يدرس HSK 2 أو 3.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> تبيع نفسك بأقل من قيمتك (‎1,085 مقابل ‎410 المعلنة)، وتفقد ثقة العميل حين
+          يرى رقمين مختلفين في شاشتين، وتعرض له شريط تقدم يكذب عليه.
+        </p>
+      </div>
+
+      <div class="f warn">
+        <div class="f-top"><span class="f-id">R-07</span><span class="chip warn">مهم</span>
+          <h3>لا واجهة تسويقية ولا وجود في البحث</h3></div>
+        <p>
+          الرابط الجذر يفتح التطبيق مباشرة على شاشة تسأل الزائر عن اسمه. لا صفحة تعريفية، ولا
+          صور للمنتج، ولا شهادات، ولا تسعير معروض، ولا وصف قابل للفهرسة (الوصف الحالي يذكر HSK 1
+          وحده)، ولا صورة مشاركة للواتساب وتويتر.
+        </p>
+        <p class="impact">
+          <b>الأثر:</b> لا يوجد شيء يمكن لحملة إعلانية أن توجّه إليه، ولا شيء يظهر في جوجل لمن
+          يبحث «تعلم الصينية بالعربي»، ولا شيء يُشارَك في مجموعة. كل زائر يجب أن يُشترى بالإعلان،
+          وحتى ذلك الزائر يواجه نموذج تسجيل قبل أن يرى ما اشتريتَ انتباهه لأجله.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ SECTION-BY-SECTION ═══ -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">04 · Section audit</span>
+      <h2>الأقسام التسعة عشر، واحداً واحداً</h2>
+      <p>
+        لكل قسم سؤال واحد: هل يبيع (يقنع بالدفع)، أم يبقّي (يمنع الهجر)، أم يزيد الحشو؟
+        القسم الذي لا يفعل أياً منها يستهلك انتباه المستخدم ووقت صيانتك بلا مقابل.
+      </p>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>القسم</th><th>الحجم الفعلي</th><th>الدور التجاري</th><th>الحكم</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="sec">لوحة التحكم</td><td class="n">—</td>
+            <td>يبقّي — يعرض التقدم والسلسلة وخطة اليوم، وهذه أقوى محفزات العودة</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">المفردات والنطق</td><td class="n">1,085 كلمة</td>
+            <td>يبيع ويبقّي — قلب المنتج، بمراجعة متباعدة SM-2 حقيقية وبطاقات وأربعة أنماط دراسة</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">الدروس</td><td class="n">81 درساً</td>
+            <td>يبيع — المسار المنظّم هو ما يميّزك عن تطبيق بطاقات مجاني</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">القواعد</td><td class="n">207 قاعدة</td>
+            <td>يبيع — الشرح النحوي بالعربية هو ميزتك التي لا يقدّمها أحد بجودة</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">محاكي الامتحان</td><td class="n">40 سؤالاً مهملاً</td>
+            <td>يبيع — أقوى دافع دفع على الإطلاق: اجتياز اختبار معتمد</td>
+            <td><span class="chip crit">معطّل جزئياً</span></td></tr>
+          <tr><td class="sec">المحادثات</td><td class="n">40 حواراً</td>
+            <td>يبقّي — لكن HSK 2 فيه 6 حوارات فقط</td>
+            <td><span class="chip warn">فجوة</span></td></tr>
+          <tr><td class="sec">القصص</td><td class="n">36 قصة</td>
+            <td>يبقّي — قراءة ممتدة مع أسئلة فهم، وهي نادرة في هذا المستوى</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">المعلم الذكي</td><td class="n">محرك قواعد</td>
+            <td>يبيع — بشرط تسويقه كمساعد يعمل بلا إنترنت لا كذكاء اصطناعي</td>
+            <td><span class="chip warn">تموضع خاطئ</span></td></tr>
+          <tr><td class="sec">تدريب النطق</td><td class="n">—</td>
+            <td>يبيع — لكنه لا يعمل على آيفون ولا فايرفوكس</td>
+            <td><span class="chip crit">دعم ناقص</span></td></tr>
+          <tr><td class="sec">الحروف (الكتابة)</td><td class="n">HanziWriter</td>
+            <td>يبيع — ترتيب الضربات ميزة يبحث عنها الجاد، وهو الأقرب للدفع</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">البينين</td><td class="n">مضمَّن في الواجهة</td>
+            <td>يبيع — بوابة المبتدئ، وأول ما يبحث عنه الناطق بالعربية</td>
+            <td><span class="chip warn">ازدواج محتوى</span></td></tr>
+          <tr><td class="sec">القاموس البصري</td><td class="n">3 مستويات</td>
+            <td>يبقّي — تعلّم بالصور، مناسب للجوال ولقطات التسويق</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">التمارين</td><td class="n">مولَّدة</td>
+            <td>يبقّي — الممارسة اليومية هي ما يبني العادة</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">الألعاب</td><td class="n">لعبة ذاكرة + نبرات</td>
+            <td>حشو — ممتع لكنه لا يقنع أحداً بالدفع ولا يمنع أحداً من الهجر</td>
+            <td><span class="chip mute">ثانوي</span></td></tr>
+          <tr><td class="sec">أسئلة يومية</td><td class="n">49 سؤالاً</td>
+            <td>يبقّي — عادة يومية قصيرة، مرشّح ممتاز لإشعار يومي لاحقاً</td>
+            <td><span class="chip ok">أصل</span></td></tr>
+          <tr><td class="sec">الجمل</td><td class="n">من المفردات</td>
+            <td>يبقّي — لكنه يكرر ما تعرضه أقسام أخرى</td>
+            <td><span class="chip mute">ازدواج</span></td></tr>
+          <tr><td class="sec">خريطة الطريق</td><td class="n">10 وحدات (HSK 1)</td>
+            <td>يبيع — يعرض «إلى أين ستصل»، وهذا ما يبرر السعر</td>
+            <td><span class="chip warn">HSK 1 فقط عملياً</span></td></tr>
+          <tr><td class="sec">الإنجازات</td><td class="n">11 إنجازاً</td>
+            <td>يبقّي — عدد ضئيل جداً؛ يُستنفد في أسبوعين</td>
+            <td><span class="chip warn">رقيق</span></td></tr>
+          <tr><td class="sec">الإعدادات</td><td class="n">—</td>
+            <td>يبقّي — تصدير/استيراد التقدم هنا هو خط دفاعك الوحيد ضد ضياع البيانات، وهو مخفي</td>
+            <td><span class="chip warn">مدفون</span></td></tr>
+        </tbody>
+        <caption>الأحجام مستخرجة من ملفات البيانات مباشرة، لا من الوصف التسويقي.</caption>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══ CONTENT INVENTORY ═══ -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">05 · Inventory</span>
+      <h2>جرد المحتوى — أين تقف فعلاً</h2>
+      <p>هذا هو أصلك القابل للتقييم. أي مشترٍ أو شريك سينظر إلى هذا الجدول أولاً.</p>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>المستوى</th><th>مفردات</th><th>قواعد</th><th>دروس</th><th>محادثات</th><th>قصص</th><th>الحالة</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="sec">HSK 1</td><td class="n">411</td><td class="n">53</td><td class="n">48</td><td class="n">16</td><td class="n">14</td>
+            <td><span class="chip ok">مكتمل</span></td></tr>
+          <tr><td class="sec">HSK 2</td><td class="n">195</td><td class="n">30</td><td class="n">15</td><td class="n">6</td><td class="n">10</td>
+            <td><span class="chip crit">ناقص</span></td></tr>
+          <tr><td class="sec">HSK 3</td><td class="n">479</td><td class="n">124</td><td class="n">18</td><td class="n">18</td><td class="n">12</td>
+            <td><span class="chip ok">قوي</span></td></tr>
+          <tr><td class="sec">الإجمالي</td><td class="n">1,085</td><td class="n">207</td><td class="n">81</td><td class="n">40</td><td class="n">36</td>
+            <td><span class="chip opp">قابل للترخيص</span></td></tr>
+        </tbody>
+        <caption>كل كلمة في المستويات الثلاثة تحمل جملة مثال وتعبير حفظ وجذور الحروف — تغطية ١٠٠٪ بلا استثناء.</caption>
+      </table>
+    </div>
+    <p class="note" style="margin-top:18px">
+      قاعدة بيانات بهذه الاتساق نادرة في المحتوى العربي، وهي في ذاتها منتج يمكن ترخيصه لمعاهد
+      وتطبيقات أخرى حتى لو لم تنجح المنصة كمنتج استهلاكي. عامِلها كأصل مستقل: احفظ نسخة، ووثّق
+      مصدرها، ولا تتركها تُشحن مكشوفة في ملف علني (انظر B-03).
+    </p>
+  </section>
+
+  <!-- ═══ MONETIZATION ═══ -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">06 · Monetization</span>
+      <h2>نموذج الربح — لماذا ‎$9 مدى الحياة قرار خاسر</h2>
+      <p>حتى لو أصلحتَ كل الأعطال أعلاه، النموذج الحالي يضع سقفاً منخفضاً على ما يمكن أن تجنيه.</p>
+    </div>
+    <div class="stack">
+      <ul class="plain">
+        <li><b>تجربة ٢٤ ساعة قصيرة على منتج تعليمي.</b> تعلّم لغة قرار طويل الأمد؛ يوم واحد لا يكفي ليشعر المستخدم بتقدّم يبرّر الدفع. التجربة المبنية على <em>إنجاز</em> (أول درسين، أو أول ٥٠ كلمة) تحوّل أفضل من تجربة مبنية على <em>ساعة</em>، ولها ميزة إضافية: لا يمكن تجاوزها بتغيير التاريخ.</li>
+        <li><b>‎$9 مرة واحدة تقتل قيمة العميل مدى الحياة.</b> بنيتَ ثلاثة مستويات و‎1,085 كلمة ومحاكي امتحان — هذا منتج بقيمة تفوق كوب قهوة. تسعيرك الحالي يخبر السوق أن منتجك رخيص، ثم يمنعك من جني أي ريال إضافي من نفس العميل بعد ذلك.</li>
+        <li><b>لا يوجد مسار ترقية.</b> بما أن السعر واحد للكل، لا يمكن للعميل أن ينمو معك: من يجتاز HSK 1 وينتقل إلى 3 يدفع نفس ما دفعه من جرّب يوماً واحداً.</li>
+        <li><b>لا وسيلة دفع محلية.</b> Gumroad وحده يخدم بطاقات دولية. في السوق الخليجي والمصري تحتاج مدى/K-Net/فوري/آبل باي — وغيابها يقتل التحويل حتى مع منتج مقنع.</li>
+      </ul>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>المسار</th><th>السعر المقترح</th><th>ما يشتريه</th><th>لماذا</th></tr></thead>
+          <tbody>
+            <tr><td class="sec">مجاني</td><td class="n">$0</td>
+              <td>HSK 1 كاملاً</td>
+              <td>مستوى كامل مجاناً يبني ثقة وسمعة ومشاركة أكثر مما يبنيه يوم تجربة — وHSK 1 هو الأرخص محتوىً والأسهل تعويضاً</td></tr>
+            <tr><td class="sec">اشتراك</td><td class="n">$5–7 / شهر</td>
+              <td>HSK 2 و3، المحاكي الكامل، مزامنة الأجهزة</td>
+              <td>يحوّل ‎$9 مرة إلى ‎$60+ سنوياً لنفس العميل، ويجعل تكلفة الخادم مبرَّرة</td></tr>
+            <tr><td class="sec">مدى الحياة</td><td class="n">$59–79</td>
+              <td>كل شيء + التحديثات</td>
+              <td>ابقِ الخيار لمن يكره الاشتراكات، لكن سعّره كما يليق بحجم المحتوى</td></tr>
+            <tr><td class="sec">معاهد / شركات</td><td class="n">تسعير لكل مقعد</td>
+              <td>لوحة متابعة للمعلّم</td>
+              <td>معاهد اللغات، برامج المنح الدراسية للصين، شركات لها أعمال صينية — عقد واحد يعادل مئات المشتركين الأفراد</td></tr>
+          </tbody>
+          <caption>أرقام مقترحة كنقطة بداية للاختبار، لا كتوصية نهائية — تحتاج بيانات تحويل حقيقية أولاً، وهي غير متوفرة اليوم (انظر B-06).</caption>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ POSITIONING ═══ -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">07 · Positioning</span>
+      <h2>أين تفوز، وأين لا يجب أن تحارب</h2>
+    </div>
+    <div class="stack">
+      <p class="prose">
+        منافسوك الحقيقيون — Duolingo وHelloChinese وPleco وAnki — كلهم يخدمون الناطق بالإنجليزية
+        أولاً، والدعم العربي فيهم إما غائب أو ترجمة آلية باهتة. هذه فجوة حقيقية، وأنت فيها.
+      </p>
+      <ul class="plain">
+        <li><b>ميزتك الحقيقية:</b> الشرح النحوي بالعربية، وربط الجذور والحروف، وتعابير الحفظ المكتوبة بعقل عربي، وواجهة RTL أصلية لا معرّبة. لا يوجد منافس يقدّم هذه الأربعة معاً.</li>
+        <li><b>ميزتك الثانية:</b> يعمل بلا إنترنت وبلا تكلفة تشغيل. في أسواق ذات إنترنت متقطّع وأسعار بيانات مرتفعة، هذه رسالة تسويقية أقوى من «ذكاء اصطناعي».</li>
+        <li><b>حيث لا يجب أن تحارب:</b> عدد الميزات. لديك ١٩ قسماً وهذا كثير جداً لمنتج بلا فريق. الألعاب وقسم الجمل لا يبيعان ولا يبقّيان — دمجهما أو تأجيلهما يوفّر صيانة ويجعل الواجهة أوضح.</li>
+        <li><b>حيث لا يجب أن تحارب:</b> جودة الذكاء الاصطناعي. لا تنافس ChatGPT بمحرك كلمات مفتاحية؛ أعد تسميته وسوّق ميزته الحقيقية (فوري، بلا إنترنت، مبني على منهجك أنت).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ ROADMAP ═══ -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">08 · Sequence</span>
+      <h2>الترتيب الذي أوصي به</h2>
+      <p>
+        الترتيب هنا مقصود: كل مرحلة تفتح ما تحتاجه المرحلة التي بعدها. لا تبدأ بالتسويق قبل أن
+        يوجد ما يُحصّل، ولا تبني ميزات قبل أن تعرف أين يتوقف الناس.
+      </p>
+    </div>
+    <div class="phases">
+
+      <div class="phase">
+        <div class="phase-top"><span class="phase-n">01</span><h3>أول أسبوعين — أن تصبح تجارة</h3></div>
+        <ul>
+          <li><b>أنشئ منتج Gumroad فعلياً</b> واستبدل الرابط الوهمي، وفعّل تكامل التحقق المعطّل في الكود.</li>
+          <li><b>ركّب أداة قياس</b> (إحصاءات Vercel كافية للبدء) وتتبّع أربعة أحداث فقط: زيارة، إكمال التسجيل، وصول لشاشة انتهاء التجربة، ضغط زر الشراء.</li>
+          <li><b>اربط بنك أسئلة الامتحان</b> بالمحاكي — استيراد واحد يرفع جودة أقوى ورقة بيع لديك.</li>
+          <li><b>وحّد الأرقام</b> في كل الشاشات على ‎1,085 كلمة، وأصلح قسمة الإحصاءات على 410 الثابتة.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-top"><span class="phase-n">02</span><h3>الشهر الثاني — أن يبقى العميل</h3></div>
+        <ul>
+          <li><b>حسابات وقاعدة بيانات</b> (Supabase تكفي) — بريد إلكتروني، مزامنة التقدم، وتحقّق من الترخيص على الخادم بدل المتصفح.</li>
+          <li><b>انقل محتوى HSK 2 و3 خلف الخادم</b> بحيث لا يُشحن إلا بعد التحقق — هذا وحده يجعل البوابة حقيقية.</li>
+          <li><b>صفحة تعريفية على الجذر</b> مع لقطات وتسعير ووصف قابل للفهرسة وصورة مشاركة، والتطبيق على مسار منفصل.</li>
+          <li><b>عالج مشكلة الصوت</b>: اكتشف غياب الصوت الصيني ووجّه المستخدم لتثبيته، أو استضف ملفات صوتية مسجّلة للكلمات الأكثر استخداماً.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-top"><span class="phase-n">03</span><h3>الشهر الثالث — أن ينمو</h3></div>
+        <ul>
+          <li><b>أكمل HSK 2</b> حتى يوازي جاريه — هذا حيث سيتسرّب المشتركون وإلا.</li>
+          <li><b>اختبر التسعير</b>: مجاني لـHSK 1، اشتراك لما بعده، وقارن بالنتيجة الحالية بالأرقام لا بالحدس.</li>
+          <li><b>أضف وسيلة دفع محلية</b> (آبل باي على الأقل) وقِس أثرها على التحويل.</li>
+          <li><b>اطرق باب B2B</b>: معهد لغات واحد أو برنامج منح واحد يعادل مئات المشتركين، ويعطيك دخلاً ثابتاً بدل موسمي.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <p class="foot">
+    أُعدّت هذه المراجعة بفحص شيفرة المشروع كاملة، وبناء النسخة الإنتاجية وتشغيلها محلياً،
+    والمرور على كل قسم في الواجهة على مقاسي الحاسوب والجوال. أعطال الدفع والبوابة
+    (B-01 إلى B-04) مُثبتة عملياً لا مستنتَجة من قراءة الكود. الأرقام المالية في قسم نموذج الربح
+    مقترحات للاختبار وليست تقديرات — فالمنصة لا تنتج اليوم أي بيانات تحويل يمكن البناء عليها.
+  </p>
+
+</div>

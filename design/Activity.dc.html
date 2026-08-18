@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700&family=Noto+Sans+SC:wght@400;700&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Tajawal', system-ui, sans-serif; }
+    h1, h2 { font-family: 'Cairo', system-ui, sans-serif; margin: 0; }
+    p { margin: 0; }
+    a { color: #1B3A6B; } a:hover { color: #24508F; }
+    .zh { font-family: 'Noto Sans SC', system-ui, sans-serif; }
+  </style>
+</helmet>
+
+<div dir="rtl" style="width: 390px; min-height: 844px; background: #F7F4EF; color: #2A2A2A; display: flex; flex-direction: column;">
+
+  <!-- شريط التقدم -->
+  <div style="padding: 20px 18px 14px; display: flex; align-items: center; gap: 14px;">
+    <button style="width: 44px; height: 44px; border-radius: 11px; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; flex: none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E6E6E" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div style="flex: 1; height: 10px; border-radius: 999px; background: rgba(42,42,42,.10); overflow: hidden;">
+      <div style="width: 43%; height: 100%; border-radius: 999px; background: #1B3A6B;"></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 5px; flex: none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"><path d="M12 3c0 4-4 5-4 9a4 4 0 0 0 8 0c0-2-1-3-1-5 2 1 3 3 3 5a6 6 0 0 1-12 0c0-5 6-6 6-9Z"/></svg>
+      <span style="font-family: 'Cairo'; font-size: 14px; font-weight: 700; color: #8A6D12;">٧</span>
+    </div>
+  </div>
+
+  <!-- السؤال -->
+  <div style="padding: 16px 18px 0; display: flex; flex-direction: column; gap: 22px; flex: 1;">
+    <h1 style="font-size: 21px; font-weight: 700; line-height: 1.5;">اختر الرد الصحيح</h1>
+
+    <!-- فقاعة المحادثة -->
+    <div style="display: flex; gap: 12px; align-items: flex-start;">
+      <div style="width: 42px; height: 42px; border-radius: 50%; background: #1B3A6B; display: grid; place-items: center; flex: none;">
+        <span style="font-family: 'Cairo'; font-size: 15px; font-weight: 700; color: #F7F4EF;">ل</span>
+      </div>
+      <div style="flex: 1; padding: 16px 18px; border-radius: 16px; border-start-end-radius: 4px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 7px;">
+        <span class="zh" style="font-size: 24px; font-weight: 700; line-height: 1.4;">你是哪国人？</span>
+        <span style="font-size: 13px; color: #6E6E6E;">Nǐ shì nǎ guó rén?</span>
+        <button style="align-self: flex-start; display: flex; align-items: center; gap: 6px; margin-top: 4px; padding: 8px 12px; min-height: 36px; border: 1px solid rgba(27,58,107,.25); border-radius: 9px; background: transparent; cursor: pointer;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="1.9" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>
+          <span style="font-size: 12px; color: #1B3A6B;">استمع</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- الخيارات -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+
+      <button style="display: flex; align-items: center; gap: 13px; width: 100%; min-height: 62px; padding: 14px 16px; border-radius: 14px; border: 1.5px solid rgba(42,42,42,.12); background: #FFFFFF; cursor: pointer; text-align: start;">
+        <span style="width: 26px; height: 26px; border-radius: 7px; background: rgba(42,42,42,.06); display: grid; place-items: center; font-size: 12px; color: #6E6E6E; flex: none;">١</span>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span class="zh" style="font-size: 17px; font-weight: 700;">我很好，谢谢。</span>
+          <span style="font-size: 12px; color: #6E6E6E;">أنا بخير، شكراً.</span>
+        </div>
+      </button>
+
+      <!-- الخيار الصحيح -->
+      <button style="display: flex; align-items: center; gap: 13px; width: 100%; min-height: 62px; padding: 14px 16px; border-radius: 14px; border: 1.5px solid #1B7F4B; background: rgba(27,127,75,.08); cursor: pointer; text-align: start;">
+        <span style="width: 26px; height: 26px; border-radius: 7px; background: #1B7F4B; display: grid; place-items: center; flex: none;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span class="zh" style="font-size: 17px; font-weight: 700;">我是中国人。</span>
+          <span style="font-size: 12px; color: #17663D;">أنا صيني.</span>
+        </div>
+      </button>
+
+      <!-- خيار خاطئ مختار: الأحمر + أيقونة، فالحكم لا يعتمد على اللون وحده -->
+      <button style="display: flex; align-items: center; gap: 13px; width: 100%; min-height: 62px; padding: 14px 16px; border-radius: 14px; border: 1.5px solid #C8102E; background: rgba(200,16,46,.07); cursor: pointer; text-align: start;">
+        <span style="width: 26px; height: 26px; border-radius: 7px; background: #C8102E; display: grid; place-items: center; flex: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span class="zh" style="font-size: 17px; font-weight: 700;">我叫阿里。</span>
+          <span style="font-size: 12px; color: #8C0C20;">اسمي علي.</span>
+        </div>
+      </button>
+
+      <button style="display: flex; align-items: center; gap: 13px; width: 100%; min-height: 62px; padding: 14px 16px; border-radius: 14px; border: 1.5px solid rgba(42,42,42,.12); background: #FFFFFF; cursor: pointer; text-align: start;">
+        <span style="width: 26px; height: 26px; border-radius: 7px; background: rgba(42,42,42,.06); display: grid; place-items: center; font-size: 12px; color: #6E6E6E; flex: none;">٤</span>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span class="zh" style="font-size: 17px; font-weight: 700;">再见！</span>
+          <span style="font-size: 12px; color: #6E6E6E;">مع السلامة!</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- شريط الحكم السفلي -->
+  <div style="margin-top: auto; padding: 18px; background: rgba(200,16,46,.07); border-top: 1.5px solid rgba(200,16,46,.3); display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; align-items: flex-start; gap: 12px;">
+      <span style="width: 30px; height: 30px; border-radius: 50%; background: #C8102E; display: grid; place-items: center; flex: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </span>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-family: 'Cairo'; font-size: 15px; font-weight: 700; color: #8C0C20;">هذا جواب عن سؤال آخر</span>
+        <p style="font-size: 13px; line-height: 1.7; color: #4A4A4A;"><span class="zh" style="font-weight: 700;">哪国</span> تسأل عن البلد لا عن الاسم. الجواب: <span class="zh" style="font-weight: 700;">我是中国人。</span></p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button style="flex: none; width: 52px; height: 52px; border-radius: 13px; border: 1px solid rgba(42,42,42,.16); background: #FFFFFF; display: grid; place-items: center; cursor: pointer;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.6 2.6 0 1 1 3.4 2.5c-.6.2-.9.8-.9 1.4v.4"/><path d="M12 17.2h.01"/></svg>
+      </button>
+      <button style="flex: 1; height: 52px; border: 0; border-radius: 13px; background: #1B3A6B; color: #F7F4EF; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer;">تابع</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

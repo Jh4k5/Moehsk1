@@ -48,7 +48,7 @@ export const Analytics = {
   /**
    * Compute overall learning statistics from localStorage data.
    */
-  getStats(): LearningStats {
+  getStats(totalWords = 405): LearningStats {
     // ── SRS data ──────────────────────────────────────────────────────────────
     const srs = getJson<
       Record<
@@ -63,7 +63,6 @@ export const Analytics = {
     >("srs_data", {})
 
     const learnedWords = Object.keys(srs).length
-    const totalWords = 410
 
     const today = todayKey()
     let dueToday = 0
@@ -202,10 +201,10 @@ export const Analytics = {
   /**
    * Cached version of getStats – refreshes at most once every 5 seconds.
    */
-  getCachedStats(): LearningStats {
+  getCachedStats(totalWords = 405): LearningStats {
     const now = Date.now()
     if (!cachedStats || now - cacheTimestamp > CACHE_TTL) {
-      cachedStats = this.getStats()
+      cachedStats = this.getStats(totalWords)
       cacheTimestamp = now
     }
     return cachedStats

@@ -7,188 +7,200 @@
 <body>
 <x-dc>
 <helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700&family=Noto+Sans+SC:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700&family=Noto+Sans+SC:wght@400;700;900&display=swap">
   <style>
-    body { margin: 0; font-family: 'Tajawal', system-ui, sans-serif; }
-    h1, h2, h3 { font-family: 'Cairo', system-ui, sans-serif; margin: 0; }
+    body { margin: 0; font-family: 'Tajawal', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    h1,h2,h3,h4 { font-family: 'Cairo', system-ui, sans-serif; margin: 0; }
     p { margin: 0; }
-    a { color: #1B3A6B; } a:hover { color: #24508F; }
+    a { color: #1B3A6B; text-decoration: none; } a:hover { color: #24508F; }
     .zh { font-family: 'Noto Sans SC', system-ui, sans-serif; }
   </style>
 </helmet>
 
-<div dir="rtl" style="width: 1200px; min-height: 920px; background: #F7F4EF; color: #2A2A2A; display: flex;">
+<div dir="rtl" style="width: 390px; min-height: 844px; background: #F7F4EF; color: #2A2A2A; display: flex; flex-direction: column; position: relative;">
 
-  <!-- الشريط الجانبي -->
-  <div style="width: 236px; flex: none; background: #1B3A6B; display: flex; flex-direction: column; padding: 22px 0;">
-    <div style="display: flex; align-items: center; gap: 11px; padding: 0 20px 22px;">
-      <div style="width: 38px; height: 38px; border-radius: 10px; background: #F7F4EF; display: grid; place-items: center; flex: none;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="1.8" stroke-linecap="round"><path d="M2 17h20"/><path d="M4 17c0-5 3.5-8 8-8s8 3 8 8"/><path d="M12 9V4"/><path d="M8 6l4-2 4 2"/></svg>
+  <!-- ═══ ترويسة الهوية ═══ -->
+  <div style="background: linear-gradient(168deg, #1B3A6B 0%, #16294A 62%, #0F1F3A 100%); padding: 20px 18px 82px; position: relative; overflow: hidden;">
+
+    <!-- زخرفة: قوس الجسر من الشعار -->
+    <svg width="390" height="150" viewBox="0 0 390 150" fill="none" style="position: absolute; bottom: -22px; inset-inline-start: -30px; opacity: .16;">
+      <path d="M-10 120 C 60 40, 150 40, 200 120" stroke="#D4AF37" stroke-width="2.5"/>
+      <path d="M60 120 C 110 62, 190 62, 250 120" stroke="#C8102E" stroke-width="2.5"/>
+      <path d="M-10 121 H 300" stroke="#D4AF37" stroke-width="1.5"/>
+    </svg>
+    <span class="zh" style="position: absolute; top: -18px; inset-inline-end: -6px; font-size: 130px; font-weight: 900; color: rgba(247,244,239,.045); line-height: 1;">桥</span>
+
+    <div style="position: relative; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 38px; height: 38px; border-radius: 11px; background: #F7F4EF; display: grid; place-items: center; flex: none;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="1.8" stroke-linecap="round"><path d="M2 17h20"/><path d="M4 17c0-5 3.5-8 8-8s8 3 8 8"/><path d="M12 9V4"/><path d="M8 6l4-2 4 2"/></svg>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <span style="font-family: 'Cairo'; font-size: 14px; font-weight: 700; color: #F7F4EF; line-height: 1.25;">جسر إلى الصين</span>
+          <span style="font-size: 9px; letter-spacing: .16em; color: #6E97D0;">HSK 1 · المستوى الأول</span>
+        </div>
       </div>
-      <div style="display: flex; flex-direction: column;">
-        <span style="font-family: 'Cairo'; font-size: 14px; font-weight: 700; color: #F7F4EF;">جسر إلى الصين</span>
-        <span style="font-size: 10px; color: #A9C3E4;">HSK 1</span>
+      <div style="display: flex; align-items: center; gap: 7px; padding: 8px 13px; border-radius: 999px; background: rgba(212,175,55,.15); border: 1px solid rgba(212,175,55,.42);">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"><path d="M12 3c0 4-4 5-4 9a4 4 0 0 0 8 0c0-2-1-3-1-5 2 1 3 3 3 5a6 6 0 0 1-12 0c0-5 6-6 6-9Z"/></svg>
+        <span style="font-family: 'Cairo'; font-size: 14px; font-weight: 800; color: #D4AF37;">٧</span>
       </div>
     </div>
 
-    <div style="padding: 0 12px; display: flex; flex-direction: column; gap: 3px;">
-      <div style="display: flex; align-items: center; gap: 11px; min-height: 46px; padding: 0 14px; border-radius: 11px; background: rgba(212,175,55,.16); border-inline-start: 3px solid #D4AF37;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.9" stroke-linecap="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9h12v-9"/></svg>
-        <span style="font-size: 14px; font-weight: 700; color: #F7F4EF;">الرئيسية</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 11px; min-height: 46px; padding: 0 14px; border-radius: 11px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A9C3E4" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4Z"/><path d="M20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7Z"/></svg>
-        <span style="font-size: 14px; color: #D6E3F2;">مساري</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 11px; min-height: 46px; padding: 0 14px; border-radius: 11px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A9C3E4" stroke-width="1.8" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M8 12l3 3 5-6"/></svg>
-        <span style="font-size: 14px; color: #D6E3F2;">مراجعة اليوم</span>
-        <span style="margin-inline-start: auto; padding: 2px 8px; border-radius: 999px; background: #C8102E; font-size: 11px; font-weight: 700; color: #FFF;">١٢</span>
-      </div>
-
-      <div style="padding: 18px 14px 8px;"><span style="font-size: 10px; letter-spacing: .12em; color: #6E97D0;">المكتبة — اختيارية</span></div>
-
-      <div style="display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 0 14px; border-radius: 11px;">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A9C3E4" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 13h4"/></svg>
-        <span style="font-size: 13px; color: #A9C3E4;">المفردات والقواعد</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 0 14px; border-radius: 11px;">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A9C3E4" stroke-width="1.8" stroke-linecap="round"><path d="M5 19l7-14 7 14"/><path d="M8 14h8"/></svg>
-        <span style="font-size: 13px; color: #A9C3E4;">الحروف والبينين</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 0 14px; border-radius: 11px;">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A9C3E4" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h11a3 3 0 0 1 3 3v1H7a3 3 0 0 0-3 3Z"/><path d="M20 18H9a3 3 0 0 1-3-3"/></svg>
-        <span style="font-size: 13px; color: #A9C3E4;">القصص والمحادثات</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 0 14px; border-radius: 11px;">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A9C3E4" stroke-width="1.8" stroke-linecap="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M6 4h12v5a6 6 0 0 1-12 0Z"/></svg>
-        <span style="font-size: 13px; color: #A9C3E4;">محاكي الامتحان</span>
-      </div>
+    <div style="position: relative; padding-top: 22px; display: flex; flex-direction: column; gap: 5px;">
+      <h1 style="font-size: 23px; font-weight: 800; color: #F7F4EF; line-height: 1.35;">مساء الخير يا محمد</h1>
+      <p style="font-size: 13.5px; color: #A9C3E4; line-height: 1.65;">وحدة واحدة و١٢ مراجعة — نحو ١١ دقيقة.</p>
     </div>
+  </div>
 
-    <div style="margin-top: auto; padding: 16px 20px 0; border-top: 1px solid rgba(247,244,239,.10); display: flex; align-items: center; gap: 10px;">
-      <div style="width: 34px; height: 34px; border-radius: 50%; background: #24508F; display: grid; place-items: center; flex: none;">
-        <span style="font-family: 'Cairo'; font-size: 13px; font-weight: 700; color: #F7F4EF;">م</span>
-      </div>
-      <div style="display: flex; flex-direction: column;">
-        <span style="font-size: 13px; font-weight: 600; color: #F7F4EF;">محمد</span>
-        <span style="font-size: 11px; color: #A9C3E4;">المسار الكامل</span>
+  <!-- ═══ بطاقة «التالي» مرفوعة فوق الترويسة ═══ -->
+  <div style="padding: 0 16px; margin-top: -62px; position: relative; z-index: 2;">
+    <div style="border-radius: 20px; background: #FFFFFF; box-shadow: 0 18px 38px -22px rgba(15,31,58,.6); border: 1px solid rgba(42,42,42,.07); overflow: hidden;">
+      <div style="height: 4px; background: linear-gradient(90deg, #D4AF37, #C8102E);"></div>
+      <div style="padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+            <span style="font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: #8A6D12;">التالي في مسارك</span>
+            <h2 style="font-size: 17.5px; font-weight: 800; line-height: 1.4;">الوحدة ٢ — بلدي وجنسيتي</h2>
+            <span style="font-size: 12px; color: #6E6E6E;">الدرس ٣ · ٨ كلمات · قاعدة <span class="zh" style="font-weight: 700; color: #2A2A2A;">是</span></span>
+          </div>
+          <!-- حلقة تقدّم الوحدة -->
+          <div style="position: relative; width: 58px; height: 58px; flex: none;">
+            <svg width="58" height="58" viewBox="0 0 58 58">
+              <circle cx="29" cy="29" r="24" fill="none" stroke="rgba(42,42,42,.09)" stroke-width="6"/>
+              <circle cx="29" cy="29" r="24" fill="none" stroke="#1B3A6B" stroke-width="6" stroke-linecap="round" stroke-dasharray="151" stroke-dashoffset="91" transform="rotate(-90 29 29)"/>
+            </svg>
+            <span style="position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Cairo'; font-size: 14px; font-weight: 800; color: #1B3A6B;">٤٠٪</span>
+          </div>
+        </div>
+
+        <!-- شريط أنواع الأنشطة داخل الوحدة -->
+        <div style="display: flex; align-items: center; gap: 7px;">
+          <span style="width: 30px; height: 30px; border-radius: 9px; background: rgba(27,127,75,.12); display: grid; place-items: center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1B7F4B" stroke-width="2.6" stroke-linecap="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
+          </span>
+          <span style="width: 30px; height: 30px; border-radius: 9px; background: rgba(27,127,75,.12); display: grid; place-items: center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1B7F4B" stroke-width="2.6" stroke-linecap="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
+          </span>
+          <span style="width: 30px; height: 30px; border-radius: 9px; background: #1B3A6B; display: grid; place-items: center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F7F4EF" stroke-width="1.9" stroke-linecap="round"><path d="M5 19l7-14 7 14"/><path d="M8 14h8"/></svg>
+          </span>
+          <span style="width: 30px; height: 30px; border-radius: 9px; background: rgba(42,42,42,.05); display: grid; place-items: center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.9" stroke-linecap="round"><path d="M12 4v10"/><rect x="9" y="4" width="6" height="8" rx="3"/><path d="M6 12a6 6 0 0 0 12 0"/></svg>
+          </span>
+          <span style="width: 30px; height: 30px; border-radius: 9px; background: rgba(42,42,42,.05); display: grid; place-items: center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.9" stroke-linecap="round"><path d="M4 6h11a3 3 0 0 1 3 3v1H7a3 3 0 0 0-3 3Z"/></svg>
+          </span>
+          <span style="margin-inline-start: auto; font-size: 11px; color: #8A8A8A;">٦ من ١٤</span>
+        </div>
+
+        <button style="width: 100%; min-height: 52px; border: 0; border-radius: 14px; background: #1B3A6B; color: #F7F4EF; font-family: 'Cairo'; font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>تابع الوحدة</span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#F7F4EF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- المحتوى -->
-  <div style="flex: 1; padding: 32px 40px; display: flex; flex-direction: column; gap: 24px;">
-
-    <div style="display: flex; align-items: flex-start; justify-content: space-between;">
-      <div style="display: flex; flex-direction: column; gap: 6px;">
-        <h1 style="font-size: 27px; font-weight: 800;">مساء الخير يا محمد</h1>
-        <p style="font-size: 15px; color: #4A4A4A;">أمامك وحدة واحدة اليوم و١٢ كلمة للمراجعة — نحو ١١ دقيقة.</p>
+  <!-- ═══ هدف اليوم ═══ -->
+  <div style="padding: 18px 16px 0; display: flex; gap: 11px;">
+    <div style="flex: 1; padding: 15px 16px; border-radius: 15px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.08); display: flex; align-items: center; gap: 13px;">
+      <div style="position: relative; width: 46px; height: 46px; flex: none;">
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <circle cx="23" cy="23" r="19" fill="none" stroke="rgba(42,42,42,.08)" stroke-width="5"/>
+          <circle cx="23" cy="23" r="19" fill="none" stroke="#D4AF37" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="47.8" transform="rotate(-90 23 23)"/>
+        </svg>
+        <span style="position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Cairo'; font-size: 13px; font-weight: 800; color: #8A6D12;">٦</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; background: rgba(212,175,55,.16); border: 1px solid rgba(212,175,55,.45);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"><path d="M12 3c0 4-4 5-4 9a4 4 0 0 0 8 0c0-2-1-3-1-5 2 1 3 3 3 5a6 6 0 0 1-12 0c0-5 6-6 6-9Z"/></svg>
-        <div style="display: flex; flex-direction: column;">
-          <span style="font-family: 'Cairo'; font-size: 16px; font-weight: 800; color: #8A6D12; line-height: 1.1;">٧ أيام</span>
-          <span style="font-size: 11px; color: #8A6D12;">لا تكسر السلسلة</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- البطاقة الرئيسية: ما التالي -->
-    <div style="padding: 28px 30px; border-radius: 18px; background: #1B3A6B; color: #F7F4EF; display: flex; align-items: center; justify-content: space-between; gap: 30px; position: relative; overflow: hidden;">
-      <div style="position: absolute; top: 0; inset-inline-end: 0; width: 4px; height: 100%; background: #D4AF37;"></div>
-      <div style="display: flex; flex-direction: column; gap: 9px;">
-        <span style="font-size: 12px; letter-spacing: .1em; color: #D4AF37;">التالي في مسارك</span>
-        <h2 style="font-size: 24px; font-weight: 700;">الدرس ٣ · الوحدة ٢ — بلدي وجنسيتي</h2>
-        <span style="font-size: 14px; color: #A9C3E4;">٨ كلمات جديدة · قاعدة 是 · ١٤ نشاطاً · ٦ دقائق</span>
-      </div>
-      <button style="flex: none; height: 56px; padding: 0 34px; border: 0; border-radius: 13px; background: #D4AF37; color: #16294A; font-family: 'Cairo'; font-size: 17px; font-weight: 700; cursor: pointer;">تابع</button>
-    </div>
-
-    <!-- صف الأرقام -->
-    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
-      <div style="padding: 20px; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 6px;">
-        <span style="font-size: 12px; color: #6E6E6E;">كلمات محفوظة</span>
-        <span style="font-family: 'Cairo'; font-size: 26px; font-weight: 800; color: #1B3A6B;">٩٤ <span style="font-size: 14px; font-weight: 500; color: #8A8A8A;">/ ٤٠٥</span></span>
-        <div style="height: 5px; border-radius: 999px; background: rgba(42,42,42,.08); overflow: hidden;"><div style="width: 23%; height: 100%; background: #1B3A6B;"></div></div>
-      </div>
-      <div style="padding: 20px; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 6px;">
-        <span style="font-size: 12px; color: #6E6E6E;">وحدات مكتملة</span>
-        <span style="font-family: 'Cairo'; font-size: 26px; font-weight: 800; color: #1B7F4B;">٩ <span style="font-size: 14px; font-weight: 500; color: #8A8A8A;">/ ٦٨</span></span>
-        <div style="height: 5px; border-radius: 999px; background: rgba(42,42,42,.08); overflow: hidden;"><div style="width: 13%; height: 100%; background: #1B7F4B;"></div></div>
-      </div>
-      <div style="padding: 20px; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 6px;">
-        <span style="font-size: 12px; color: #6E6E6E;">هدف اليوم</span>
-        <span style="font-family: 'Cairo'; font-size: 26px; font-weight: 800; color: #8A6D12;">٦ <span style="font-size: 14px; font-weight: 500; color: #8A8A8A;">/ ١٠ كلمات</span></span>
-        <div style="height: 5px; border-radius: 999px; background: rgba(42,42,42,.08); overflow: hidden;"><div style="width: 60%; height: 100%; background: #D4AF37;"></div></div>
-      </div>
-      <div style="padding: 20px; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 6px;">
-        <span style="font-size: 12px; color: #6E6E6E;">دقة آخر ٧ أيام</span>
-        <span style="font-family: 'Cairo'; font-size: 26px; font-weight: 800; color: #1B3A6B;">٨٦٪</span>
-        <div style="height: 5px; border-radius: 999px; background: rgba(42,42,42,.08); overflow: hidden;"><div style="width: 86%; height: 100%; background: #24508F;"></div></div>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 13px; font-weight: 700;">هدف اليوم</span>
+        <span style="font-size: 11.5px; color: #6E6E6E;">٦ من ١٠ كلمات</span>
       </div>
     </div>
+    <div style="flex: none; width: 108px; padding: 15px 14px; border-radius: 15px; background: #1B3A6B; display: flex; flex-direction: column; justify-content: center; gap: 3px;">
+      <span style="font-family: 'Cairo'; font-size: 21px; font-weight: 800; color: #F7F4EF; line-height: 1.1;">٩٤<span style="font-size: 12px; font-weight: 500; color: #6E97D0;">/٤٠٥</span></span>
+      <span style="font-size: 11px; color: #A9C3E4;">كلمة محفوظة</span>
+      <div style="height: 4px; border-radius: 999px; background: rgba(247,244,239,.16); overflow: hidden; margin-top: 4px;"><div style="width: 23%; height: 100%; background: #D4AF37;"></div></div>
+    </div>
+  </div>
 
-    <!-- صفّان -->
-    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start;">
+  <!-- ═══ مراجعة مستحقة ═══ -->
+  <div style="padding: 18px 0 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 16px 11px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <h3 style="font-size: 15px; font-weight: 800;">مراجعة مستحقة</h3>
+        <span style="padding: 2px 9px; border-radius: 999px; background: #C8102E; font-size: 11px; font-weight: 700; color: #FFF;">١٢</span>
+      </div>
+      <span style="font-size: 12px; color: #1B3A6B; font-weight: 700;">راجع الكل</span>
+    </div>
+    <div style="display: flex; gap: 10px; padding: 0 16px; overflow-x: auto;">
 
-      <div style="padding: 24px; border-radius: 16px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 15px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <h3 style="font-size: 16px; font-weight: 700;">كلمات تحتاج مراجعة</h3>
-          <span style="padding: 3px 10px; border-radius: 999px; background: rgba(200,16,46,.09); font-size: 12px; font-weight: 700; color: #C8102E;">١٢ مستحقة</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="zh" style="font-size: 22px; font-weight: 700; width: 58px;">谢谢</span>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-              <span style="font-size: 13px;">شكراً · xièxie</span>
-              <div style="height: 4px; border-radius: 999px; background: rgba(42,42,42,.08); overflow: hidden;"><div style="width: 25%; height: 100%; background: #C8102E;"></div></div>
-            </div>
-            <span style="font-size: 11px; color: #C8102E;">أخطأت ٣ مرات</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="zh" style="font-size: 22px; font-weight: 700; width: 58px;">老师</span>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-              <span style="font-size: 13px;">معلّم · lǎoshī</span>
-              <div style="height: 4px; border-radius: 999px; background: rgba(42,42,42,.08); overflow: hidden;"><div style="width: 55%; height: 100%; background: #D4AF37;"></div></div>
-            </div>
-            <span style="font-size: 11px; color: #8A6D12;">مستحقة اليوم</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="zh" style="font-size: 22px; font-weight: 700; width: 58px;">同学</span>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-              <span style="font-size: 13px;">زميل الفصل · tóngxué</span>
-              <div style="height: 4px; border-radius: 999px; background: rgba(42,42,42,.08); overflow: hidden;"><div style="width: 62%; height: 100%; background: #D4AF37;"></div></div>
-            </div>
-            <span style="font-size: 11px; color: #8A6D12;">مستحقة اليوم</span>
-          </div>
-        </div>
-        <button style="height: 46px; border: 1px solid rgba(27,58,107,.3); border-radius: 11px; background: transparent; color: #1B3A6B; font-family: 'Cairo'; font-size: 14px; font-weight: 700; cursor: pointer;">ابدأ المراجعة — ٤ دقائق</button>
+      <div style="flex: none; width: 112px; padding: 14px 12px; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(200,16,46,.28); display: flex; flex-direction: column; gap: 7px; align-items: center;">
+        <span class="zh" style="font-size: 28px; font-weight: 700; line-height: 1;">谢谢</span>
+        <span style="font-size: 11px; color: #6E6E6E;">xièxie</span>
+        <span style="font-size: 11.5px; font-weight: 500;">شكراً</span>
+        <span style="padding: 2px 8px; border-radius: 6px; background: rgba(200,16,46,.09); font-size: 10px; color: #C8102E;">أخطأت ٣ مرات</span>
       </div>
 
-      <div style="padding: 24px; border-radius: 16px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 15px;">
-        <h3 style="font-size: 16px; font-weight: 700;">آخر ١٤ يوماً</h3>
-        <div style="display: flex; align-items: flex-end; gap: 7px; height: 96px;">
-          <div style="flex: 1; height: 34%; border-radius: 4px; background: rgba(27,58,107,.22);"></div>
-          <div style="flex: 1; height: 58%; border-radius: 4px; background: rgba(27,58,107,.3);"></div>
-          <div style="flex: 1; height: 12%; border-radius: 4px; background: rgba(42,42,42,.09);"></div>
-          <div style="flex: 1; height: 70%; border-radius: 4px; background: rgba(27,58,107,.42);"></div>
-          <div style="flex: 1; height: 46%; border-radius: 4px; background: rgba(27,58,107,.28);"></div>
-          <div style="flex: 1; height: 88%; border-radius: 4px; background: rgba(27,58,107,.55);"></div>
-          <div style="flex: 1; height: 24%; border-radius: 4px; background: rgba(27,58,107,.18);"></div>
-          <div style="flex: 1; height: 62%; border-radius: 4px; background: rgba(27,58,107,.35);"></div>
-          <div style="flex: 1; height: 78%; border-radius: 4px; background: rgba(27,58,107,.48);"></div>
-          <div style="flex: 1; height: 40%; border-radius: 4px; background: rgba(27,58,107,.26);"></div>
-          <div style="flex: 1; height: 92%; border-radius: 4px; background: rgba(27,58,107,.6);"></div>
-          <div style="flex: 1; height: 66%; border-radius: 4px; background: rgba(27,58,107,.38);"></div>
-          <div style="flex: 1; height: 54%; border-radius: 4px; background: rgba(27,58,107,.32);"></div>
-          <div style="flex: 1; height: 74%; border-radius: 4px; background: #D4AF37;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #8A8A8A;">
-          <span>قبل ١٤ يوماً</span><span>اليوم</span>
-        </div>
-        <p style="font-size: 13px; line-height: 1.7; color: #4A4A4A; padding-top: 4px; border-top: 1px solid rgba(212,175,55,.4);">أفضل أوقاتك للمذاكرة بين ٩ و١١ مساءً — ودقّتك فيها أعلى بـ١٤٪ من الصباح.</p>
+      <div style="flex: none; width: 112px; padding: 14px 12px; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 7px; align-items: center;">
+        <span class="zh" style="font-size: 28px; font-weight: 700; line-height: 1;">老师</span>
+        <span style="font-size: 11px; color: #6E6E6E;">lǎoshī</span>
+        <span style="font-size: 11.5px; font-weight: 500;">معلّم</span>
+        <span style="padding: 2px 8px; border-radius: 6px; background: rgba(212,175,55,.18); font-size: 10px; color: #8A6D12;">مستحقة اليوم</span>
       </div>
+
+      <div style="flex: none; width: 112px; padding: 14px 12px; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.09); display: flex; flex-direction: column; gap: 7px; align-items: center;">
+        <span class="zh" style="font-size: 28px; font-weight: 700; line-height: 1;">同学</span>
+        <span style="font-size: 11px; color: #6E6E6E;">tóngxué</span>
+        <span style="font-size: 11.5px; font-weight: 500;">زميل</span>
+        <span style="padding: 2px 8px; border-radius: 6px; background: rgba(212,175,55,.18); font-size: 10px; color: #8A6D12;">مستحقة اليوم</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ سلسلة الأيام ═══ -->
+  <div style="padding: 20px 16px 0;">
+    <div style="padding: 16px 18px; border-radius: 16px; background: #FFFFFF; border: 1px solid rgba(42,42,42,.08); display: flex; flex-direction: column; gap: 13px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h3 style="font-size: 14.5px; font-weight: 800;">سلسلتك — ٧ أيام</h3>
+        <span style="font-size: 11.5px; color: #8A6D12;">أطول سلسلة: ١٢ يوماً</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; gap: 5px;">
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;"><span style="width: 100%; height: 34px; border-radius: 8px; background: #D4AF37;"></span><span style="font-size: 10px; color: #8A8A8A;">س</span></div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;"><span style="width: 100%; height: 34px; border-radius: 8px; background: #D4AF37;"></span><span style="font-size: 10px; color: #8A8A8A;">ح</span></div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;"><span style="width: 100%; height: 34px; border-radius: 8px; background: #D4AF37;"></span><span style="font-size: 10px; color: #8A8A8A;">ن</span></div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;"><span style="width: 100%; height: 34px; border-radius: 8px; background: #D4AF37;"></span><span style="font-size: 10px; color: #8A8A8A;">ث</span></div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;"><span style="width: 100%; height: 34px; border-radius: 8px; background: #D4AF37;"></span><span style="font-size: 10px; color: #8A8A8A;">ر</span></div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;"><span style="width: 100%; height: 34px; border-radius: 8px; background: #D4AF37;"></span><span style="font-size: 10px; color: #8A8A8A;">خ</span></div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;"><span style="width: 100%; height: 34px; border-radius: 8px; border: 2px dashed rgba(212,175,55,.6);"></span><span style="font-size: 10px; font-weight: 700; color: #8A6D12;">ج</span></div>
+      </div>
+      <p style="font-size: 12px; line-height: 1.65; color: #4A4A4A; padding-top: 10px; border-top: 1px solid rgba(212,175,55,.35);">أنهِ وحدة اليوم قبل منتصف الليل لتصل إلى ٨ أيام.</p>
+    </div>
+  </div>
+
+  <div style="height: 96px;"></div>
+
+  <!-- ═══ الشريط السفلي ═══ -->
+  <div style="position: absolute; bottom: 0; inset-inline: 0; background: #FFFFFF; border-top: 1px solid rgba(42,42,42,.08); padding: 8px 10px 20px; display: flex; justify-content: space-around; align-items: flex-start; box-shadow: 0 -6px 24px -14px rgba(15,31,58,.35);">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; min-height: 46px; padding-top: 6px;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.1" stroke-linecap="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9h12v-9"/></svg>
+      <span style="font-size: 10.5px; font-weight: 700; color: #1B3A6B;">الرئيسية</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; min-height: 46px; padding-top: 6px;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="1.9" stroke-linecap="round"><path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4Z"/><path d="M20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7Z"/></svg>
+      <span style="font-size: 10.5px; color: #8A8A8A;">مساري</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; min-height: 46px; position: relative; padding-top: 6px;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="1.9" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M8 12l3 3 5-6"/></svg>
+      <span style="position: absolute; top: 2px; inset-inline-end: 10px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: #C8102E; color: #FFF; font-size: 10px; font-weight: 700; display: grid; place-items: center;">١٢</span>
+      <span style="font-size: 10.5px; color: #8A8A8A;">مراجعة</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; min-height: 46px; padding-top: 6px;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="1.9" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 13h4"/></svg>
+      <span style="font-size: 10.5px; color: #8A8A8A;">المكتبة</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; min-height: 46px; padding-top: 6px;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg>
+      <span style="font-size: 10.5px; color: #8A8A8A;">حسابي</span>
     </div>
   </div>
 </div>

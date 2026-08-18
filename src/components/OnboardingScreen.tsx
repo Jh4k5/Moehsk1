@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Sparkles, Target } from 'lucide-react'
 import { useLearningStore, type UserProfile } from '@/lib/store'
 import { useI18n } from '@/lib/i18n'
+import { Logo } from '@/components/brand/Logo'
 
 const AVATARS = ['🐼', '🐉', '🦊', '🐱', '🦁', '🐧', '🦉', '🐢', '🌸', '⭐', '🎋', '🏮']
 const GOALS = [
@@ -49,25 +50,25 @@ export default function OnboardingScreen() {
     <div
       className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
       dir={dir}
-      style={{ background: 'linear-gradient(150deg, #150d24 0%, #221238 35%, #3b1a63 70%, #6d28d9 130%)' }}
+      style={{ background: 'linear-gradient(150deg, #08101C 0%, #0C1626 40%, #16294A 75%, #1B3A6B 120%)' }}
     >
       {/* خلفية حيّة: هالات متدرجة + حروف عائمة */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           className="absolute -top-24 -right-24 w-[28rem] h-[28rem] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.28), transparent 65%)', filter: 'blur(10px)' }}
+          style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.22), transparent 65%)', filter: 'blur(10px)' }}
           animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
           className="absolute -bottom-32 -left-24 w-[32rem] h-[32rem] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(232,121,249,0.22), transparent 65%)', filter: 'blur(12px)' }}
+          style={{ background: 'radial-gradient(circle, rgba(200,16,46,0.20), transparent 65%)', filter: 'blur(12px)' }}
           animate={{ scale: [1.1, 1, 1.1], opacity: [0.8, 0.55, 0.8] }}
           transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
           className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[24rem] h-[24rem] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(251,146,60,0.10), transparent 60%)', filter: 'blur(14px)' }}
+          style={{ background: 'radial-gradient(circle, rgba(62,109,181,0.16), transparent 60%)', filter: 'blur(14px)' }}
           animate={{ y: [0, -18, 0] }}
           transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -100,7 +101,7 @@ export default function OnboardingScreen() {
                 onClick={() => setLang(lg)}
                 className={
                   'px-4 py-1.5 rounded-full text-xs font-bold transition-all ' +
-                  (lang === lg ? 'bg-gradient-to-r from-violet-500 to-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/25' : 'text-white/50 hover:text-white')
+                  (lang === lg ? 'bg-gradient-to-r from-[var(--navy-600)] to-[var(--navy-500)] text-white shadow-lg shadow-[var(--navy-600)]/30' : 'text-white/50 hover:text-white')
                 }
               >
                 {lbl}
@@ -112,15 +113,15 @@ export default function OnboardingScreen() {
         {/* الشعار */}
         <div className="text-center mb-6">
           <motion.div
-            className="mx-auto mb-3 w-[4.5rem] h-[4.5rem] rounded-2xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-orange-400 p-[2px] shadow-lg shadow-fuchsia-500/30"
-            animate={{ boxShadow: ['0 8px 32px -6px rgba(217,70,239,0.35)', '0 8px 44px -4px rgba(167,139,250,0.55)', '0 8px 32px -6px rgba(217,70,239,0.35)'] }}
+            className="mx-auto mb-3 w-[4.5rem] h-[4.5rem] rounded-2xl bg-gradient-to-br from-[var(--gold-500)] via-[var(--red-500)] to-[var(--navy-500)] p-[2px] shadow-lg shadow-[var(--red-500)]/30"
+            animate={{ boxShadow: ['0 8px 32px -6px rgba(200,16,46,0.30)', '0 8px 44px -4px rgba(212,175,55,0.45)', '0 8px 32px -6px rgba(200,16,46,0.30)'] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           >
             <div className="w-full h-full rounded-2xl bg-[#1c1130]/90 flex items-center justify-center">
-              <span className="text-3xl font-bold text-white">桥</span>
+              <Logo variant="icon-white" size={44} />
             </div>
           </motion.div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">{t('جِسر', 'JISR')}</h1>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">{t('جسر إلى الصين', 'Bridge to China')}</h1>
           <p className="text-sm text-white/50 mt-1">{t('جسرك إلى اللغة الصينية', 'Your bridge to Chinese')}</p>
         </div>
 
@@ -130,7 +131,7 @@ export default function OnboardingScreen() {
             <motion.span
               key={i}
               className="h-1.5 rounded-full"
-              animate={{ width: step === i ? 28 : 8, backgroundColor: step === i ? '#e879f9' : 'rgba(255,255,255,0.2)' }}
+              animate={{ width: step === i ? 28 : 8, backgroundColor: step === i ? 'var(--brand-gold)' : 'rgba(247,244,239,0.22)' }}
               transition={{ duration: 0.3 }}
             />
           ))}
@@ -147,7 +148,7 @@ export default function OnboardingScreen() {
             >
               <div>
                 <label className="flex items-center gap-1.5 text-sm font-bold text-white/80 mb-2">
-                  <Sparkles className="w-4 h-4 text-fuchsia-300" />
+                  <Sparkles className="w-4 h-4 text-[var(--red-300)]" />
                   {t('ما اسمك؟', 'What is your name?')}
                 </label>
                 <input
@@ -155,7 +156,7 @@ export default function OnboardingScreen() {
                   onChange={(e) => { setName(e.target.value); setError('') }}
                   onKeyDown={(e) => e.key === 'Enter' && (name.trim() ? setStep(1) : setError(t('يرجى إدخال اسمك', 'Please enter your name')))}
                   placeholder={t('اكتب اسمك هنا...', 'Type your name here...')}
-                  className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-400/30 transition-all"
+                  className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--gold-500)] focus:ring-2 focus:ring-[var(--gold-500)]/35 transition-all"
                   autoFocus
                 />
                 {error && <p className="text-xs text-red-300 mt-2">{error}</p>}
@@ -173,7 +174,7 @@ export default function OnboardingScreen() {
                       className={
                         'aspect-square rounded-xl text-2xl flex items-center justify-center transition-colors ' +
                         (avatar === a
-                          ? 'bg-gradient-to-br from-violet-500 to-fuchsia-600 ring-2 ring-fuchsia-300/60 shadow-lg shadow-fuchsia-500/40'
+                          ? 'bg-gradient-to-br from-[var(--navy-500)] to-[var(--navy-700)] ring-2 ring-[var(--gold-500)]/70 shadow-lg shadow-[var(--navy-900)]/50'
                           : 'bg-white/8 hover:bg-white/15')
                       }
                     >
@@ -187,7 +188,7 @@ export default function OnboardingScreen() {
                 onClick={() => (name.trim() ? setStep(1) : setError(t('يرجى إدخال اسمك', 'Please enter your name')))}
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.985 }}
-                className="w-full rounded-xl bg-gradient-to-r from-violet-600 via-fuchsia-600 to-fuchsia-500 py-3.5 font-bold text-white shadow-lg shadow-fuchsia-500/30 hover:brightness-110 transition-all flex items-center justify-center gap-2"
+                className="w-full rounded-xl bg-gradient-to-r from-[var(--navy-600)] to-[var(--navy-500)] py-3.5 font-bold text-white shadow-lg shadow-[var(--navy-900)]/45 hover:brightness-110 transition-all flex items-center justify-center gap-2"
               >
                 {t('متابعة', 'Continue')}
                 <Forward className="w-4 h-4" />
@@ -222,7 +223,7 @@ export default function OnboardingScreen() {
                     transition={{ delay: 0.06 * i }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full rounded-xl bg-white/8 border border-white/10 px-4 py-3 hover:bg-gradient-to-r hover:from-violet-600/40 hover:to-fuchsia-600/40 hover:border-fuchsia-400/40 transition-colors group"
+                    className="w-full rounded-xl bg-white/8 border border-white/10 px-4 py-3 hover:bg-gradient-to-r hover:from-[var(--navy-600)]/50 hover:to-[var(--navy-500)]/40 hover:border-[var(--gold-500)]/45 transition-colors group"
                     style={{ textAlign: dir === 'rtl' ? 'right' : 'left' }}
                   >
                     <div className="flex items-center justify-between gap-3">

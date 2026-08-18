@@ -1,0 +1,13 @@
+import { chromium } from '/tmp/claude-0/-home-user-Moehsk1/5ce07edf-136c-5661-83c0-79701346b341/scratchpad/node_modules/playwright/index.mjs';
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const p = await b.newPage({ viewport: { width: 1200, height: 800 } });
+const errs = [];
+p.on('console', m => { if (m.type() === 'error') errs.push(m.text().slice(0, 200)); });
+p.on('pageerror', e => errs.push('PAGEERROR: ' + e.message.slice(0, 250)));
+await p.goto('http://localhost:3200/', { waitUntil: 'networkidle' });
+await p.waitForTimeout(2500);
+console.log('inputs on page:', await p.locator('input').count());
+console.log('body text head:', (await p.locator('body').innerText()).slice(0, 160).replace(/\n/g, ' | '));
+console.log('errors:', errs.length ? errs.slice(0,4).join('\n  ') : 'none');
+await p.screenshot({ path: '/tmp/claude-0/-home-user-Moehsk1/5ce07edf-136c-5661-83c0-79701346b341/scratchpad/shots/diag.png' });
+await b.close();

@@ -25,9 +25,9 @@ function TrialBanner() {
       style={{ background: 'linear-gradient(135deg, #1a237e 0%, #283593 100%)' }}
     >
       <div className="flex items-center gap-2 text-sm">
-        <Gift className="h-4 w-4 shrink-0 text-amber-300" />
+        <Gift className="h-4 w-4 shrink-0 text-[var(--gold-300)]" />
         <span>{ts('تجربة مجانية:','Free trial:')}</span>
-        <Badge className="border-0 bg-amber-500/20 px-2 py-0 font-bold text-amber-300 hover:bg-amber-500/20">
+        <Badge className="border-0 bg-[var(--gold-500)]/20 px-2 py-0 font-bold text-[var(--gold-300)] hover:bg-[var(--gold-500)]/20">
           <Clock className="ml-1 h-3 w-3" />
           {trialRemainingFormatted}
         </Badge>
@@ -36,7 +36,7 @@ function TrialBanner() {
       <Button
         size="sm"
         onClick={() => window.open(CONFIG.GUMROAD_URL, '_blank')}
-        className="h-8 gap-1.5 rounded-lg border-0 bg-emerald-500 px-4 text-xs font-bold text-white hover:bg-emerald-600"
+        className="h-8 gap-1.5 rounded-lg border-0 bg-[var(--green-500)] px-4 text-xs font-bold text-white hover:bg-[var(--green-600)]"
       >
         <Crown className="h-3.5 w-3.5" />
         اشترك الآن {CONFIG.PRICE}
@@ -100,9 +100,9 @@ function PaywallOverlay() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: 'spring' }}
-                  className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100"
+                  className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--green-300)]"
                 >
-                  <Check className="h-10 w-10 text-emerald-600" />
+                  <Check className="h-10 w-10 text-[var(--green-600)]" />
                 </motion.div>
                 <h3 className="text-xl font-bold text-gray-900">{ts('تم التفعيل بنجاح! 🎉','Activated successfully! 🎉')}</h3>
                 <p className="text-sm text-gray-500">{ts('مرحباً بك في جِسر — النسخة الكاملة','Welcome to JISR — Full Version')}</p>
@@ -111,16 +111,16 @@ function PaywallOverlay() {
             ) : (
               <>
                 {/* Header decoration */}
-                <div className="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 px-8 pb-8 pt-10">
-                  <div className="absolute -top-2 -left-2 h-16 w-16 rounded-full bg-amber-400/20" />
+                <div className="relative bg-gradient-to-br from-[var(--navy-600)] via-[var(--navy-700)] to-[var(--navy-800)] px-8 pb-8 pt-10">
+                  <div className="absolute -top-2 -left-2 h-16 w-16 rounded-full bg-[var(--gold-400)]/20" />
                   <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-white/5" />
                   <div className="relative">
                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm">
-                      <Crown className="h-8 w-8 text-amber-300" />
+                      <Crown className="h-8 w-8 text-[var(--gold-300)]" />
                     </div>
                     <h3 className="mb-1 text-2xl font-bold text-white">{ts('انتهت فترة التجربة','Your free trial has ended')}</h3>
-                    <p className="text-sm text-blue-200">
-                      احصل على وصول كامل لـ <strong className="text-amber-300">{ts('600+ كلمة','600+ words')}</strong> و <strong className="text-amber-300">{ts('دروس تفاعلية','Interactive lessons')}</strong>
+                    <p className="text-sm text-[var(--navy-200)]">
+                      احصل على وصول كامل لـ <strong className="text-[var(--gold-300)]">{ts('600+ كلمة','600+ words')}</strong> و <strong className="text-[var(--gold-300)]">{ts('دروس تفاعلية','Interactive lessons')}</strong>
                     </p>
                   </div>
                 </div>
@@ -130,7 +130,7 @@ function PaywallOverlay() {
                   <div className="mb-3 flex flex-wrap justify-center gap-2">
                     {['بطاقات ذكية SRS', '5 طرق دراسة', 'محاكي امتحان', 'دروس تفاعلية', 'متعقب تقدم'].map((f) => (
                       <Badge key={f} variant="secondary" className="gap-1 text-xs">
-                        <Sparkles className="h-3 w-3 text-amber-500" />
+                        <Sparkles className="h-3 w-3 text-[var(--gold-500)]" />
                         {f}
                       </Badge>
                     ))}
@@ -143,7 +143,7 @@ function PaywallOverlay() {
                   <Button
                     size="lg"
                     onClick={() => window.open(CONFIG.GUMROAD_URL, '_blank')}
-                    className="w-full gap-2 rounded-xl border-0 bg-gradient-to-l from-blue-600 to-indigo-700 py-6 text-base font-bold text-white shadow-lg shadow-blue-500/25 hover:from-blue-700 hover:to-indigo-800"
+                    className="w-full gap-2 rounded-xl border-0 bg-gradient-to-l from-[var(--navy-600)] to-[var(--navy-700)] py-6 text-base font-bold text-white shadow-lg shadow-[var(--navy-500)]/25 hover:from-[var(--navy-700)] hover:to-[var(--navy-800)]"
                   >
                     <CreditCard className="h-5 w-5" />
                     احصل على الوصول الكامل — {CONFIG.PRICE}

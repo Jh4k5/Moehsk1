@@ -1,15 +1,23 @@
 import type { Metadata } from "next";
-import { Tajawal, Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
+import { Cairo, Tajawal, Noto_Sans_SC } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PaywallProvider } from "@/lib/paywall-context";
 import { LangController } from "@/components/LangController";
 
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic", "latin"],
+  weight: ["600", "700", "800"],
+  display: "swap",
+});
+
 const tajawal = Tajawal({
   variable: "--font-tajawal",
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700", "800"],
+  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
 const notoSansSC = Noto_Sans_SC({
@@ -17,16 +25,13 @@ const notoSansSC = Noto_Sans_SC({
   weight: ["400", "700"],
 });
 
-const notoSerifSC = Noto_Serif_SC({
-  variable: "--font-noto-serif-sc",
-  weight: ["400", "700"],
-});
-
 export const metadata: Metadata = {
-  title: "Jisr — تعلم اللغة الصينية",
-  description: "منصة جِسر لتعلم اللغة الصينية للمستوى الأول (HSK 1) للمتحدثين بالعربية",
+  title: "جسر إلى الصين — تعلّم اللغة الصينية",
+  description:
+    "منصة عربية لتعلّم اللغة الصينية من الصفر حتى HSK 3: مفردات وقواعد وكتابة الحروف ونطق ومحادثات، بمسار متدرّج يبدأ من أول درس.",
   icons: {
-    icon: "/logo.svg",
+    icon: [{ url: "/brand/app-icon.svg", type: "image/svg+xml" }],
+    apple: "/brand/app-icon.svg",
   },
 };
 
@@ -56,7 +61,7 @@ export default function RootLayout({
         ` }} />
       </head>
       <body
-        className={`${tajawal.variable} ${notoSansSC.variable} ${notoSerifSC.variable} antialiased bg-background text-foreground font-arabic`}
+        className={`${cairo.variable} ${tajawal.variable} ${notoSansSC.variable} antialiased bg-background text-foreground font-arabic`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
           <PaywallProvider>

@@ -6,8 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-tajawal);
+  --font-display: var(--font-cairo);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,256 +49,228 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ╔═══════════════════════════════════════════════════════╗
-   ║  1. BASE PALETTE — الألوان الخام غير المتغيرة        ║
+   ║  1. BRAND PALETTE — لوحة «جسر إلى الصين»              ║
+   ║  المصدر: brand-identity.json — خمسة ألوان معتمدة       ║
    ╚═══════════════════════════════════════════════════════╝ */
 :root {
   --radius: 0.75rem;
 
-  /* ── البنفسجي — اللون الأساسي ── */
-  --violet-950: #1e0a3c;
-  --violet-900: #2e1065;
-  --violet-800: #4c1d95;
-  --violet-700: #6d28d9;
-  --violet-600: #7c3aed;
-  --violet-500: #8b5cf6;
-  --violet-400: #a78bfa;
-  --violet-300: #c4b5fd;
-  --violet-200: #ddd6fe;
-  --violet-100: #ede9fe;
-  --violet-50:  #f5f3ff;
+  /* ── ألوان الهوية الخمسة (لا تُعدَّل) ── */
+  --brand-red:      #C8102E;   /* الأحمر الصيني   — تمييز وطاقة */
+  --brand-gold:     #D4AF37;   /* الذهبي الإمبراطوري — تميّز وإنجاز */
+  --brand-navy:     #1B3A6B;   /* الأزرق الموثوق  — اللون الأساسي */
+  --brand-ivory:    #F7F4EF;   /* العاجي          — الخلفية */
+  --brand-charcoal: #2A2A2A;   /* الفحمي          — نص المتن */
 
-  /* ── الأزرق السماوي — للعناصر الصينية ── */
-  --sky-700: #0369a1;
-  --sky-600: #0284c7;
-  --sky-500: #0ea5e9;
-  --sky-400: #38bdf8;
-  --sky-300: #7dd3fc;
-  --sky-100: #e0f2fe;
+  /* ── سلالم مشتقة من ألوان الهوية ── */
+  --navy-900: #0C1626;  --navy-800: #122033;  --navy-700: #16294A;
+  --navy-600: #1B3A6B;  --navy-500: #24508F;  --navy-400: #3E6DB5;
+  --navy-300: #6E97D0;  --navy-200: #A9C3E4;  --navy-100: #D6E3F2;  --navy-50:  #EDF3F9;
 
-  /* ── الزمكري — اللون الثانوي ── */
-  --fuchsia-700: #a21caf;
-  --fuchsia-600: #c026d3;
-  --fuchsia-500: #d946ef;
-  --fuchsia-400: #e879f9;
+  --red-700: #8C0C20;   --red-600: #A50D26;   --red-500: #C8102E;
+  --red-400: #E23A4E;   --red-300: #F05365;   --red-200: #F8A3AD;   --red-100: #FBDDE1;
 
-  /* ── الأخضر — النجاح والتقدم ── */
-  --emerald-600: #059669;
-  --emerald-500: #10b981;
-  --emerald-400: #34d399;
-  --emerald-100: #d1fae5;
+  --gold-700: #8A6D12;  --gold-600: #B08A1E;  --gold-500: #D4AF37;
+  --gold-400: #E0C468;  --gold-300: #EBD9A0;  --gold-100: #F7EFD6;
 
-  /* ── الذهبي — الإنجاز والسلسلة ── */
-  --amber-600:  #d97706;
-  --amber-500:  #f59e0b;
-  --amber-400:  #fbbf24;
-  --amber-100:  #fef3c7;
+  --ivory-100: #F7F4EF; --ivory-200: #EFEAE1; --ivory-300: #E4DDD1;
+  --ink-900: #2A2A2A;   --ink-700: #4A4A4A;   --ink-500: #6E6E6E;   --ink-300: #8A8A8A;
 
-  /* ── الأحمر — الخطأ والتحذير ── */
-  --rose-600: #e11d48;
-  --rose-500: #f43f5e;
-  --rose-400: #fb7185;
-  --rose-100: #ffe4e6;
+  --green-600: #17663D; --green-500: #1B7F4B; --green-400: #2E9E63; --green-300: #4FBF85;
 
-  /* ── البرتقالي — الطاقة والتفاعل ── */
-  --orange-500: #f97316;
-  --orange-400: #fb923c;
+  /* ── نبرات الماندرين، منسجمة مع الهوية ── */
+  --tone-1: #24508F;   /* الأولى — مسطحة عالية */
+  --tone-2: #1B7F4B;   /* الثانية — صاعدة */
+  --tone-3: #B08A1E;   /* الثالثة — هابطة صاعدة */
+  --tone-4: #C8102E;   /* الرابعة — حادة هابطة */
+  --tone-0: #8A8A8A;   /* محايدة */
 
-  /* ── التركوازي — معلومات ونصائح ── */
-  --teal-500: #14b8a6;
-  --teal-400: #2dd4bf;
-
-  /* ── نبرات النطق الصينية ── */
-  --tone-1: #818cf8;  /* البنفسجي الفاتح — النبرة الأولى */
-  --tone-2: #34d399;  /* الأخضر — النبرة الثانية */
-  --tone-3: #fbbf24;  /* الذهبي — النبرة الثالثة */
-  --tone-4: #f87171;  /* الأحمر — النبرة الرابعة */
-  --tone-0: #94a3b8;  /* الرمادي — نبرة محايدة */
+  /* ── أسماء قديمة تُبقى كمرادفات حتى تُرحَّل بالكامل ── */
+  --violet-950: var(--navy-900); --violet-900: var(--navy-800); --violet-800: var(--navy-700);
+  --violet-700: var(--navy-700); --violet-600: var(--navy-600); --violet-500: var(--navy-500);
+  --violet-400: var(--navy-400); --violet-300: var(--navy-300); --violet-200: var(--navy-200);
+  --violet-100: var(--navy-100); --violet-50:  var(--navy-50);
+  --sky-700: var(--navy-700); --sky-600: var(--navy-600); --sky-500: var(--navy-500);
+  --sky-400: var(--navy-400); --sky-300: var(--navy-300); --sky-100: var(--navy-100);
+  --fuchsia-700: var(--red-700); --fuchsia-600: var(--red-500);
+  --fuchsia-500: var(--red-400); --fuchsia-400: var(--red-300);
+  --emerald-600: var(--green-600); --emerald-500: var(--green-500);
+  --emerald-400: var(--green-400); --emerald-100: #DCF0E5;
+  --amber-600: var(--gold-700); --amber-500: var(--gold-500);
+  --amber-400: var(--gold-400); --amber-100: var(--gold-100);
+  --rose-600: var(--red-600); --rose-500: var(--red-500);
+  --rose-400: var(--red-400); --rose-100: var(--red-100);
+  --orange-500: var(--gold-500); --orange-400: var(--gold-400);
+  --teal-500: var(--green-500); --teal-400: var(--green-400);
 }
 
 /* ╔═══════════════════════════════════════════════════════╗
-   ║  2. DARK MODE — الوضع الليلي (الافتراضي)             ║
+   ║  2. DARK MODE — أرضية كحلية مشتقة من لون الهوية        ║
+   ║  عاجي على #0C1626 = 16.52 : تباين ممتاز                ║
    ╚═══════════════════════════════════════════════════════╝ */
 :root, .dark {
-  /* ── الأسطح (Surfaces) ── */
-  --surface-base:    #0c0a1d;
-  --surface-page:    #110e2a;
-  --surface-card:    #1a1640;
-  --surface-card-h:  #231e52;
-  --surface-card-a:  #2c2668;
-  --surface-sidebar: #0d0b22;
-  --surface-header:  rgba(12, 10, 29, 0.88);
+  --surface-base:    #08101C;
+  --surface-page:    #0C1626;
+  --surface-card:    #122033;
+  --surface-card-h:  #17293F;
+  --surface-card-a:  #1D3350;
+  --surface-sidebar: #0A1220;
+  --surface-header:  rgba(12, 22, 38, 0.85);
 
-  /* ── الحدود ── */
-  --line-default:  rgba(139, 92, 246, 0.08);
-  --line-subtle:   rgba(139, 92, 246, 0.15);
-  --line-medium:   rgba(139, 92, 246, 0.25);
-  --line-strong:   rgba(139, 92, 246, 0.40);
+  --line-subtle:  rgba(247, 244, 239, 0.06);
+  --line-default: rgba(247, 244, 239, 0.12);
+  --line-medium:  rgba(247, 244, 239, 0.20);
+  --line-strong:  rgba(212, 175, 55, 0.35);
 
-  /* ── النصوص ── */
-  --text-primary:   #f1f0ff;
-  --text-secondary: #c4b5fd;
-  --text-tertiary:  #8b7fc7;
-  --text-muted:     #5b5280;
-  --text-on-primary:#ffffff;
-  --text-on-accent: #ffffff;
+  --text-primary:    #F7F4EF;
+  --text-secondary:  #C9D3E0;
+  --text-tertiary:   #9AA7B8;
+  --text-muted:      #6E7C90;
+  --text-on-primary: #FFFFFF;
+  --text-on-accent:  #FFFFFF;
 
-  /* ── الألوان الدلالية الداكنة ── */
-  --clr-primary:    var(--violet-600);
-  --clr-primary-h:  var(--violet-500);
-  --clr-secondary:  var(--fuchsia-600);
-  --clr-success:    var(--emerald-500);
-  --clr-success-h:  var(--emerald-400);
-  --clr-success-bg: rgba(16, 185, 129, 0.12);
-  --clr-warning:    var(--amber-500);
-  --clr-warning-bg: rgba(245, 158, 11, 0.12);
-  --clr-danger:     var(--rose-500);
-  --clr-danger-bg:  rgba(244, 63, 94, 0.12);
-  --clr-info:       var(--sky-500);
-  --clr-info-bg:    rgba(14, 165, 233, 0.12);
-  --clr-energy:     var(--orange-500);
-  --clr-energy-bg:  rgba(249, 115, 22, 0.12);
-  --clr-teal:       var(--teal-500);
-  --clr-teal-bg:    rgba(20, 184, 166, 0.12);
+  /* الكحلي = الإجراء · الأحمر = الخطأ والتمييز · الذهبي = الإنجاز */
+  --clr-primary:    var(--navy-400);
+  --clr-primary-h:  var(--navy-300);
+  --clr-secondary:  var(--red-400);
+  --clr-success:    var(--green-300);
+  --clr-success-h:  var(--green-400);
+  --clr-success-bg: rgba(79, 191, 133, 0.14);
+  --clr-warning:    var(--gold-500);
+  --clr-warning-bg: rgba(212, 175, 55, 0.14);
+  --clr-danger:     var(--red-400);
+  --clr-danger-bg:  rgba(226, 58, 78, 0.14);
+  --clr-info:       var(--navy-300);
+  --clr-info-bg:    rgba(110, 151, 208, 0.14);
+  --clr-energy:     var(--gold-500);
+  --clr-energy-bg:  rgba(212, 175, 55, 0.14);
+  --clr-teal:       var(--green-300);
+  --clr-teal-bg:    rgba(79, 191, 133, 0.14);
 
-  /* ── الظلال ── */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.7);
-  --shadow-glow-primary: 0 4px 24px rgba(124, 58, 237, 0.30);
-  --shadow-glow-success: 0 4px 24px rgba(16, 185, 129, 0.30);
+  /* قناة الحكم — لا تعتمد على اللون وحده أبداً */
+  --action:         var(--navy-400);
+  --action-h:       var(--navy-300);
+  --action-fg:      #FFFFFF;
+  --verdict-right:  var(--green-300);
+  --verdict-right-bg: rgba(79, 191, 133, 0.14);
+  --verdict-wrong:  var(--red-400);
+  --verdict-wrong-bg: rgba(226, 58, 78, 0.14);
+  --verdict-earned: var(--gold-500);
 
-  /* ── التدرجات ── */
-  --gradient-primary: linear-gradient(135deg, var(--violet-500), var(--fuchsia-600));
-  --gradient-hero:    linear-gradient(135deg, #2e1065 0%, #4c1d95 35%, #86198f 75%, #1a0e3e 100%);
-  --gradient-sidebar: linear-gradient(180deg, #0d0b22 0%, #170f38 50%, #0d0b22 100%);
-  --gradient-card-back: linear-gradient(135deg, #231e52, #1a1640);
-  --gradient-accent:  linear-gradient(135deg, #f472b6, #fb923c);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 14px -4px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 18px 44px -18px rgba(0, 0, 0, 0.75);
+  --shadow-glow-primary: 0 0 22px rgba(62, 109, 181, 0.35);
+  --shadow-glow-success: 0 0 22px rgba(79, 191, 133, 0.30);
 
-  /* ── shadcn/ui متوافق ── */
-  --background: oklch(0.12 0.03 290);
-  --foreground: #f1f0ff;
-  --card: #1a1640;
-  --card-foreground: #f1f0ff;
-  --popover: #1a1640;
-  --popover-foreground: #f1f0ff;
-  --primary: #7c3aed;
-  --primary-foreground: #ffffff;
-  --secondary: #231e52;
-  --secondary-foreground: #c4b5fd;
-  --muted: #231e52;
-  --muted-foreground: #8b7fc7;
-  --accent: #2c2668;
-  --accent-foreground: #c4b5fd;
-  --destructive: #f43f5e;
-  --border: rgba(139, 92, 246, 0.15);
-  --input: rgba(139, 92, 246, 0.15);
-  --ring: #7c3aed;
-  --chart-1: #8b5cf6;
-  --chart-2: #10b981;
-  --chart-3: #f59e0b;
-  --chart-4: #f43f5e;
-  --chart-5: #0ea5e9;
-  --sidebar: #0d0b22;
-  --sidebar-foreground: #c4b5fd;
-  --sidebar-primary: #7c3aed;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1640;
-  --sidebar-accent-foreground: #c4b5fd;
-  --sidebar-border: rgba(139, 92, 246, 0.10);
-  --sidebar-ring: #7c3aed;
+  --gradient-primary:   linear-gradient(135deg, var(--navy-600), var(--navy-400));
+  --gradient-hero:      linear-gradient(150deg, #08101C 0%, #0C1626 45%, #16294A 100%);
+  --gradient-sidebar:   linear-gradient(180deg, #0A1220 0%, #0C1626 100%);
+  --gradient-card-back: linear-gradient(135deg, var(--navy-700), var(--navy-500));
+  --gradient-accent:    linear-gradient(135deg, var(--red-500), var(--gold-500));
+
+  --background: #0C1626;              --foreground: #F7F4EF;
+  --card: #122033;                    --card-foreground: #F7F4EF;
+  --popover: #122033;                 --popover-foreground: #F7F4EF;
+  --primary: var(--navy-400);         --primary-foreground: #FFFFFF;
+  --secondary: #17293F;               --secondary-foreground: #C9D3E0;
+  --muted: #17293F;                   --muted-foreground: #9AA7B8;
+  --accent: #1D3350;                  --accent-foreground: #F7F4EF;
+  --destructive: var(--red-400);
+  --border: rgba(247, 244, 239, 0.12);
+  --input: rgba(247, 244, 239, 0.12);
+  --ring: var(--gold-500);
+  --chart-1: var(--navy-400); --chart-2: var(--red-400); --chart-3: var(--gold-500);
+  --chart-4: var(--green-300); --chart-5: var(--navy-200);
+  --sidebar: #0A1220;                 --sidebar-foreground: #C9D3E0;
+  --sidebar-primary: var(--navy-400); --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #122033;          --sidebar-accent-foreground: #F7F4EF;
+  --sidebar-border: rgba(247, 244, 239, 0.10);
+  --sidebar-ring: var(--gold-500);
 }
 
 /* ╔═══════════════════════════════════════════════════════╗
-   ║  3. LIGHT MODE — الوضع النهاري                        ║
+   ║  3. LIGHT MODE — أرضية عاجية                          ║
+   ║  فحمي على العاجي = 13.08 · كحلي على العاجي = 10.27     ║
+   ║  الذهبي هنا شكلٌ لا نص (نصاً يعطي 1.92 — غير مرئي)     ║
    ╚═══════════════════════════════════════════════════════╝ */
 .light {
-  /* ── الأسطح ── */
-  --surface-base:    #fdfcff;
-  --surface-page:    #f7f4ff;
-  --surface-card:    #ffffff;
-  --surface-card-h:  #f3eeff;
-  --surface-card-a:  #ece4ff;
-  --surface-sidebar: #6d28d9;
-  --surface-header:  rgba(255, 255, 255, 0.92);
+  --surface-base:    #EFEAE1;
+  --surface-page:    #F7F4EF;
+  --surface-card:    #FFFFFF;
+  --surface-card-h:  #FBF9F5;
+  --surface-card-a:  #F2EDE4;
+  --surface-sidebar: #1B3A6B;
+  --surface-header:  rgba(247, 244, 239, 0.85);
 
-  /* ── الحدود ── */
-  --line-default:  #e8e0f7;
-  --line-subtle:   #ddd4f2;
-  --line-medium:   #c9bde8;
-  --line-strong:   #a78bfa;
+  --line-subtle:  rgba(42, 42, 42, 0.06);
+  --line-default: rgba(42, 42, 42, 0.12);
+  --line-medium:  rgba(42, 42, 42, 0.20);
+  --line-strong:  rgba(27, 58, 107, 0.35);
 
-  /* ── النصوص ── */
-  --text-primary:   #1e1145;
-  --text-secondary: #4c3a8f;
-  --text-tertiary:  #7c6baf;
-  --text-muted:     #a99cc7;
-  --text-on-primary:#ffffff;
-  --text-on-accent: #ffffff;
+  --text-primary:    #2A2A2A;
+  --text-secondary:  #4A4A4A;
+  --text-tertiary:   #6E6E6E;
+  --text-muted:      #8A8A8A;
+  --text-on-primary: #F7F4EF;
+  --text-on-accent:  #FFFFFF;
 
-  /* ── الألوان الدلالية النهارية ── */
-  --clr-primary:    var(--violet-700);
-  --clr-primary-h:  var(--violet-600);
-  --clr-secondary:  var(--fuchsia-700);
-  --clr-success:    var(--emerald-600);
-  --clr-success-h:  var(--emerald-500);
-  --clr-success-bg: #d1fae5;
-  --clr-warning:    var(--amber-600);
-  --clr-warning-bg: #fef3c7;
-  --clr-danger:     var(--rose-600);
-  --clr-danger-bg:  #ffe4e6;
-  --clr-info:       var(--sky-600);
-  --clr-info-bg:    #e0f2fe;
-  --clr-energy:     var(--orange-500);
-  --clr-energy-bg:  #ffedd5;
-  --clr-teal:       var(--teal-500);
-  --clr-teal-bg:    #ccfbf1;
+  --clr-primary:    var(--navy-600);
+  --clr-primary-h:  var(--navy-500);
+  --clr-secondary:  var(--red-500);
+  --clr-success:    var(--green-500);
+  --clr-success-h:  var(--green-600);
+  --clr-success-bg: rgba(27, 127, 75, 0.10);
+  --clr-warning:    var(--gold-700);
+  --clr-warning-bg: rgba(212, 175, 55, 0.18);
+  --clr-danger:     var(--red-500);
+  --clr-danger-bg:  rgba(200, 16, 46, 0.10);
+  --clr-info:       var(--navy-500);
+  --clr-info-bg:    rgba(36, 80, 143, 0.10);
+  --clr-energy:     var(--gold-600);
+  --clr-energy-bg:  rgba(212, 175, 55, 0.18);
+  --clr-teal:       var(--green-500);
+  --clr-teal-bg:    rgba(27, 127, 75, 0.10);
 
-  /* ── الظلال ── */
-  --shadow-sm: 0 1px 3px rgba(30, 17, 69, 0.06);
-  --shadow-md: 0 4px 16px rgba(30, 17, 69, 0.08);
-  --shadow-lg: 0 8px 32px rgba(30, 17, 69, 0.10);
-  --shadow-glow-primary: 0 4px 24px rgba(124, 58, 237, 0.18);
-  --shadow-glow-success: 0 4px 24px rgba(16, 185, 129, 0.18);
+  --action:         var(--navy-600);
+  --action-h:       var(--navy-500);
+  --action-fg:      #F7F4EF;
+  --verdict-right:  var(--green-500);
+  --verdict-right-bg: rgba(27, 127, 75, 0.10);
+  --verdict-wrong:  var(--red-500);
+  --verdict-wrong-bg: rgba(200, 16, 46, 0.10);
+  --verdict-earned: var(--gold-600);
 
-  /* ── التدرجات ── */
-  --gradient-primary: linear-gradient(135deg, var(--violet-500), var(--fuchsia-600));
-  --gradient-hero:    linear-gradient(135deg, var(--violet-600) 0%, var(--fuchsia-500) 55%, var(--orange-400) 130%);
-  --gradient-sidebar: linear-gradient(180deg, #7c3aed 0%, #a21caf 100%);
-  --gradient-card-back: linear-gradient(135deg, var(--violet-100), var(--violet-50));
-  --gradient-accent:  linear-gradient(135deg, #ec4899, #fb923c);
+  --shadow-sm: 0 1px 2px rgba(27, 58, 107, 0.06);
+  --shadow-md: 0 4px 14px -4px rgba(27, 58, 107, 0.12);
+  --shadow-lg: 0 18px 44px -18px rgba(27, 58, 107, 0.28);
+  --shadow-glow-primary: 0 0 22px rgba(27, 58, 107, 0.18);
+  --shadow-glow-success: 0 0 22px rgba(27, 127, 75, 0.16);
 
-  /* ── shadcn/ui متوافق ── */
-  --background: #f5f2ff;
-  --foreground: #1e1145;
-  --card: #ffffff;
-  --card-foreground: #1e1145;
-  --popover: #ffffff;
-  --popover-foreground: #1e1145;
-  --primary: #7c3aed;
-  --primary-foreground: #ffffff;
-  --secondary: #ede9fe;
-  --secondary-foreground: #4c3a8f;
-  --muted: #f0ecff;
-  --muted-foreground: #7c6baf;
-  --accent: #ddd6fe;
-  --accent-foreground: #4c3a8f;
-  --destructive: #e11d48;
-  --border: #e8e0f7;
-  --input: #e8e0f7;
-  --ring: #7c3aed;
-  --chart-1: #8b5cf6;
-  --chart-2: #10b981;
-  --chart-3: #f59e0b;
-  --chart-4: #f43f5e;
-  --chart-5: #0ea5e9;
-  --sidebar: #6d28d9;
-  --sidebar-foreground: #f3eeff;
-  --sidebar-primary: #fbbf24;
-  --sidebar-primary-foreground: #1e1145;
-  --sidebar-accent: #8b5cf6;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.15);
-  --sidebar-ring: #fbbf24;
+  --gradient-primary:   linear-gradient(135deg, var(--navy-600), var(--navy-500));
+  --gradient-hero:      linear-gradient(150deg, #FFFFFF 0%, #F7F4EF 50%, #EDF3F9 100%);
+  --gradient-sidebar:   linear-gradient(180deg, #1B3A6B 0%, #16294A 100%);
+  --gradient-card-back: linear-gradient(135deg, var(--navy-600), var(--navy-400));
+  --gradient-accent:    linear-gradient(135deg, var(--red-500), var(--gold-500));
+
+  --background: #F7F4EF;              --foreground: #2A2A2A;
+  --card: #FFFFFF;                    --card-foreground: #2A2A2A;
+  --popover: #FFFFFF;                 --popover-foreground: #2A2A2A;
+  --primary: var(--navy-600);         --primary-foreground: #F7F4EF;
+  --secondary: #EFEAE1;               --secondary-foreground: #4A4A4A;
+  --muted: #EFEAE1;                   --muted-foreground: #6E6E6E;
+  --accent: #E4DDD1;                  --accent-foreground: #2A2A2A;
+  --destructive: var(--red-500);
+  --border: rgba(42, 42, 42, 0.12);
+  --input: rgba(42, 42, 42, 0.16);
+  --ring: var(--navy-600);
+  --chart-1: var(--navy-600); --chart-2: var(--red-500); --chart-3: var(--gold-600);
+  --chart-4: var(--green-500); --chart-5: var(--navy-400);
+  --sidebar: #1B3A6B;                 --sidebar-foreground: #D6E3F2;
+  --sidebar-primary: var(--gold-500); --sidebar-primary-foreground: #16294A;
+  --sidebar-accent: #16294A;          --sidebar-accent-foreground: #F7F4EF;
+  --sidebar-border: rgba(247, 244, 239, 0.12);
+  --sidebar-ring: var(--gold-500);
 }
 
 
@@ -316,7 +288,7 @@
   body {
     background: var(--surface-page);
     color: var(--text-primary);
-    font-family: 'Tajawal', var(--font-geist-sans), sans-serif;
+    font-family: var(--font-tajawal), 'Tajawal', 'Noto Sans Arabic', system-ui, sans-serif;
     transition: background 0.35s ease, color 0.35s ease;
   }
   /* الإنجليزية: خط لاتيني نظيف */
@@ -324,7 +296,7 @@
     font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   }
   ::selection {
-    background: rgba(139, 92, 246, 0.25);
+    background: rgba(212, 175, 55, 0.25);
   }
 }
 
@@ -370,7 +342,7 @@
 }
 .j-card:hover {
   border-color: var(--clr-primary);
-  box-shadow: var(--shadow-md), 0 0 0 1px rgba(139, 92, 246, 0.12), 0 8px 24px -8px rgba(139, 92, 246, 0.35);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(212, 175, 55, 0.12), 0 8px 24px -8px rgba(212, 175, 55, 0.35);
   transform: translateY(-2px);
 }
 
@@ -388,11 +360,11 @@
   position: absolute;
   top: -50%; left: -50%;
   width: 200%; height: 200%;
-  background: radial-gradient(ellipse at 30% 30%, rgba(139,92,246,0.15) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 30% 30%, rgba(212, 175, 55,0.15) 0%, transparent 60%);
   pointer-events: none;
 }
 .light .j-hero-card::before {
-  background: radial-gradient(ellipse at 30% 30%, rgba(139,92,246,0.10) 0%, transparent 50%);
+  background: radial-gradient(ellipse at 30% 30%, rgba(212, 175, 55,0.10) 0%, transparent 50%);
 }
 
 /* ── زر أساسي ── */
@@ -419,7 +391,7 @@
 .j-btn-primary:hover {
   background: linear-gradient(135deg, var(--clr-primary-h), var(--clr-primary));
   transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(124, 58, 237, 0.40);
+  box-shadow: 0 6px 28px rgba(27, 58, 107, 0.40);
 }
 .j-btn-primary:active {
   transform: translateY(0);
@@ -495,7 +467,7 @@
   font-size: 0.7rem;
   font-weight: 700;
 }
-.j-badge-violet  { background: rgba(139,92,246,0.15); color: var(--violet-400); }
+.j-badge-violet  { background: rgba(212, 175, 55,0.15); color: var(--violet-400); }
 .j-badge-green   { background: var(--clr-success-bg);   color: var(--clr-success); }
 .j-badge-amber   { background: var(--clr-warning-bg);   color: var(--clr-warning); }
 .j-badge-rose    { background: var(--clr-danger-bg);    color: var(--clr-danger); }
@@ -526,7 +498,7 @@
    ╚═══════════════════════════════════════════════════════╝ */
 .j-sidebar {
   background: var(--gradient-sidebar);
-  border-left: 1px solid rgba(139,92,246,0.06);
+  border-left: 1px solid rgba(212, 175, 55,0.06);
   box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
 }
 
@@ -554,8 +526,8 @@
   transform: translateX(2px);
 }
 .j-nav-item.active {
-  background: linear-gradient(135deg, rgba(124,58,237,0.32), rgba(217,70,239,0.14));
-  color: #e9d5ff;
+  background: linear-gradient(135deg, rgba(212,175,55,0.28), rgba(200,16,46,0.14));
+  color: var(--brand-ivory);
   border: 1px solid rgba(168,85,247,0.35);
 }
 .j-nav-item.active::before {
@@ -592,7 +564,7 @@
   background: rgba(255,255,255,0.05);
 }
 .j-nav-item.active .j-nav-icon {
-  background: rgba(124,58,237,0.25);
+  background: rgba(212,175,55,0.22);
 }
 
 /* ── الشريط الجانبي المغلق ── */
@@ -615,7 +587,7 @@
   border-radius: 0.5rem;
   font-size: 0.8rem;
   white-space: nowrap;
-  border: 1px solid rgba(139,92,246,0.20);
+  border: 1px solid rgba(212, 175, 55,0.20);
   box-shadow: var(--shadow-md);
   z-index: 100;
   pointer-events: none;
@@ -861,7 +833,7 @@
 }
 .j-bottom-nav-item.active {
   color: var(--clr-primary);
-  background: rgba(139,92,246,0.10);
+  background: rgba(212, 175, 55,0.10);
 }
 .j-bottom-nav-item svg,
 .j-bottom-nav-item .j-nav-icon-sm {
@@ -876,21 +848,21 @@
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(212, 175, 55, 0.15);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.30);
+  background: rgba(212, 175, 55, 0.30);
 }
 
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.12);
+  background: rgba(212, 175, 55, 0.12);
   border-radius: 3px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.25);
+  background: rgba(212, 175, 55, 0.25);
 }
 
 .scrollbar-none {
@@ -923,8 +895,8 @@
 
 /* نبض */
 @keyframes j-pulse-primary {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(27, 58, 107, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(27, 58, 107, 0); }
 }
 @keyframes pulse-correct {
   0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
@@ -956,7 +928,7 @@
   100% { background-position: 200% 0; }
 }
 .shimmer {
-  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55,0.08), transparent);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }

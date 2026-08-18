@@ -115,7 +115,7 @@ export default function SettingsSection() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-2xl">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--navy-500)] to-[var(--red-600)] flex items-center justify-center text-2xl">
               {store.profile?.avatarEmoji || '🐼'}
             </div>
             <div className="flex-1">
@@ -276,12 +276,12 @@ export default function SettingsSection() {
       <Card className="j-card border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-500" /> {t('الترخيص','License')}
+            <Crown className="w-4 h-4 text-[var(--gold-500)]" /> {t('الترخيص','License')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {isPaid ? (
-            <div className="flex items-center gap-2 text-emerald-500">
+            <div className="flex items-center gap-2 text-[var(--green-500)]">
               <Check className="w-5 h-5" />
               <span className="font-bold">{ts('النسخة الكاملة مفعّلة — وصول مدى الحياة','Full version active — lifetime access')}</span>
             </div>
@@ -314,7 +314,7 @@ export default function SettingsSection() {
                 </Button>
               </div>
               {licenseMsg && (
-                <p className={'text-xs ' + (licenseMsg.ok ? 'text-emerald-500' : 'text-red-500')}>{licenseMsg.text}</p>
+                <p className={'text-xs ' + (licenseMsg.ok ? 'text-[var(--green-500)]' : 'text-red-500')}>{licenseMsg.text}</p>
               )}
             </>
           )}

@@ -140,7 +140,7 @@ export default function AchievementsSection() {
       {/* ── Header ─────────────────────────────────────────────── */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--clr-warning)]/20 to-amber-700/20 border border-[var(--clr-warning)]/30">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--clr-warning)]/20 to-[var(--gold-700)]/20 border border-[var(--clr-warning)]/30">
             <Trophy className="h-6 w-6 text-[var(--clr-warning)]" />
           </div>
           <div>
@@ -152,7 +152,7 @@ export default function AchievementsSection() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[var(--clr-warning)]/20 to-amber-950/10 border border-[var(--clr-warning)]/20 px-4 py-2">
+        <div className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[var(--clr-warning)]/20 to-[var(--gold-700)]/10 border border-[var(--clr-warning)]/20 px-4 py-2">
           <Star className="h-5 w-5 text-[var(--clr-warning)]" />
           <span className="text-2xl font-bold text-[var(--clr-warning)] sm:text-3xl">
             {totalPoints}
@@ -200,7 +200,7 @@ export default function AchievementsSection() {
               <div
                 className={`rounded-xl p-4 text-center transition-all duration-300 border ${
                   isUnlocked
-                    ? 'bg-gradient-to-b from-[var(--clr-warning)]/30 to-amber-950/20 border-[var(--clr-warning)]/50 hover:shadow-lg hover:shadow-amber-500/10 cursor-default'
+                    ? 'bg-gradient-to-b from-[var(--clr-warning)]/30 to-[var(--gold-700)]/20 border-[var(--clr-warning)]/50 hover:shadow-lg hover:shadow-[var(--gold-500)]/10 cursor-default'
                     : 'bg-[var(--surface-card)]/50 border-[var(--line-medium)] opacity-50 cursor-default'
                 }`}
               >
@@ -208,7 +208,7 @@ export default function AchievementsSection() {
                 <div
                   className={`mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full ${
                     isUnlocked
-                      ? 'bg-gradient-to-br from-[var(--clr-warning)]/20 to-amber-700/10'
+                      ? 'bg-gradient-to-br from-[var(--clr-warning)]/20 to-[var(--gold-700)]/10'
                       : 'bg-[var(--surface-card)]/80'
                   }`}
                 >
@@ -279,8 +279,8 @@ export default function AchievementsSection() {
             }}
             className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2"
           >
-            <div className="flex items-center gap-3 rounded-xl border-2 border-[var(--clr-warning)]/60 bg-gradient-to-r from-amber-950/90 via-gray-900/95 to-amber-950/90 px-5 py-4 shadow-2xl shadow-amber-500/10 backdrop-blur-sm min-w-[280px] sm:min-w-[340px]">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--clr-warning)]/30 to-amber-700/20 border border-[var(--clr-warning)]/30">
+            <div className="flex items-center gap-3 rounded-xl border-2 border-[var(--clr-warning)]/60 bg-gradient-to-r from-[var(--gold-700)]/90 via-gray-900/95 to-[var(--gold-700)]/90 px-5 py-4 shadow-2xl shadow-[var(--gold-500)]/10 backdrop-blur-sm min-w-[280px] sm:min-w-[340px]">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--clr-warning)]/30 to-[var(--gold-700)]/20 border border-[var(--clr-warning)]/30">
                 <span className="text-2xl">{achievement.emoji}</span>
               </div>
               <div className="flex-1 text-right min-w-0">

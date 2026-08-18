@@ -42,6 +42,7 @@ import OnboardingScreen from '@/components/OnboardingScreen'
 import SettingsSection from '@/components/SettingsSection'
 import Paywall from '@/components/Paywall'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { Logo } from '@/components/brand/Logo'
 
 // ─── SRS Helper
 import { isDueForReview, getDifficultyLabel, getWeakWords } from '@/lib/srs'
@@ -674,8 +675,8 @@ export default function Home() {
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#17111f' }}>
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center animate-pulse">
-          <span className="text-2xl font-bold text-white">桥</span>
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--navy-500)] to-[var(--red-600)] flex items-center justify-center animate-pulse">
+          <Logo variant="app" size={56} />
         </div>
       </div>
     )
@@ -696,16 +697,16 @@ export default function Home() {
         <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 max-w-[1600px] mx-auto w-full pr-16 lg:pr-4">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <div className="j-logo-icon shrink-0">
-              <span className="j-logo-zh">桥</span>
+              <Logo variant="app" size={40} />
             </div>
             <div className="hidden sm:block shrink-0">
               <div className="j-logo-text">
-                <span className="j-logo-ar">{t('جِسر', 'JISR')}</span>
-                <span className="j-logo-en">JISR · {activeLevel.label}</span>
+                <span className="j-logo-ar">{t('جسر إلى الصين', 'Bridge to China')}</span>
+                <span className="j-logo-en">{activeLevel.label}</span>
               </div>
             </div>
             <div className="hidden md:block min-w-0">
-              <h1 className="text-lg font-bold truncate" style={{color: "var(--text-primary)"}}>{t('جِسر — تعلم الصينية', 'JISR — Learn Chinese')} {activeLevel.label}</h1>
+              <h1 className="text-lg font-bold truncate" style={{color: "var(--text-primary)"}}>{t('تعلّم اللغة الصينية', 'Learn Chinese')} — {activeLevel.label}</h1>
               <p className="text-xs text-[var(--text-tertiary)] truncate">{stats.total} {t('كلمة', 'words')} • {activeLevel.grammarRules.length} {t('قاعدة', 'rules')} • {activeLevel.level === 1 ? t('مستوى مبتدئ', 'Beginner') : activeLevel.level === 2 ? t('مستوى ثانٍ', 'Elementary') : t('مستوى متوسط', 'Intermediate')}</p>
             </div>
           </div>
@@ -783,12 +784,12 @@ export default function Home() {
             {/* ── Logo + Toggle ── */}
             <div className={"flex items-center gap-3 px-4 py-4 border-b border-white/8 " + (sidebarOpen ? "" : "lg:justify-center lg:px-2")}>
               <div className="w-10 h-10 bg-gradient-to-br j-logo-icon">
-                <span className="font-chinese-serif text-white text-xl font-bold">桥</span>
+                <Logo variant="icon-white" size={34} />
               </div>
               {(sidebarOpen || typeof window === 'undefined') && (
                 <div className="flex-1 min-w-0 hidden lg:block">
-                  <span className="text-white font-bold text-lg leading-tight block">{t('جِسر', 'JISR')}</span>
-                  <span className="j-logo-en">JISR · {activeLevel.label}</span>
+                  <span className="text-white font-bold text-lg leading-tight block">{t('جسر إلى الصين', 'Bridge to China')}</span>
+                  <span className="j-logo-en">{activeLevel.label}</span>
                 </div>
               )}
               {/* Mobile close */}
@@ -801,7 +802,7 @@ export default function Home() {
 
             {/* ── User info ── */}
             <div className={"flex items-center gap-3 px-4 py-3 mx-3 mt-3 rounded-xl bg-white/5 " + (sidebarOpen ? "" : "lg:hidden")}>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--violet-500)] to-[var(--violet-700)] flex items-center justify-center shrink-0 text-lg">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--navy-500)] to-[var(--navy-700)] flex items-center justify-center shrink-0 text-lg">
                 {profile.avatarEmoji || '🐼'}
               </div>
               {sidebarOpen && (
@@ -883,29 +884,29 @@ export default function Home() {
             <div className="flex-1 overflow-y-auto custom-scrollbar py-1 px-0 space-y-3 mt-2">
               {[
                 { title: 'التعلم', titleEn: 'Learn', items: [
-                  { id: 'vocabulary' as Section, label: 'المفردات والنطق', labelEn: 'Vocabulary', icon: BookOpen, color: '#fbbf24' },
-                  { id: 'grammar' as Section, label: 'القواعد', labelEn: 'Grammar', icon: GraduationCap, color: '#38bdf8' },
-                  { id: 'sentences' as Section, label: 'الجمل', labelEn: 'Sentences', icon: MessageCircle, color: '#34d399' },
-                  { id: 'stories' as Section, label: 'القصص', labelEn: 'Stories', icon: BookMarked, color: '#f472b6' },
-                  { id: 'conversations' as Section, label: 'المحادثات', labelEn: 'Conversations', icon: MessageSquare, color: '#2dd4bf' },
+                  { id: 'vocabulary' as Section, label: 'المفردات والنطق', labelEn: 'Vocabulary', icon: BookOpen, color: '#D4AF37' },
+                  { id: 'grammar' as Section, label: 'القواعد', labelEn: 'Grammar', icon: GraduationCap, color: '#6E97D0' },
+                  { id: 'sentences' as Section, label: 'الجمل', labelEn: 'Sentences', icon: MessageCircle, color: '#4FBF85' },
+                  { id: 'stories' as Section, label: 'القصص', labelEn: 'Stories', icon: BookMarked, color: '#E23A4E' },
+                  { id: 'conversations' as Section, label: 'المحادثات', labelEn: 'Conversations', icon: MessageSquare, color: '#D4AF37' },
                 ]},
                 { title: 'التدريب', titleEn: 'Practice', items: [
-                  { id: 'practice' as Section, label: 'التمارين', labelEn: 'Exercises', icon: Target, color: '#fb923c' },
-                  { id: 'games' as Section, label: 'الألعاب', labelEn: 'Games', icon: Gamepad2, color: '#fb7185' },
-                  { id: 'exam' as Section, label: 'محاكي الامتحان', labelEn: 'Exam Simulator', icon: FileText, color: '#818cf8' },
-                  { id: 'qa' as Section, label: 'أسئلة يومية', labelEn: 'Daily Q&A', icon: HelpCircle, color: '#a3e635' },
+                  { id: 'practice' as Section, label: 'التمارين', labelEn: 'Exercises', icon: Target, color: '#E23A4E' },
+                  { id: 'games' as Section, label: 'الألعاب', labelEn: 'Games', icon: Gamepad2, color: '#D4AF37' },
+                  { id: 'exam' as Section, label: 'محاكي الامتحان', labelEn: 'Exam Simulator', icon: FileText, color: '#6E97D0' },
+                  { id: 'qa' as Section, label: 'أسئلة يومية', labelEn: 'Daily Q&A', icon: HelpCircle, color: '#4FBF85' },
                 ]},
                 { title: 'الأدوات', titleEn: 'Tools', items: [
-                  { id: 'visual-dict' as Section, label: 'القاموس البصري', labelEn: 'Visual Dictionary', icon: Image, color: '#e879f9' },
-                  { id: 'pinyin' as Section, label: 'البينين', labelEn: 'Pinyin', icon: Languages, color: '#22d3ee' },
-                  { id: 'hanzi' as Section, label: 'الحروف', labelEn: 'Characters', icon: PenTool, color: '#f87171' },
-                  { id: 'pronunciation' as Section, label: 'تدريب النطق', labelEn: 'Pronunciation', icon: Mic, color: '#c084fc' },
+                  { id: 'visual-dict' as Section, label: 'القاموس البصري', labelEn: 'Visual Dictionary', icon: Image, color: '#6E97D0' },
+                  { id: 'pinyin' as Section, label: 'البينين', labelEn: 'Pinyin', icon: Languages, color: '#4FBF85' },
+                  { id: 'hanzi' as Section, label: 'الحروف', labelEn: 'Characters', icon: PenTool, color: '#E23A4E' },
+                  { id: 'pronunciation' as Section, label: 'تدريب النطق', labelEn: 'Pronunciation', icon: Mic, color: '#D4AF37' },
                 ]},
                 { title: 'أخرى', titleEn: 'More', items: [
-                  { id: 'roadmap' as Section, label: 'خريطة الطريق', labelEn: 'Roadmap', icon: Map, color: '#4ade80' },
-                  { id: 'achievements' as Section, label: 'الإنجازات', labelEn: 'Achievements', icon: Medal, color: '#facc15' },
-                  { id: 'chat' as Section, label: 'المساعد الذكي', labelEn: 'AI Tutor', icon: Bot, color: '#60a5fa' },
-                  { id: 'settings' as Section, label: 'الإعدادات', labelEn: 'Settings', icon: SettingsGear, color: '#cbd5e1' },
+                  { id: 'roadmap' as Section, label: 'خريطة الطريق', labelEn: 'Roadmap', icon: Map, color: '#4FBF85' },
+                  { id: 'achievements' as Section, label: 'الإنجازات', labelEn: 'Achievements', icon: Medal, color: '#D4AF37' },
+                  { id: 'chat' as Section, label: 'المساعد الذكي', labelEn: 'AI Tutor', icon: Bot, color: '#6E97D0' },
+                  { id: 'settings' as Section, label: 'الإعدادات', labelEn: 'Settings', icon: SettingsGear, color: '#A9C3E4' },
                 ]},
               ].map(group => (
                 <div key={group.title}>
@@ -953,7 +954,7 @@ export default function Home() {
               <div className="sidebar-progress bg-white/5 rounded-xl p-3">
                 <div className="flex justify-between items-center mb-1.5">
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">{ts('التقدم العام','Overall progress')}</span>
-                  <span className="text-xs text-[var(--violet-300)] font-bold">{stats.progress}%</span>
+                  <span className="text-xs text-[var(--navy-300)] font-bold">{stats.progress}%</span>
                 </div>
                 <div className="progress-duo mb-1">
                   <div className="progress-duo-fill" style={{ width: stats.progress + '%' }} />
@@ -1135,9 +1136,9 @@ function DashboardSection({ stats, onNavigate }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: ts('كلمة محفوظة', 'Words learned'), value: stats.learned, total: stats.total, icon: BookOpen, color: 'from-[var(--clr-primary)] to-[var(--clr-primary-h)]' },
-          { label: ts('قاعدة نحوية', 'Grammar rules'), value: dashLevel.grammarRules.length, icon: GraduationCap, color: 'from-[var(--clr-warning)] to-[var(--amber-600)]' },
-          { label: ts('أيام متتالية', 'Day streak'), value: store.dailyStreak, icon: Flame, color: 'from-[var(--clr-energy)] to-[var(--orange-400)]' },
-          { label: ts('مستوى التقدم', 'Progress'), value: `${stats.progress}%`, icon: Trophy, color: 'from-[var(--clr-success)] to-[var(--emerald-600)]' },
+          { label: ts('قاعدة نحوية', 'Grammar rules'), value: dashLevel.grammarRules.length, icon: GraduationCap, color: 'from-[var(--clr-warning)] to-[var(--gold-600)]' },
+          { label: ts('أيام متتالية', 'Day streak'), value: store.dailyStreak, icon: Flame, color: 'from-[var(--clr-energy)] to-[var(--gold-400)]' },
+          { label: ts('مستوى التقدم', 'Progress'), value: `${stats.progress}%`, icon: Trophy, color: 'from-[var(--clr-success)] to-[var(--green-600)]' },
         ].map((stat, i) => (
           <Card key={i} className="j-stat-card card-hover border-0">
             <CardContent className="p-4 flex flex-col items-center text-center gap-1.5">

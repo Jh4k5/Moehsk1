@@ -208,6 +208,25 @@ type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Relationships: []
 }
 
+export type GatewayEventRow = {
+  id: string
+  provider: SubscriptionSource
+  event_id: string
+  event_type: string
+  payload: Json
+  processed_at: string | null
+  error: string | null
+  received_at: string
+}
+
+export type GatewayCustomerRow = {
+  provider: SubscriptionSource
+  external_customer_id: string
+  user_id: string
+  email: string | null
+  created_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -222,6 +241,8 @@ export interface Database {
       progress_imports: Table<ProgressImportRow>
       app_config: Table<AppConfigRow>
       app_config_history: Table<AppConfigHistoryRow>
+      gateway_events: Table<GatewayEventRow>
+      gateway_customers: Table<GatewayCustomerRow>
     }
     Views: {
       redemption_code_usage: { Row: RedemptionCodeUsageRow; Relationships: [] }
@@ -277,6 +298,35 @@ export interface Database {
         Returns: SubscriptionRow
       }
       bootstrap_admin: { Args: { target_email: string }; Returns: ProfileRow }
+      // ── Payment gateway ──
+      // Service-role only: every one of these is revoked from anon and
+      // authenticated in 0009_gateway.sql. They appear here because the webhook
+      // route calls them through the admin client, not because a browser may.
+      gateway_record_event: {
+        Args: { p_provider: SubscriptionSource; p_event_id: string; p_event_type: string; p_payload: Json }
+        /** false when the event was seen before — the caller must then stop. */
+        Returns: boolean
+      }
+      gateway_apply_subscription: {
+        Args: {
+          p_provider: SubscriptionSource
+          p_external_sub_id: string
+          p_external_cust_id?: string | null
+          p_email?: string | null
+          p_plan?: string | null
+          p_status?: SubscriptionStatus
+          p_period_start?: string | null
+          p_period_end?: string | null
+          p_cancel_at_end?: boolean
+          p_metadata?: Json
+        }
+        Returns: Json
+      }
+      gateway_mark_processed: {
+        Args: { p_provider: SubscriptionSource; p_event_id: string; p_error?: string | null }
+        Returns: undefined
+      }
+      admin_pending_gateway_events: { Args: { limit_count?: number }; Returns: GatewayEventRow[] }
     }
     Enums: {
       app_role: AppRole

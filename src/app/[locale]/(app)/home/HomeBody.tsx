@@ -2,6 +2,7 @@
 import { useLearningStore } from '@/lib/store'
 import { useMounted } from '@/hooks/use-mounted'
 import HomeSection from '@/features/home/HomeSection'
+import { ProgressHandoff } from '@/features/session/ProgressHandoff'
 import OnboardingScreen from '@/components/OnboardingScreen'
 
 // Onboarding used to be a wall in front of the entire app: the root component
@@ -11,7 +12,7 @@ import OnboardingScreen from '@/components/OnboardingScreen'
 // It is a first-run home screen now. `/path`, `/library` and the marketing
 // pages render without it; only this one route asks for a name, because this
 // is the one route whose whole content is "how are YOU doing".
-export function HomeBody() {
+export function HomeBody({ signedIn = false }: { signedIn?: boolean }) {
   const profile = useLearningStore((s) => s.profile)
   const hydrated = useLearningStore((s) => s._hasHydrated)
   const mounted = useMounted()
@@ -30,5 +31,12 @@ export function HomeBody() {
   // render later.
   if (!mounted || !hydrated) return <div className="j-section-skeleton" aria-busy="true" />
 
-  return profile ? <HomeSection /> : <OnboardingScreen />
+  return (
+    <>
+      {/* Runs once per account, and renders nothing when there is nothing to
+          carry — which is most sign-ups. */}
+      <ProgressHandoff signedIn={signedIn} />
+      {profile ? <HomeSection /> : <OnboardingScreen />}
+    </>
+  )
 }

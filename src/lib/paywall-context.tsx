@@ -121,27 +121,45 @@ export function PaywallProvider({ children }: { children: ReactNode }) {
 
   // Activate license key
   const activateLicense = useCallback(async (key: string): Promise<{ success: boolean; error?: string }> => {
+    // POSTs to /api/redeem, which checks the code against the `redemption_codes`
+    // table through a SECURITY DEFINER function.
+    //
+    // It used to POST to /api/validate-license, which compared the input against
+    // SIX KEYS HARDCODED IN THIS REPOSITORY — 'JISR-BETA-LAUNCH' among them.
+    // The repository is on GitHub, so anyone who read it had the paid version
+    // for free, permanently, with no record that they had taken it. That route
+    // is deleted.
+    //
+    // The real path needs an account, because a code grants a subscription and a
+    // subscription belongs to someone. Saying so plainly is better than the old
+    // behaviour of granting access to a browser.
     try {
-      const res = await fetch('/api/validate-license', {
+      const res = await fetch('/api/redeem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ license_key: key }),
+        body: JSON.stringify({ code: key }),
       })
 
-      if (!res.ok) {
-        return { success: false, error: 'خطأ بالاتصال، حاول مجدداً' }
+      if (res.status === 401) {
+        return { success: false, error: 'سجّل الدخول أولاً لتفعيل الكود.' }
+      }
+      if (res.status === 429) {
+        return { success: false, error: 'محاولات كثيرة. انتظر قليلاً ثم أعد المحاولة.' }
+      }
+      if (!res.ok && res.status !== 200) {
+        return { success: false, error: 'تعذّر تفعيل الكود الآن.' }
       }
 
-      const data = await res.json()
-
-      if (data.valid) {
+      const data = (await res.json()) as { ok?: boolean; error?: string }
+      if (data.ok === true) {
+        // The grant lives in the database now, not in this flag. The flag stays
+        // so the current session stops showing the paywall without a reload.
         localStorage.setItem(CONFIG.STORAGE_KEY_OK, '1')
-        advance() // re-derive: `readState` now sees the paid flag
+        advance()
         setIsActivated(true)
         return { success: true }
-      } else {
-        return { success: false, error: data.error || 'مفتاح خاطئ — تحقق من بريدك الإلكتروني' }
       }
+      return { success: false, error: data.error ?? 'هذا الكود غير صحيح.' }
     } catch {
       return { success: false, error: 'خطأ بالاتصال، حاول مجدداً' }
     }

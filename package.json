@@ -9,10 +9,11 @@
     "lint": "eslint .",
     "validate:content": "node scripts/validate-content.js",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run validate:content && npm run check:activities && npm run check:progress",
+    "check": "npm run typecheck && npm run validate:content && npm run check:activities && npm run check:progress && npm run check:payments",
     "check:paywall": "node scripts/check-paywall.js",
     "check:activities": "node scripts/check-activities.js",
-    "check:progress": "node scripts/check-progress.js"
+    "check:progress": "node scripts/check-progress.js",
+    "check:payments": "node scripts/check-payments.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -17,10 +17,19 @@ export async function generateMetadata({
   return { title: t('الرئيسية', 'Home'), robots: { index: false } }
 }
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ signed_in?: string }>
+}) {
+  // The OAuth callback lands here with `?signed_in=1`, which is the cue for the
+  // one-time progress handoff. Reading it from the URL rather than from the
+  // session means the handoff runs on the visit that STARTED the session, not
+  // on every later one.
+  const { signed_in: signedIn } = await searchParams
   return (
     <SectionErrorBoundary sectionName="الرئيسية">
-      <HomeBody />
+      <HomeBody signedIn={signedIn === '1'} />
     </SectionErrorBoundary>
   )
 }

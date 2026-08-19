@@ -30,8 +30,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — secrets never, the template always.
+# `.env*` on its own also ignored `.env.example`, which is the one env file that
+# has to be committed: it is how anyone else learns which variables exist.
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -54,4 +57,5 @@ server.log
 /skills/
 .vercel
 .env*
+!.env.example
 hsk2_manifest.json

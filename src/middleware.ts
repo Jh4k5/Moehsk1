@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { isLocale, negotiateLocale } from '@/lib/locale'
+import { updateSession } from '@/lib/supabase/middleware'
 
 // ─── Locale negotiation ─────────────────────────────────────────────────────
 // Every page lives under `/ar/...` or `/en/...`. A request that names no locale
@@ -16,23 +17,43 @@ import { isLocale, negotiateLocale } from '@/lib/locale'
 const COOKIE = 'NEXT_LOCALE'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
-/** Paths middleware must never touch: API, build output, public files. */
+/**
+ * Paths middleware must never LOCALISE: build output, public files, and the
+ * OAuth callback — whose URL the identity provider holds, so redirecting it to
+ * `/ar/auth/callback` would break every sign-in.
+ *
+ * `/api` is here too: an API route has no language, and redirecting a webhook
+ * POST to `/ar/api/...` would drop its body.
+ */
 const SKIP =
-  /^\/(?:api|_next|_vercel|brand|favicon\.ico|robots\.txt|sitemap\.xml|manifest\.webmanifest)(?:\/|$)/
+  /^\/(?:api|auth|_next|_vercel|brand|favicon\.ico|robots\.txt|sitemap\.xml|manifest\.webmanifest)(?:\/|$)/
 /** Anything carrying a file extension is a public asset, not a page. */
 const HAS_EXTENSION = /\.[a-z0-9]+$/i
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
 
+  // ── Session first, on every request that is not an asset ──
+  //
+  // Supabase access tokens are short-lived, and the refreshed pair comes back
+  // as Set-Cookie on THIS response. So the response object the session helper
+  // built has to be the one that is returned — building a fresh `NextResponse`
+  // afterwards discards the new cookies and signs the reader out on their next
+  // navigation, intermittently, which is close to undebuggable from a report.
+  //
+  // Before Supabase is configured this is a no-op that returns a plain
+  // `NextResponse.next()`, so the platform runs unauthenticated exactly as it
+  // did before.
   if (SKIP.test(pathname) || HAS_EXTENSION.test(pathname)) return NextResponse.next()
+
+  const { response: sessionResponse } = await updateSession(request)
 
   const first = pathname.split('/')[1]
 
   // Already localised. Keep the cookie in step, so the next bare-path visit —
   // a shared `/`, a bookmark — lands in the language last read in.
   if (isLocale(first)) {
-    const response = NextResponse.next()
+    const response = sessionResponse
     if (request.cookies.get(COOKIE)?.value !== first) {
       response.cookies.set(COOKIE, first, { path: '/', maxAge: COOKIE_MAX_AGE, sameSite: 'lax' })
     }
@@ -51,6 +72,9 @@ export function middleware(request: NextRequest) {
   url.search = search
 
   const response = NextResponse.redirect(url)
+  // Carry over any refreshed auth cookies onto the redirect, or a reader whose
+  // token expired on a bare-path visit is signed out by the redirect itself.
+  for (const cookie of sessionResponse.cookies.getAll()) response.cookies.set(cookie)
   response.cookies.set(COOKIE, locale, { path: '/', maxAge: COOKIE_MAX_AGE, sameSite: 'lax' })
   // `/` answers in two languages depending on the request, so a cache must vary
   // on what decided it instead of pinning the first answer for everyone.
@@ -61,5 +85,5 @@ export function middleware(request: NextRequest) {
 export const config = {
   // Mirrors SKIP; the runtime check stays because a matcher cannot express
   // "has a file extension" reliably.
-  matcher: ['/((?!api|_next|_vercel|brand|.*\\.[a-z0-9]+$).*)'],
+  matcher: ['/((?!api|auth|_next|_vercel|brand|.*\\.[a-z0-9]+$).*)'],
 }

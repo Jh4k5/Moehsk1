@@ -56,6 +56,7 @@ export default function HomeSection() {
   const progress = store.unitProgress
   const stats = levelProgress(level, progress)
   const next = nextUnitFor(level, progress)
+  const primerDone = store.primerDone
 
   // Words come from the level bundle, which for a paid level is fetched from
   // `/api/content/[level]` and already filtered by entitlement. Importing the
@@ -125,8 +126,24 @@ export default function HomeSection() {
         </div>
       </header>
 
-      {/* ═══ The next unit — the subject of this screen ═══ */}
-      {next ? (
+      {/* ═══ The next thing — the subject of this screen ═══ */}
+      {/* Before anything is finished, "what's next" is the primer, not lesson
+          one. Sending someone who has never seen a character straight into 你好
+          is the drop-off this whole rebuild exists to prevent. */}
+      {!primerDone && stats.doneUnits === 0 ? (
+        <section className="j-next-card" aria-labelledby="j-next-title">
+          <span className="j-next-eyebrow">ابدأ من هنا</span>
+          <h2 id="j-next-title">تمهيد المبتدئ</h2>
+          <p className="j-next-goal">
+            ما هي الصينية ولماذا لا أبجدية لها، وكيف تُبنى الرموز من جذورها، والنبرات الأربع،
+            وقراءة البينين. عشر دقائق قبل الدرس الأول — مجانية بالكامل.
+          </p>
+          <Link href={`/${locale}/primer`} className="j-next-cta">
+            <span>ابدأ التمهيد</span>
+            <ChevronLeft size={17} aria-hidden />
+          </Link>
+        </section>
+      ) : next ? (
         <section className="j-next-card" aria-labelledby="j-next-title">
           <span className="j-next-eyebrow">التالي في مسارك</span>
           <h2 id="j-next-title">{next.title}</h2>

@@ -181,6 +181,9 @@ export interface LearningStore
   // whether or not the word could be used, and unlocked nothing.
   unitProgress: UnitProgress;
   completeUnit: (key: string, correct: number, scored: number) => void;
+  /** The beginner primer — «unit zero». Free, and before lesson one. */
+  primerDone: boolean;
+  completePrimer: () => void;
   isUnitDone: (key: string) => boolean;
   resetUnit: (key: string) => void;
 
@@ -349,6 +352,13 @@ export const useLearningStore = create<LearningStore>()(
 
       // ── Unit progress ─────────────────────────────────────────────────
       unitProgress: {},
+
+      primerDone: false,
+      completePrimer: () => {
+        if (get().primerDone) return;
+        set({ primerDone: true });
+        get().incrementStreak();
+      },
 
       completeUnit: (key, correct, scored) => {
         // The key comes from a URL, so it is validated before it is recorded.
@@ -560,11 +570,16 @@ export const useLearningStore = create<LearningStore>()(
       // from the defaults instead of assumed present.
       migrate: (persisted: unknown) => {
         const old = (persisted ?? {}) as Partial<LearningStore>;
-        return { ...old, unitProgress: old.unitProgress ?? {} } as LearningStore;
+        return {
+          ...old,
+          unitProgress: old.unitProgress ?? {},
+          primerDone: old.primerDone ?? false,
+        } as LearningStore;
       },
       partialize: (state) => ({
         learnedWords: state.learnedWords,
         unitProgress: state.unitProgress,
+        primerDone: state.primerDone,
         dailyStreak: state.dailyStreak,
         lastStudyDate: state.lastStudyDate,
         srsCards: state.srsCards,

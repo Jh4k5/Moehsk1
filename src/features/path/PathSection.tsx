@@ -11,7 +11,7 @@
 
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Check, Lock, Play } from 'lucide-react'
+import { BookOpen, Check, Lock, Play } from 'lucide-react'
 import { HanziWatermark } from '@/components/nav/BridgeArt'
 import { useMounted } from '@/hooks/use-mounted'
 import { useLearningStore } from '@/lib/store'
@@ -30,6 +30,7 @@ export default function PathSection() {
   const level = useLearningStore((s) => s.currentLevel) as HskLevelNo
   const setLevel = useLearningStore((s) => s.setLevel)
   const progress = useLearningStore((s) => s.unitProgress)
+  const primerDone = useLearningStore((s) => s.primerDone)
 
   const lessons = useMemo(() => groupByLesson(level), [level])
   const stats = levelProgress(level, mounted ? progress : {})
@@ -63,6 +64,25 @@ export default function PathSection() {
           <div className="j-path-track"><div className="j-path-fill" style={{ width: `${stats.percent}%` }} /></div>
         </div>
       </header>
+
+      {/* The primer sits at the head of the path, not beside it. Someone who
+          has never seen a character needs it before lesson one, and burying it
+          in the library is how it goes unread. It stays visible after it is
+          done — as a finished step, revisitable — because tones are the thing
+          learners come back to. */}
+      <Link href={`/${locale}/primer`} className={'j-primer-entry' + (primerDone ? ' is-done' : '')}>
+        <span className="j-primer-entry-mark" aria-hidden>
+          {primerDone ? <Check size={17} /> : <BookOpen size={17} />}
+        </span>
+        <span className="j-primer-entry-body">
+          <span className="j-primer-entry-title">تمهيد المبتدئ</span>
+          <span className="j-primer-entry-sub">
+            {primerDone
+              ? 'أتممته — عُد إليه متى شئت.'
+              : 'ابدأ من هنا: ما هي الصينية، الجذور، النبرات الأربع، والبينين. مجاني بالكامل.'}
+          </span>
+        </span>
+      </Link>
 
       <ol className="j-spine">
         {lessons.map(({ lesson, title, titleZh, units }) => {

@@ -20,6 +20,7 @@ const { isUnitUnlocked, nextUnitFor, levelProgress, unitPassed } = load('src/lib
 const { ACHIEVEMENTS } = load('src/data/achievements.ts')
 
 const failures = []
+const notes = []
 
 // ── Unlocking ───────────────────────────────────────────────────────────────
 for (const level of [1, 2, 3]) {
@@ -77,7 +78,45 @@ for (const a of ACHIEVEMENTS) {
   if (atStart) failures.push(`achievement "${a.id}" (${a.titleAr}) is granted before studying anything`)
 }
 
+// ── The daily-goal counter ──────────────────────────────────────────────────
+// The home screen draws its goal ring from `dailyActivity[today].wordsLearned`.
+// That number was never incremented by anything, anywhere, so the ring sat at
+// 0% for every learner however much they studied — one of the three "systems
+// that pretend to work" the plan set out to fix, and the last to be caught.
+{
+  global.window = undefined
+  global.localStorage = {
+    _d: {},
+    getItem(k) { return this._d[k] ?? null },
+    setItem(k, v) { this._d[k] = String(v) },
+    removeItem(k) { delete this._d[k] },
+  }
+  // Quiet: zustand's persist middleware complains about the stub storage on
+  // every write. Expected, and it would bury the actual result.
+  const { warn, error } = console
+  console.warn = () => {}
+  console.error = () => {}
+  const { useLearningStore } = load('src/lib/store.ts')
+
+  const today = new Date().toDateString()
+  const s = useLearningStore.getState()
+  s.toggleLearned(901)
+  s.toggleLearned(902)
+  s.toggleLearned(903)
+  const counted = useLearningStore.getState().dailyActivity[today]?.wordsLearned ?? 0
+  if (counted !== 3) failures.push(`daily goal: three new words counted as ${counted} — the ring cannot move`)
+
+  useLearningStore.getState().toggleLearned(901)
+  const afterUnlearn = useLearningStore.getState().dailyActivity[today]?.wordsLearned ?? 0
+  if (afterUnlearn !== 3) failures.push(`daily goal: un-learning a word changed today's count to ${afterUnlearn} — the day's history must not rewrite itself`)
+
+  console.warn = warn
+  console.error = error
+  notes.push('daily-goal counter moves on a new word and does not rewrite the day')
+}
+
 console.log(`levels: 3 | units: ${[1,2,3].reduce((n,l)=>n+(UNITS_BY_LEVEL[l]||[]).length,0)} | achievements: ${ACHIEVEMENTS.length}`)
+for (const note of notes) console.log(`  · ${note}`)
 if (failures.length) {
   console.log(`\n✗ ${failures.length} failure(s):`)
   for (const f of failures) console.log('   ' + f)

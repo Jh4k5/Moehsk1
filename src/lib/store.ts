@@ -246,11 +246,34 @@ export const useLearningStore = create<LearningStore>()(
       // ── Progress ──────────────────────────────────────────────────────
       learnedWords: [],
       toggleLearned: (id) =>
-        set((state) => ({
-          learnedWords: state.learnedWords.includes(id)
+        set((state) => {
+          const already = state.learnedWords.includes(id);
+          const learnedWords = already
             ? state.learnedWords.filter((w) => w !== id)
-            : [...state.learnedWords, id],
-        })),
+            : [...state.learnedWords, id];
+
+          // THE daily-goal counter, and the only place it moves.
+          //
+          // The goal ring on the home screen was stuck at 0% for everyone:
+          // `recordDailyActivity` had exactly one caller and it passed
+          // `wordsLearned = 0`, so nothing in the entire codebase ever
+          // incremented the number the ring is drawn from. A learner could
+          // finish six units and watch a ring that never filled.
+          //
+          // Counting here rather than in `completeUnit` covers every route by
+          // which a word is actually learned — the mandatory path and the free
+          // flashcards alike — and counts each word once, because this is the
+          // one function that decides a word is learned. Un-learning a word
+          // does not decrement: the day's count is what happened that day, and
+          // reversing it later does not un-happen it.
+          const today = new Date().toDateString();
+          const day = state.dailyActivity[today] || { wordsLearned: 0, questionsAnswered: 0 };
+          const dailyActivity = already
+            ? state.dailyActivity
+            : { ...state.dailyActivity, [today]: { ...day, wordsLearned: day.wordsLearned + 1 } };
+
+          return { learnedWords, dailyActivity };
+        }),
       isLearned: (id) => get().learnedWords.includes(id),
 
       // ── Flashcard ─────────────────────────────────────────────────────
@@ -345,6 +368,9 @@ export const useLearningStore = create<LearningStore>()(
         // navigation click, so opening the app four times looked like four days
         // of study — a number that flattered the learner and measured nothing.
         get().incrementStreak();
+        // Questions only. The words are counted by `toggleLearned`, which the
+        // session calls for each of the unit's words — counting them here too
+        // would double every unit.
         const today = new Date().toDateString();
         get().recordDailyActivity(today, 0, scored, 0);
       },

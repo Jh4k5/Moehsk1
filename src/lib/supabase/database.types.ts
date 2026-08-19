@@ -15,7 +15,7 @@ export type SubscriptionSource =
 export type RedemptionKind = 'subscription' | 'trial' | 'lifetime'
 export type UnitStatus = 'in_progress' | 'completed'
 
-export interface ProfileRow {
+export type ProfileRow = {
   id: string
   email: string | null
   display_name: string | null
@@ -30,7 +30,7 @@ export interface ProfileRow {
   updated_at: string
 }
 
-export interface SubscriptionRow {
+export type SubscriptionRow = {
   id: string
   user_id: string
   status: SubscriptionStatus
@@ -47,7 +47,7 @@ export interface SubscriptionRow {
   updated_at: string
 }
 
-export interface RedemptionCodeRow {
+export type RedemptionCodeRow = {
   id: string
   code: string
   kind: RedemptionKind
@@ -65,7 +65,7 @@ export interface RedemptionCodeRow {
   updated_at: string
 }
 
-export interface RedemptionCodeUsageRow {
+export type RedemptionCodeUsageRow = {
   id: string
   code: string
   kind: RedemptionKind
@@ -83,7 +83,7 @@ export interface RedemptionCodeUsageRow {
   last_redeemed_at: string | null
 }
 
-export interface RedemptionRow {
+export type RedemptionRow = {
   id: string
   code_id: string
   user_id: string
@@ -93,7 +93,7 @@ export interface RedemptionRow {
   ip_hash: string | null
 }
 
-export interface UnitProgressRow {
+export type UnitProgressRow = {
   user_id: string
   level: number
   lesson_no: number
@@ -108,7 +108,7 @@ export interface UnitProgressRow {
   last_activity_at: string
 }
 
-export interface WordProgressRow {
+export type WordProgressRow = {
   user_id: string
   level: number
   word_id: number
@@ -125,7 +125,7 @@ export interface WordProgressRow {
   updated_at: string
 }
 
-export interface DailyActivityRow {
+export type DailyActivityRow = {
   user_id: string
   activity_date: string
   words_learned: number
@@ -135,7 +135,7 @@ export interface DailyActivityRow {
   seconds_studied: number
 }
 
-export interface EventRow {
+export type EventRow = {
   id: number
   user_id: string | null
   name: string
@@ -143,7 +143,7 @@ export interface EventRow {
   occurred_at: string
 }
 
-export interface ProgressImportRow {
+export type ProgressImportRow = {
   id: string
   user_id: string
   snapshot: Json
@@ -153,7 +153,7 @@ export interface ProgressImportRow {
   replayed_at: string | null
 }
 
-export interface AppConfigRow {
+export type AppConfigRow = {
   key: string
   value: Json
   value_type: 'number' | 'string' | 'boolean' | 'json'
@@ -166,7 +166,7 @@ export interface AppConfigRow {
   updated_at: string
 }
 
-export interface AppConfigHistoryRow {
+export type AppConfigHistoryRow = {
   id: number
   key: string
   old_value: Json
@@ -175,7 +175,7 @@ export interface AppConfigHistoryRow {
   changed_at: string
 }
 
-export interface EntitlementRow {
+export type EntitlementRow = {
   is_entitled: boolean
   is_lifetime: boolean
   active_until: string | null
@@ -184,7 +184,7 @@ export interface EntitlementRow {
   status: SubscriptionStatus | null
 }
 
-export interface AdminUserRow {
+export type AdminUserRow = {
   id: string
   email: string | null
   display_name: string | null
@@ -288,3 +288,25 @@ export interface Database {
     CompositeTypes: Record<string, never>
   }
 }
+
+// ── Regression guard ────────────────────────────────────────────────────────
+//
+// Every `*Row` above is a `type` alias, never an `interface`. TypeScript gives
+// object type ALIASES an implicit index signature but withholds it from
+// interfaces, and postgrest-js constrains each row to `Record<string, unknown>`.
+// So a single `interface FooRow` silently fails that constraint, the client
+// falls back to its untyped schema, and every `.rpc()` argument in the codebase
+// starts typing as `undefined` — with no error pointing here.
+//
+// The assertion below turns that silent degradation into a build failure.
+type _RowsAreIndexable = {
+  [K in keyof Database['public']['Tables']]: Database['public']['Tables'][K]['Row'] extends Record<
+    string,
+    unknown
+  >
+    ? true
+    : ['NOT INDEXABLE — declare this Row as a `type`, not an `interface`', K]
+}
+type _AllTrue = _RowsAreIndexable[keyof _RowsAreIndexable] extends true ? true : never
+const _schemaIsWellFormed: _AllTrue = true
+void _schemaIsWellFormed

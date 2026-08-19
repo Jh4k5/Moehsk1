@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { usePaywall, CONFIG } from '@/lib/paywall-context'
+import { usePaywall } from '@/lib/paywall-context'
+import { usePricing } from '@/lib/config/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +15,7 @@ import { ts } from '@/lib/i18n'
 // ═══════════════════════════════════════════════════════════
 function TrialBanner() {
   const { trialRemainingFormatted, isPaid, status } = usePaywall()
+  const { lifetime, checkoutHref } = usePricing()
 
   if (isPaid || status !== 'trial') return null
 
@@ -35,11 +37,14 @@ function TrialBanner() {
 
       <Button
         size="sm"
-        onClick={() => window.open(CONFIG.GUMROAD_URL, '_blank')}
-        className="h-8 gap-1.5 rounded-lg border-0 bg-[var(--green-500)] px-4 text-xs font-bold text-white hover:bg-[var(--green-600)]"
+        onClick={() => { if (checkoutHref) window.location.assign(checkoutHref) }}
+        disabled={!checkoutHref}
+        className="h-8 gap-1.5 rounded-lg border-0 bg-[var(--green-500)] px-4 text-xs font-bold text-white hover:bg-[var(--green-600)] disabled:opacity-60"
       >
         <Crown className="h-3.5 w-3.5" />
-        اشترك الآن {CONFIG.PRICE}
+        {/* The amount appears only when the owner has set one in the admin
+            panel. No price in the code means no stale price on the screen. */}
+        {ts('اشترك الآن', 'Subscribe')}{lifetime ? ` — ${lifetime}` : ''}
       </Button>
     </motion.div>
   )
@@ -50,6 +55,7 @@ function TrialBanner() {
 // ═══════════════════════════════════════════════════════════
 function PaywallOverlay() {
   const { status, isPaid, activateLicense } = usePaywall()
+  const { lifetime, checkoutHref } = usePricing()
   const [licenseKey, setLicenseKey] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -142,11 +148,12 @@ function PaywallOverlay() {
                   {/* Gumroad purchase button */}
                   <Button
                     size="lg"
-                    onClick={() => window.open(CONFIG.GUMROAD_URL, '_blank')}
-                    className="w-full gap-2 rounded-xl border-0 bg-gradient-to-l from-[var(--navy-600)] to-[var(--navy-700)] py-6 text-base font-bold text-white shadow-lg shadow-[var(--navy-500)]/25 hover:from-[var(--navy-700)] hover:to-[var(--navy-800)]"
+                    onClick={() => { if (checkoutHref) window.location.assign(checkoutHref) }}
+                    disabled={!checkoutHref}
+                    className="w-full gap-2 rounded-xl border-0 bg-gradient-to-l from-[var(--navy-600)] to-[var(--navy-700)] py-6 text-base font-bold text-white shadow-lg shadow-[var(--navy-500)]/25 hover:from-[var(--navy-700)] hover:to-[var(--navy-800)] disabled:opacity-60"
                   >
                     <CreditCard className="h-5 w-5" />
-                    احصل على الوصول الكامل — {CONFIG.PRICE}
+                    {ts('احصل على الوصول الكامل', 'Get full access')}{lifetime ? ` — ${lifetime}` : ''}
                   </Button>
 
                   {/* Divider */}

@@ -2,9 +2,11 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
+import { useMounted } from '@/hooks/use-mounted'
 import { useLearningStore } from '@/lib/store'
 import { useI18n, ts } from '@/lib/i18n'
-import { usePaywall, CONFIG } from '@/lib/paywall-context'
+import { usePaywall } from '@/lib/paywall-context'
+import { usePricing } from '@/lib/config/client'
 import { speak, getChineseVoices } from '@/lib/tts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -27,7 +29,15 @@ export default function SettingsSection() {
   const store = useLearningStore()
   const { t, lang, setLang } = useI18n()
   const { theme, setTheme } = useTheme()
+  // `next-themes` reads the stored theme from the browser, so `theme` is
+  // undefined on the server and defined on the client. Highlighting the active
+  // option straight away therefore rendered a different className on each side
+  // and React threw the whole subtree away (hydration error #418). Until the
+  // first client render lands, every option renders unselected — exactly what
+  // the server rendered — and the highlight appears one render later.
+  const mounted = useMounted()
   const { status, isPaid, activateLicense, trialRemainingFormatted } = usePaywall()
+  const { lifetime, checkoutHref } = usePricing(lang)
 
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
   const [licenseKey, setLicenseKey] = useState('')
@@ -187,7 +197,7 @@ export default function SettingsSection() {
                 onClick={() => setTheme(opt.value)}
                 className={
                   'rounded-xl border p-3 flex flex-col items-center gap-1.5 transition-all ' +
-                  (theme === opt.value
+                  (mounted && theme === opt.value
                     ? 'border-primary bg-primary/10 text-primary'
                     : 'border-[var(--line-default)] text-[var(--text-muted)] hover:border-primary/40')
                 }
@@ -289,16 +299,17 @@ export default function SettingsSection() {
             <>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="gap-1">
-                  {status === 'trial' ? `تجربة مجانية — متبقي ${trialRemainingFormatted}` : 'انتهت التجربة'}
+                  {mounted && status === 'trial'
+                    ? t(`تجربة مجانية — متبقي ${trialRemainingFormatted}`, `Free trial — ${trialRemainingFormatted} left`)
+                    : t('انتهت التجربة', 'Trial ended')}
                 </Badge>
-                <a
-                  href={CONFIG.GUMROAD_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-primary hover:underline"
-                >
-                  {t('شراء النسخة الكاملة','Buy the full version')} — {CONFIG.PRICE}
-                </a>
+                {checkoutHref && (
+                  <a href={checkoutHref} className="text-xs text-primary hover:underline">
+                    {/* No amount until the owner sets one from the admin panel. */}
+                    {t('شراء النسخة الكاملة', 'Buy the full version')}
+                    {lifetime ? ` — ${lifetime}` : ''}
+                  </a>
+                )}
               </div>
               <div className="flex gap-2">
                 <Input

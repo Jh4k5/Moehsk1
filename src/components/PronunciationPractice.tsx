@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { speak } from '@/lib/tts'
+import { useSpeechRecognitionSupport } from '@/hooks/use-speech-support'
 import { ts } from '@/lib/i18n'
 import { useActiveLevel } from '@/lib/levels'
 import { categories } from '@/data/categories'
@@ -191,7 +192,12 @@ export default function PronunciationPractice() {
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [attempts, setAttempts] = useState<Record<number, { scores: number[]; best: number }>>({})
-  const [isSupported, setIsSupported] = useState(true)
+  // Browser capability, read at render — not mirrored into state by an effect.
+  // A runtime failure (permission denied, no engine) is separate state, because
+  // that one really can change while the page is open.
+  const detected = useSpeechRecognitionSupport()
+  const [recognitionFailed, setRecognitionFailed] = useState(false)
+  const isSupported = detected && !recognitionFailed
   const recognitionRef = useRef<any>(null)
 
   // Filtered words
@@ -202,20 +208,12 @@ export default function PronunciationPractice() {
 
   const currentWord = filteredWords[currentWordIndex]
 
-  // Check speech recognition support
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-      setIsSupported(!!SR)
-    }
-  }, [])
-
   // Start recording
   const startRecording = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRecognition) {
       setError('متصفحك لا يدعم التعرف على الصوت. يرجى استخدام Chrome أو Edge.')
-      setIsSupported(false)
+      setRecognitionFailed(true)
       return
     }
 

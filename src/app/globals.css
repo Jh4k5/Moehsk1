@@ -785,7 +785,10 @@
   overflow-x: hidden;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
+  /* Room for the bottom bar — which exists at exactly these widths, no other.
+     This used to stop at 767px while the bar was hidden from 768px, so the
+     768–1023px band reserved 5rem for a bar that was not there. */
   .j-main-content { padding-bottom: 5rem; }
   .j-header { padding: 0.625rem 1rem; }
 }
@@ -815,7 +818,7 @@
   backdrop-filter: blur(12px);
   box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
 }
-@media (min-width: 768px) { .j-bottom-nav { display: none; } }
+@media (min-width: 1024px) { .j-bottom-nav { display: none; } }
 
 .j-bottom-nav-item {
   display: flex;
@@ -1007,4 +1010,443 @@
 /* ── Safe Area ── */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║  16. APP SHELL — هيكل التطبيق                        ║
+   ╚═══════════════════════════════════════════════════════╝
+   The shell mounts once in `(app)/layout.tsx` and survives navigation. One
+   breakpoint decides its shape, stated here and in `use-mobile.ts`, nowhere
+   else: below it the bottom bar and the drawer, at and above it the rail. */
+:root { --bp-desktop: 1024px; }
+
+.j-app-shell {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--surface-page);
+}
+
+/* The rail is out of the flow below the breakpoint — display, not opacity, so
+   its links are unreachable by tab and invisible to a screen reader too. */
+.j-sidebar.j-rail { display: none; }
+@media (min-width: 1024px) {
+  .j-sidebar.j-rail {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    width: 16rem;
+    flex-shrink: 0;
+    transition: width 0.2s ease;
+  }
+  .j-sidebar.j-rail.j-sidebar-collapsed { width: 4.5rem; }
+}
+
+.j-app-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;      /* lets long Chinese lines shrink instead of widening the page */
+}
+
+.j-app-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  padding-top: max(0.625rem, env(safe-area-inset-top, 0px));
+  background: color-mix(in srgb, var(--surface-card) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-default);
+}
+
+/* Loading state for a lazily-loaded library section. Reserves height so the
+   page does not jump when the chunk lands. */
+.j-section-skeleton {
+  min-height: 60vh;
+  border-radius: 1rem;
+  background: linear-gradient(
+    100deg,
+    var(--surface-card) 30%,
+    color-mix(in srgb, var(--surface-card) 60%, var(--line-default)) 50%,
+    var(--surface-card) 70%
+  );
+  background-size: 300% 100%;
+  animation: j-skeleton 1.4s ease-in-out infinite;
+}
+@keyframes j-skeleton { to { background-position: -150% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .j-section-skeleton { animation: none; }
+}
+
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║  17. LIBRARY — المكتبة (الأقسام الاختيارية)          ║
+   ╚═══════════════════════════════════════════════════════╝
+   Fifteen optional sections. Everything here says "optional" out loud — the
+   flat nineteen-tile grid is what made a new learner freeze. */
+.j-library-index { padding: 1rem 1rem 2rem; max-width: 60rem; margin-inline: auto; }
+
+.j-library-head { margin-bottom: 1.75rem; }
+.j-library-head h1 {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+.j-library-head p {
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 42ch;
+}
+.j-library-path-link {
+  display: inline-block;
+  margin-top: 0.875rem;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.j-library-group { margin-bottom: 1.75rem; }
+.j-library-group h2 {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.625rem;
+  /* Gold is a shape here, never text: at 1.92 against ivory it is unreadable
+     as a letterform and perfectly legible as a rule. */
+  border-bottom: 2px solid var(--brand-gold);
+  padding-bottom: 0.375rem;
+}
+
+.j-library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+@media (min-width: 640px) { .j-library-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .j-library-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.j-library-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  /* 44px is the floor for a touch target; this clears it with room to spare,
+     which matters when nine users in ten are on a phone. */
+  min-height: 5.25rem;
+  padding: 0.875rem;
+  border-radius: 0.875rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.j-library-tile:hover { border-color: var(--brand-gold); transform: translateY(-2px); }
+.j-library-tile:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .j-library-tile:hover { transform: none; }
+}
+
+.j-library-section { padding: 0.75rem 1rem 2rem; }
+
+.j-library-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+.j-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--text-muted);
+  padding: 0.375rem 0;
+}
+.j-crumb:hover { color: var(--text-primary); }
+.j-crumb-current { color: var(--text-primary); font-weight: 700; }
+.j-crumb-current::before { content: '·'; margin-inline-end: 0.5rem; color: var(--text-muted); }
+
+/* The way back to the mandatory path, on every optional page. A learner who
+   wandered in is one tap from what is actually next. */
+.j-back-to-path {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 0.875rem;
+  border-radius: 0.875rem;
+  border: 1px dashed var(--brand-gold);
+  background: color-mix(in srgb, var(--brand-gold) 8%, transparent);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+.j-back-to-path:hover { background: color-mix(in srgb, var(--brand-gold) 16%, transparent); }
+
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║  18. LANDING — الصفحات التعريفية (وقود الفهرسة)      ║
+   ╚═══════════════════════════════════════════════════════╝
+   The marketing surfaces: `/{locale}`, `/{locale}/hsk/{n}`, `/{locale}/lesson/…`.
+   These are the only pages a crawler indexes, and the first thing a visitor
+   sees. Mobile-first throughout — nine users in ten arrive on a phone, so the
+   390px column is the design and every wider layout is an widening of it. */
+.j-landing {
+  /* `clip` and not `hidden`: it contains the ornaments' bleed without turning
+     the page into a scroll container, so `position: sticky` still works inside.
+     The bridge arch is drawn 420px wide on purpose and hangs past both edges;
+     unclipped it added 22px of horizontal scroll at every width. */
+  overflow-x: clip;
+  background: var(--surface-page);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.j-landing-hero {
+  position: relative;
+  overflow: hidden;              /* the ornaments' own clipping box */
+  isolation: isolate;
+  background: var(--gradient-sidebar, var(--navy-900));
+  padding: 1.25rem 1.25rem 3rem;
+  padding-top: max(1.25rem, env(safe-area-inset-top, 0px));
+}
+.j-landing-hero-short { padding-bottom: 2rem; }
+@media (min-width: 640px) { .j-landing-hero { padding: 1.75rem 2rem 4rem; } }
+
+.j-landing-ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  /* 40px tall: a thumb target, not a mouse target. */
+  min-height: 2.5rem;
+  padding: 0 0.875rem;
+  border-radius: 0.625rem;
+  border: 1px solid rgba(247, 244, 239, 0.22);
+  color: var(--brand-ivory);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.j-landing-ghost-btn:hover { background: rgba(247, 244, 239, 0.1); border-color: rgba(247, 244, 239, 0.4); }
+
+.j-landing-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+  padding: 0.3125rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.1);
+  /* Gold reads as text here because the ground is navy — 8.62:1. On the ivory
+     sections below, gold is only ever a border or a rule. */
+  color: var(--gold-300, var(--brand-gold));
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ── Calls to action ── */
+.j-cta-gold, .j-cta-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  border-radius: 0.875rem;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 0.9375rem;
+  text-align: center;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.j-cta-gold {
+  align-self: flex-start;
+  background: var(--brand-gold);
+  /* Charcoal on gold, not white: white on gold is 2.10:1 and unreadable. */
+  color: var(--brand-charcoal);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.28);
+}
+.j-cta-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(212, 175, 55, 0.38); }
+.j-cta-outline {
+  border: 1.5px solid var(--action);
+  color: var(--action);
+  background: transparent;
+}
+.j-cta-outline:hover { background: color-mix(in srgb, var(--action) 10%, transparent); }
+@media (prefers-reduced-motion: reduce) {
+  .j-cta-gold:hover { transform: none; }
+}
+
+/* ── The numbers strip ── */
+.j-landing-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  max-width: 64rem;
+  margin: -1.75rem auto 0;       /* lifts the strip over the hero's lower edge */
+  position: relative;
+  z-index: 1;
+  padding: 0 1rem;
+}
+.j-landing-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.875rem 0.5rem;
+  border-radius: 0.875rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+.j-landing-stat-num {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+.j-landing-stat-label {
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+  text-wrap: balance;
+}
+@media (min-width: 640px) {
+  .j-landing-stat-num { font-size: 1.75rem; }
+  .j-landing-stat-label { font-size: 0.8125rem; }
+}
+
+/* ── Content sections ── */
+.j-landing-section {
+  max-width: 64rem;
+  margin-inline: auto;
+  padding: 2.25rem 1rem;
+}
+.j-landing-section h2 { color: var(--text-primary); text-wrap: balance; }
+@media (min-width: 640px) { .j-landing-section { padding: 3rem 2rem; } }
+
+/* ── The six stages ── */
+.j-stage-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.875rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+/* One stage is marked — writing by stroke order, the thing no competitor in
+   Arabic does. Gold as a border, never as the text. */
+.j-stage-row-accent { border-color: var(--brand-gold); background: color-mix(in srgb, var(--brand-gold) 7%, var(--surface-card)); }
+.j-stage-num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--navy-800, var(--brand-navy));
+  color: var(--brand-ivory);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 0.8125rem;
+}
+.j-stage-row-accent .j-stage-num { background: var(--brand-gold); color: var(--brand-charcoal); }
+
+/* ── Level cards ── */
+.j-level-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+  color: var(--text-primary);
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.j-level-card:hover { border-color: var(--brand-gold); transform: translateY(-2px); }
+.j-level-card:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+
+/* ── Lesson and word rows ── */
+.j-lesson-row, .j-word-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 3rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+  color: var(--text-primary);
+  transition: border-color 0.18s ease;
+}
+.j-lesson-row:hover, .j-word-row:hover { border-color: var(--brand-gold); }
+.j-lesson-num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, var(--brand-navy) 12%, transparent);
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+/* ── Pricing ── */
+.j-price-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+}
+/* The paid card carries the identity's dark ground so the free/paid split is
+   legible before a word is read. It shows no number: the price lives in
+   `app_config` and is edited from the admin panel, so there is no amount in
+   this stylesheet or anywhere else in `src/` to fall out of date. */
+.j-price-card-paid {
+  background: var(--gradient-sidebar, var(--navy-900));
+  border-color: rgba(212, 175, 55, 0.35);
+  color: var(--brand-ivory);
+}
+
+/* ── Footer ── */
+.j-landing-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1.75rem 1.25rem;
+  padding-bottom: max(1.75rem, env(safe-area-inset-bottom, 0px));
+  background: var(--gradient-sidebar, var(--navy-900));
+  text-align: center;
 }

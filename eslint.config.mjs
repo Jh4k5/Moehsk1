@@ -44,7 +44,29 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "no-useless-escape": "off",
   },
 }, {
-  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "examples/**", "skills"]
+  // The build scripts are Node CommonJS programs, not browser modules. They are
+  // MEANT to `require()`, and holding them to the app's ESM rules produced 57
+  // errors that said nothing except "this file is not a React component".
+  files: ["scripts/**/*.js", "scripts/**/*.cjs"],
+  rules: {
+    "@typescript-eslint/no-require-imports": "off",
+    "@next/next/no-assign-module-variable": "off",
+  },
+}, {
+  ignores: [
+    "node_modules/**",
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "examples/**",
+    "skills",
+    // Agent worktrees are checkouts of this same repository plus their own
+    // build output. Linting them lints the project several times over and
+    // buries the real findings — 464 errors, 403 of them from copies.
+    ".claude/worktrees/**",
+    "supabase/**",
+  ],
 }];
 
 export default eslintConfig;

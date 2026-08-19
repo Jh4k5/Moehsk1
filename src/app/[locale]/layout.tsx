@@ -5,6 +5,7 @@ import '../globals.css'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/theme-provider'
 import { PaywallProvider } from '@/lib/paywall-context'
+import { AppConfigProvider } from '@/lib/config/client'
 import { LocaleSync } from '@/components/nav/LocaleSync'
 import { HanziScale } from '@/components/nav/HanziScale'
 import { LOCALES, dirOf, isLocale, makeT, type Locale } from '@/lib/locale'
@@ -109,11 +110,18 @@ export default async function LocaleLayout({
         className={`${cairo.variable} ${tajawal.variable} ${notoSansSC.variable} antialiased bg-background text-foreground font-arabic`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
-          <PaywallProvider>
-            <LocaleSync locale={locale} />
-            <HanziScale />
-            {children}
-          </PaywallProvider>
+          {/* The owner's settings — price, free-tier size, feature flags —
+              reach every screen from here. No `value` yet means the built-in
+              defaults, whose amounts are all null, so nothing renders a price
+              the owner has not set. Wiring Supabase means passing `value` here
+              and nowhere else. */}
+          <AppConfigProvider>
+            <PaywallProvider>
+              <LocaleSync locale={locale} />
+              <HanziScale />
+              {children}
+            </PaywallProvider>
+          </AppConfigProvider>
         </ThemeProvider>
         <Toaster />
       </body>

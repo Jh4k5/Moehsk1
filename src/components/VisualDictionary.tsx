@@ -15,6 +15,7 @@ import {
 import { useLearningStore } from '@/lib/store'
 
 import { speak } from '@/lib/tts'
+import { useSpeechRecognitionSupport } from '@/hooks/use-speech-support'
 import { ts } from '@/lib/i18n'
 
 // Load voices early (some browsers populate them asynchronously)
@@ -113,7 +114,9 @@ export default function VisualDictionary() {
   const [pronounceWordIdx, setPronounceWordIdx] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
   const [pronResult, setPronResult] = useState<{ score: number; spoken: string; color: string; msg: string } | null>(null)
-  const [pronSupported, setPronSupported] = useState(true)
+  const detected = useSpeechRecognitionSupport()
+  const [recognitionFailed, setRecognitionFailed] = useState(false)
+  const pronSupported = detected && !recognitionFailed
   const recognitionRef = useRef<any>(null)
 
   // Pronunciation category (separate from browse category)
@@ -193,17 +196,6 @@ export default function VisualDictionary() {
     [pronWords, isLearned],
   )
 
-  // Check speech recognition support
-  if (typeof window !== 'undefined' && !pronSupported) {
-    // already checked
-  }
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-      setPronSupported(!!SR)
-    }
-  }, [])
-
   // ── Start quiz ──────────────────────────────────────────────────────────
   const startQuiz = useCallback(() => {
     setQuizMode(true)
@@ -255,7 +247,7 @@ export default function VisualDictionary() {
   // ── Pronunciation practice: start recording ─────────────────────────────
   const startRecording = useCallback(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SR) { setPronSupported(false); return }
+    if (!SR) { setRecognitionFailed(true); return }
 
     setPronResult(null)
     setIsRecording(true)

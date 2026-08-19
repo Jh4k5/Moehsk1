@@ -310,8 +310,15 @@ export interface StoryExcerptActivity extends ActivityBase {
 
 export interface DailyQaActivity extends ActivityBase {
   kind: 'daily-qa'
-  /** The question, in Chinese. */
-  question: SentenceRef
+  /**
+   * The question put to the learner, in Chinese.
+   *
+   * Named `ask`, not `question`: on every other kind `question` is the
+   * `MultipleChoice` the learner answers, and one field name meaning two
+   * different shapes is how a renderer ends up reading `.choices` off a
+   * sentence and showing an empty answer list.
+   */
+  ask: SentenceRef
   /** A model answer the learner compares against. */
   modelAnswer: SentenceRef
   /** Arabic nudge on how to adapt it. */

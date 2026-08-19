@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BridgeArchWide, HanziWatermark } from '@/components/nav/BridgeArt'
+import { SiteStructuredData } from '@/features/marketing/structured-data'
 import { Logo } from '@/components/brand/Logo'
 import { LEVEL_SUMMARIES, TOTAL_LESSONS, TOTAL_WORDS } from '@/features/marketing/level-summary'
 import { LOCALES, isLocale, makeT, type Locale } from '@/lib/locale'
@@ -57,6 +58,8 @@ export default async function LandingPage({
 
   return (
     <main className="j-landing">
+      <SiteStructuredData locale={locale} />
+
       {/* ═══ Dark hero ═══ */}
       <section className="j-landing-hero">
         <BridgeArchWide />

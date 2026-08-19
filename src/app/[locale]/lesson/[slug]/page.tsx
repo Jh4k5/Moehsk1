@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { BridgeArch, HanziWatermark } from '@/components/nav/BridgeArt'
+import { LessonStructuredData } from '@/features/marketing/structured-data'
 import { LEVEL_CONTENT, levelSummary, type HskLevel } from '@/features/marketing/level-summary'
 import { LOCALES, isLocale, makeT, type Locale } from '@/lib/locale'
 import { unitsOfLesson } from '@/lib/curriculum'
@@ -119,6 +120,15 @@ export default async function LessonPage({
 
   return (
     <main className="j-landing">
+      <LessonStructuredData
+        locale={locale}
+        level={level}
+        lessonId={lesson.id}
+        title={lesson.title}
+        titleZh={lesson.titleZh}
+        wordCount={lesson.vocabularyIds.length}
+      />
+
       <section className="j-landing-hero j-landing-hero-short">
         <BridgeArch />
         <HanziWatermark char={lesson.titleZh.slice(0, 1)} size={150} style={{ top: '18px', insetInlineEnd: '-18px' }} />

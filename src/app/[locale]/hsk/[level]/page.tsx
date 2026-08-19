@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CourseStructuredData } from '@/features/marketing/structured-data'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BridgeArch, HanziWatermark } from '@/components/nav/BridgeArt'
@@ -56,6 +57,8 @@ export default async function LevelPage({
 
   return (
     <main className="j-landing">
+      <CourseStructuredData locale={locale} level={level} />
+
       <section className="j-landing-hero j-landing-hero-short">
         <BridgeArch />
         <HanziWatermark char="路" size={120} style={{ top: '-30px', insetInlineStart: '-10px' }} />

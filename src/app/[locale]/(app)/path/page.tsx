@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import LessonSystem from '@/components/LessonSystem'
+import PathSection from '@/features/path/PathSection'
 import { SectionErrorBoundary } from '@/features/shared/SectionErrorBoundary'
 import { isLocale, makeT, type Locale } from '@/lib/locale'
 
@@ -17,7 +17,7 @@ export async function generateMetadata({
 export default function PathPage() {
   return (
     <SectionErrorBoundary sectionName="مساري">
-      <LessonSystem />
+      <PathSection />
     </SectionErrorBoundary>
   )
 }

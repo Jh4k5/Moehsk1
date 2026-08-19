@@ -379,7 +379,6 @@ export default function VocabularySection() {
   const handleKnowIt = () => {
     if (!word) return
     store.rateWord(word.id, 4)
-    store.incrementStreak()
     setPronResult(null)
     if (store.flashcardIndex < deck.length - 1) {
       store.setFlashcardIndex(store.flashcardIndex + 1)
@@ -698,7 +697,7 @@ export default function VocabularySection() {
                     <Button
                       size="sm"
                       variant={store.isLearned(word.id) ? 'default' : 'outline'}
-                      onClick={(e) => { e.stopPropagation(); store.toggleLearned(word.id); store.incrementStreak() }}
+                      onClick={(e) => { e.stopPropagation(); store.toggleLearned(word.id) }}
                       className={store.isLearned(word.id) ? 'bg-[var(--clr-success)] hover:bg-[var(--clr-success-h)] rounded-xl' : 'rounded-xl'}
                     >
                       {store.isLearned(word.id) ? <><Check className="w-4 h-4 ml-1" /> {ts('تم الحفظ','Saved')}</> : <><Star className="w-4 h-4 ml-1" /> حفظ</>}

@@ -110,6 +110,10 @@ export default function PracticeSection() {
     const correct = fillAnswer.trim() === fillBlankWord.zh ||
       fillAnswer.trim() === fillBlankWord.pinyin
     setFillResult(correct ? 'correct' : 'wrong')
+    // The one streak call left outside the mandatory path: answering a
+    // question CORRECTLY is study, unlike the seven "start game" clicks that
+    // used to feed it. `incrementStreak` is idempotent within a day, so this
+    // marks the day studied and nothing more.
     if (correct) incrementStreak()
   }
 
@@ -185,7 +189,7 @@ export default function PracticeSection() {
                     </Button>
                   ))}
                 </div>
-                <Button onClick={() => { generateQuiz(); incrementStreak() }} className="bg-primary hover:brightness-110">
+                <Button onClick={() => generateQuiz()} className="bg-primary hover:brightness-110">
                   ابدأ الاختبار
                 </Button>
               </CardContent>
@@ -284,7 +288,7 @@ export default function PracticeSection() {
                 <p className="text-sm text-[var(--text-muted)] text-center max-w-md">
                   سيظهر لك المعنى بالعربية والجملة المثال. {ts('اكتب الكلمة الصينية','Type the Chinese word')} أو البينيين.
                 </p>
-                <Button onClick={() => { startFillBlank(); incrementStreak() }} className="bg-primary hover:brightness-110">
+                <Button onClick={() => startFillBlank()} className="bg-primary hover:brightness-110">
                   ابدأ التمرين
                 </Button>
               </CardContent>
@@ -335,7 +339,7 @@ export default function PracticeSection() {
                 <p className="text-sm text-[var(--text-muted)] text-center max-w-md">
                   اختر الكلمة الصينية ثم اختر ترجمتها العربية لإنشاء الأزواج المتطابقة.
                 </p>
-                <Button onClick={() => { startMatchGame(); incrementStreak() }} className="bg-primary hover:brightness-110">
+                <Button onClick={() => startMatchGame()} className="bg-primary hover:brightness-110">
                   ابدأ اللعبة
                 </Button>
               </CardContent>

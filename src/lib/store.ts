@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { unitPassed, type UnitProgress } from '@/lib/curriculum/progress';
+import { parseUnitKey, unitKey } from '@/lib/curriculum/types';
 import { persist } from 'zustand/middleware';
 import {
   type SRSCard,
@@ -128,7 +130,7 @@ interface ExamState {
 }
 
 // ── Combined Store ────────────────────────────────────────────────────────
-interface LearningStore
+export interface LearningStore
   extends SRSState,
     GameState,
     ExamState {
@@ -173,6 +175,14 @@ interface LearningStore
   chatMessages: ChatMessage[];
   addChatMessage: (msg: ChatMessage) => void;
   clearChatMessages: () => void;
+
+  // Unit progress — the sequential path's record of what is finished.
+  // `learnedWords` is NOT this: it counted flashcard button presses, went up
+  // whether or not the word could be used, and unlocked nothing.
+  unitProgress: UnitProgress;
+  completeUnit: (key: string, correct: number, scored: number) => void;
+  isUnitDone: (key: string) => boolean;
+  resetUnit: (key: string) => void;
 
   // Streak
   dailyStreak: number;
@@ -313,6 +323,40 @@ export const useLearningStore = create<LearningStore>()(
       addChatMessage: (msg) =>
         set((state) => ({ chatMessages: [...state.chatMessages, msg] })),
       clearChatMessages: () => set({ chatMessages: [] }),
+
+      // ── Unit progress ─────────────────────────────────────────────────
+      unitProgress: {},
+
+      completeUnit: (key, correct, scored) => {
+        // The key comes from a URL, so it is validated before it is recorded.
+        // An unparseable one would otherwise sit in the progress map forever,
+        // unlocking nothing and matching no unit.
+        const ref = parseUnitKey(key);
+        if (!ref) return;
+        if (!unitPassed(correct, scored)) return;
+        const validKey = unitKey(ref);
+        set((state) => ({
+          unitProgress: {
+            ...state.unitProgress,
+            [validKey]: { key: validKey, correct, scored, completedAt: new Date().toISOString() },
+          },
+        }));
+        // The streak advances HERE and nowhere else. It used to advance on any
+        // navigation click, so opening the app four times looked like four days
+        // of study — a number that flattered the learner and measured nothing.
+        get().incrementStreak();
+        const today = new Date().toDateString();
+        get().recordDailyActivity(today, 0, scored, 0);
+      },
+
+      isUnitDone: (key) => Boolean(get().unitProgress[key]),
+
+      resetUnit: (key) =>
+        set((state) => {
+          const next = { ...state.unitProgress };
+          delete next[key];
+          return { unitProgress: next };
+        }),
 
       // ── Streak ────────────────────────────────────────────────────────
       dailyStreak: 0,
@@ -483,10 +527,18 @@ export const useLearningStore = create<LearningStore>()(
     }),
     {
       name: 'hsk-learning-storage',
-      version: 2,
-      migrate: (persisted: unknown) => persisted as LearningStore,
+      version: 3,
+      // v2 → v3 adds `unitProgress`. The old `migrate` was a cast that moved
+      // nothing, so a store persisted before this key existed came back without
+      // it and every read of `unitProgress[...]` threw. Missing keys are filled
+      // from the defaults instead of assumed present.
+      migrate: (persisted: unknown) => {
+        const old = (persisted ?? {}) as Partial<LearningStore>;
+        return { ...old, unitProgress: old.unitProgress ?? {} } as LearningStore;
+      },
       partialize: (state) => ({
         learnedWords: state.learnedWords,
+        unitProgress: state.unitProgress,
         dailyStreak: state.dailyStreak,
         lastStudyDate: state.lastStudyDate,
         srsCards: state.srsCards,

@@ -19,7 +19,7 @@ const memoryLevelOptions = [
 export default function GamesSection() {
   const store = useLearningStore()
   const { vocabulary, tonePairs } = useActiveLevel()
-  const { memoryCards, memoryMoves, memoryPairs, incrementStreak } = store
+  const { memoryCards, memoryMoves, memoryPairs } = store
 
   // Memory and tone state used to be lifted into the page shell; both belong
   // to this route.
@@ -169,7 +169,7 @@ export default function GamesSection() {
                     </Button>
                   ))}
                 </div>
-                <Button onClick={() => { startMemoryGame(selectedMemoryLevel); incrementStreak() }} className="bg-primary hover:brightness-110">
+                <Button onClick={() => startMemoryGame(selectedMemoryLevel)} className="bg-primary hover:brightness-110">
                   ابدأ اللعبة
                 </Button>
               </CardContent>
@@ -296,7 +296,7 @@ export default function GamesSection() {
                 <p className="text-sm text-[var(--text-muted)] text-center max-w-md">
                   اختبر قدرتك على {ts('تمييز النبرات','Tone Recognition')} في اللغة الصينية. {tonePairs.length} مجموعات نبرية للتدرب!
                 </p>
-                <Button onClick={() => { startToneGame(); incrementStreak() }} className="bg-primary hover:brightness-110">
+                <Button onClick={() => startToneGame()} className="bg-primary hover:brightness-110">
                   ابدأ اللعبة
                 </Button>
               </CardContent>

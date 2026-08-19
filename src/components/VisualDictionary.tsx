@@ -108,7 +108,6 @@ export default function VisualDictionary() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [score, setScore] = useState(0)
   const [quizFinished, setQuizFinished] = useState(false)
-  const incrementStreak = useLearningStore((s) => s.incrementStreak)
 
   // Pronunciation practice state
   const [pronounceWordIdx, setPronounceWordIdx] = useState(0)
@@ -220,8 +219,8 @@ export default function VisualDictionary() {
     }
 
     setQuizQuestions(questions)
-    incrementStreak()
-  }, [allWords, incrementStreak])
+    // No streak here: this only BUILDS the quiz. Pressing "start" is not study.
+  }, [allWords])
 
   // ── Handle answer ───────────────────────────────────────────────────────
   const handleAnswer = useCallback(

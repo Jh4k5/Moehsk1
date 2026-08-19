@@ -56,9 +56,13 @@ export default function AchievementsSection() {
   const [unlockedIds, setUnlockedIds] = useState<string[]>([])
   const [toastQueue, setToastQueue] = useState<Achievement[]>([])
 
-  // Subscribe to store changes so we can re-check conditions
+  // Subscribe to store changes so we can re-check conditions. The conditions
+  // are pure functions of this state now — they used to read `localStorage`
+  // keys the app never wrote, which is why every badge stayed locked forever.
   const learnedWordsLength = useLearningStore((s) => s.learnedWords.length)
   const dailyStreak = useLearningStore((s) => s.dailyStreak)
+  const unitsDoneCount = useLearningStore((s) => Object.keys(s.unitProgress).length)
+  const srsCount = useLearningStore((s) => Object.keys(s.srsCards).length)
 
   // ── Check achievements and detect newly unlocked ones ───────────
   const checkAchievements = useCallback(() => {
@@ -66,7 +70,7 @@ export default function AchievementsSection() {
     const newlyUnlocked: Achievement[] = []
 
     ACHIEVEMENTS.forEach((a) => {
-      if (!current.includes(a.id) && a.checkCondition()) {
+      if (!current.includes(a.id) && a.checkCondition(useLearningStore.getState())) {
         newlyUnlocked.push(a)
         current.push(a.id)
       }
@@ -108,7 +112,7 @@ export default function AchievementsSection() {
       checkAchievements()
     }, 500)
     return () => clearTimeout(timer)
-  }, [learnedWordsLength, dailyStreak, checkAchievements])
+  }, [learnedWordsLength, dailyStreak, unitsDoneCount, srsCount, checkAchievements])
 
   // ── Auto-dismiss toast ──────────────────────────────────────────
   const dismissToast = useCallback((id: string) => {

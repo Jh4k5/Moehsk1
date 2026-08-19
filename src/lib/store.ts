@@ -10,26 +10,38 @@ import {
 } from './srs';
 
 // ── Section type ──────────────────────────────────────────────────────────
-type Section =
-  | 'dashboard'
-  | 'vocabulary'
-  | 'pinyin'
-  | 'hanzi'
-  | 'pronunciation'
-  | 'lessons'
-  | 'grammar'
-  | 'conversations'
-  | 'practice'
-  | 'games'
-  | 'stories'
-  | 'exam'
-  | 'chat'
-  | 'roadmap'
-  | 'sentences'
-  | 'qa'
-  | 'visual-dict'
-  | 'achievements'
-  | 'settings';
+// THE one declaration. It used to exist three times — here, in `app/page.tsx`
+// (18 members, missing 'pronunciation', papered over with `as Section`) and in
+// `types/index.ts` (19 members, but 'handwriting' instead of 'settings').
+// `SECTIONS` is the runtime list; `Section` is derived from it, so a section
+// can never be added to one and forgotten in the other.
+export const SECTIONS = [
+  'dashboard',
+  'vocabulary',
+  'pinyin',
+  'hanzi',
+  'pronunciation',
+  'lessons',
+  'grammar',
+  'conversations',
+  'practice',
+  'games',
+  'stories',
+  'exam',
+  'chat',
+  'roadmap',
+  'sentences',
+  'qa',
+  'visual-dict',
+  'achievements',
+  'settings',
+] as const;
+
+type Section = (typeof SECTIONS)[number];
+
+export function isSection(value: string | undefined | null): value is Section {
+  return (SECTIONS as readonly string[]).includes(value as string);
+}
 
 // ── Profile & Settings ─────────────────────────────────────────────────────
 export interface UserProfile {
@@ -206,7 +218,8 @@ interface LearningStore
   currentLevel: 1 | 2 | 3;
   setLevel: (level: 1 | 2 | 3) => void;
 
-  // UI language ('ar' Arabic default | 'en' English)
+  // UI language — a runtime mirror of the `[locale]` route segment, not a
+  // stored preference. Set by `LocaleSync`; read by the non-hook `ts()` helper.
   lang: 'ar' | 'en';
   setLang: (lang: 'ar' | 'en') => void;
 }
@@ -485,7 +498,8 @@ export const useLearningStore = create<LearningStore>()(
         profile: state.profile,
         settings: state.settings,
         currentLevel: state.currentLevel,
-        lang: state.lang,
+        // `lang` is deliberately absent: the URL segment owns the language.
+        // Persisting it made a stored 'en' fight the served `/ar` page.
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

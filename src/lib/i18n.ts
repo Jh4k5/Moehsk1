@@ -1,8 +1,25 @@
 'use client'
-// ─── Bilingual (Arabic / English) helper ────────────────────────────────────
+// ─── Bilingual (Arabic / English) helper — client side ──────────────────────
+// The route decides the language (see `src/lib/locale.ts`); `store.lang` is a
+// runtime mirror of it, kept so the non-hook `ts()` / `tsPick()` helpers keep
+// working inside deeply nested components. It is deliberately NOT persisted —
+// persisting it is what made English a post-hydration DOM mutation instead of
+// an indexable URL.
 import { useLearningStore } from '@/lib/store'
+import { dirOf, type Locale } from '@/lib/locale'
 
-export type Lang = 'ar' | 'en'
+export type Lang = Locale
+export type { Locale }
+export {
+  LOCALES,
+  DEFAULT_LOCALE,
+  isLocale,
+  dirOf,
+  makeT,
+  makePick,
+  withLocale,
+  localeFromPath,
+} from '@/lib/locale'
 
 export interface I18n {
   lang: Lang
@@ -19,7 +36,7 @@ export function useI18n(): I18n {
   const setLang = useLearningStore((s) => s.setLang)
   return {
     lang,
-    dir: lang === 'en' ? 'ltr' : 'rtl',
+    dir: dirOf(lang),
     t: (ar, en) => (lang === 'en' && en != null ? en : ar),
     pick: (arVal, enVal) => (lang === 'en' && enVal != null ? (enVal as any) : arVal),
     setLang,
@@ -34,7 +51,7 @@ export function currentLang(): Lang {
 /**
  * Non-hook translation helper. Reads the current language from the store.
  * Reactive in practice because the whole tree re-renders when the language
- * changes (the Home component subscribes to `lang` via useI18n).
+ * changes (the shell subscribes to `lang` via useI18n).
  */
 export function ts(ar: string, en?: string): string {
   return useLearningStore.getState().lang === 'en' && en != null ? en : ar

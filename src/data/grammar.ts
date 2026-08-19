@@ -25,6 +25,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "他喝水。", pinyin: "Tā hē shuǐ.", ar: "هو يشرب ماء.", en: "He drinks water." },
       { zh: "她看书。", pinyin: "Tā kàn shū.", ar: "هي تقرأ كتاباً.", en: "She reads a book." },
     ],
+    tips: "الترتيب ثابت لا يتغيّر. في العربية تقول «أكلَ الولدُ التفاحة» و«الولدُ أكلَ التفاحة»، أما الصينية فلا تقبل إلا فاعل ثم فعل ثم مفعول — وتقديم الفعل يجعل الجملة غير مفهومة لا مجرد ركيكة.",
+    tipsEn: "The order never moves. Arabic allows both verb-first and subject-first; Chinese allows only subject-verb-object, and fronting the verb makes the sentence unreadable rather than merely odd.",
   },
   {
     id: 2,
@@ -90,6 +92,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "他吃饭吗？", pinyin: "Tā chī fàn ma?", ar: "هل هو يأكل؟", en: "Is he eating?" },
       { zh: "你好吗？", pinyin: "Nǐ hǎo ma?", ar: "هل أنت بخير؟", en: "How are you?" },
     ],
+    tips: "لا ترفع نبرة صوتك في آخر الجملة كما تفعل بالعربية — 吗 وحدها تصنع السؤال. ولا تجمع بينها وبين كلمة استفهام: «你叫什么名字吗؟» خطأ، لأن 什么 سألت بالفعل.",
+    tipsEn: "Do not raise your pitch at the end as Arabic does — 吗 alone makes the question. Never combine it with a question word: 你叫什么名字吗？is wrong, because 什么 has already asked.",
   },
   {
     id: 6,
@@ -104,6 +108,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "你吃不吃？", pinyin: "Nǐ chī bu chī?", ar: "هل تأكل أم لا؟", en: "Are you eating or not?" },
       { zh: "你有没有书？", pinyin: "Nǐ yǒu méiyǒu shū?", ar: "هل معك كتاب؟", en: "Do you have a book or not?" },
     ],
+    tips: "هذه الصيغة أكثر شيوعاً في الكلام اليومي من 吗، وأخفّ وقعاً. لا تضع 吗 معها أبداً — «你是不是学生吗؟» خطأ مضاعف.",
+    tipsEn: "This form is commoner in everyday speech than 吗 and sounds lighter. Never add 吗 to it — 你是不是学生吗？doubles the question.",
   },
   {
     id: 7,
@@ -120,6 +126,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "多少钱？", pinyin: "Duōshao qián?", ar: "كم الثمن؟", en: "How much does it cost?" },
       { zh: "你几岁？", pinyin: "Nǐ jǐ suì?", ar: "كم عمرك؟", en: "How old are you?" },
     ],
+    tips: "كلمة الاستفهام تبقى في موضع الجواب، ولا تتقدّم إلى أول الجملة كما في العربية. تقول «你去哪儿؟» بترتيب «أنت تذهب أين؟» لا «أين تذهب؟».",
+    tipsEn: "The question word stays where the answer would go; it does not move to the front as in Arabic. 你去哪儿？is literally you-go-where, not where-do-you-go.",
   },
   {
     id: 8,
@@ -152,6 +160,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "这里是我家。", pinyin: "Zhèlǐ shì wǒ jiā.", ar: "هنا هو منزلي.", en: "This is my home." },
       { zh: "那里有一家店。", pinyin: "Nàlǐ yǒu yī jiā diàn.", ar: "هناك متجر.", en: "There is a shop over there." },
     ],
+    tips: "لا تقل 这书 مباشرة. الصينية تُلزمك بمعدّ بين الإشارة والاسم: 这本书. العربية لا تحتاج ذلك، وهو أكثر ما يُنسى في البداية.",
+    tipsEn: "Never say 这书. Chinese requires a measure word between the demonstrative and the noun: 这本书. Arabic needs no such word, which is why it is the most-forgotten piece early on.",
   },
   {
     id: 10,
@@ -186,6 +196,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "我的书", pinyin: "wǒ de shū", ar: "كتابي", en: "my book" },
       { zh: "他的家", pinyin: "tā de jiā", ar: "بيته", en: "his home" },
     ],
+    tips: "الضمير لا يتغيّر بتغيّر موقعه: 我 هي «أنا» و«ـي» و«إياي» معاً. ولا فرق بين المذكر والمؤنث في النطق — 他 و她 تُلفظان tā تماماً، والفرق في الكتابة فقط.",
+    tipsEn: "The pronoun never inflects: 我 covers I, me and my alike. And gender is invisible in speech — 他 and 她 are both pronounced tā; the difference exists only in writing.",
   },
   {
     id: 12,
@@ -200,6 +212,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "他在看书。", pinyin: "Tā zài kàn shū.", ar: "هو يقرأ (الآن).", en: "He is reading (right now)." },
       { zh: "她正在睡觉。", pinyin: "Tā zhèngzài shuìjiào.", ar: "هي نائمة الآن.", en: "She is sleeping right now." },
     ],
+    tips: "لا يوجد في الصينية تصريف للزمن. 在 تصف أن الفعل جارٍ الآن، وليست فعلاً مساعداً كـ«يكون». ولا تستعملها مع أفعال الحالة: «我在是学生» خطأ.",
+    tipsEn: "Chinese has no tense inflection. 在 marks an action in progress; it is not an auxiliary like to be. Do not use it with state verbs: 我在是学生 is wrong.",
   },
   {
     id: 13,
@@ -232,6 +246,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "我能帮你。", pinyin: "Wǒ néng bāng nǐ.", ar: "أستطيع مساعدتك.", en: "I can help you." },
       { zh: "我可以进来吗？", pinyin: "Wǒ kěyǐ jìnlái ma?", ar: "هل يمكنني الدخول؟", en: "May I come in?" },
     ],
+    tips: "لا تصرّف الفعل بعدها كما في العربية. تقول 我想去 حرفياً «أنا أريد أذهب» — والفعل الثاني يبقى مجرّداً دائماً.",
+    tipsEn: "The following verb never changes form. 我想去 is literally I-want-go; the second verb always stays bare.",
   },
   {
     id: 15,
@@ -246,6 +262,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "她也喜欢音乐。", pinyin: "Tā yě xǐhuān yīnyuè.", ar: "هي أيضاً تحب الموسيقى.", en: "She also likes music." },
       { zh: "他也在中国。", pinyin: "Tā yě zài Zhōngguó.", ar: "هو أيضاً في الصين.", en: "He is also in China." },
     ],
+    tips: "موضعها قبل الفعل لا بعده. «أنا أيضاً طالب» تصير 我也是学生 لا 我是学生也. وهذا أشيع خطأ ينقله الناطق بالعربية.",
+    tipsEn: "It sits before the verb, never after. I am also a student is 我也是学生, not 我是学生也 — the commonest transfer error from Arabic.",
   },
   {
     id: 16,
@@ -260,6 +278,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "他们都喜欢中国。", pinyin: "Tāmen dōu xǐhuān Zhōngguó.", ar: "كلهم يحبون الصين.", en: "They all like China." },
       { zh: "我们也都很好。", pinyin: "Wǒmen yě dōu hěn hǎo.", ar: "كلنا بخير أيضاً.", en: "We are all fine too." },
     ],
+    tips: "都 تشير إلى ما قبلها لا إلى ما بعدها. 我们都是学生 تعني «كلنا طلاب»، وموقعها قبل الفعل دائماً مهما طال الفاعل.",
+    tipsEn: "都 refers back to what precedes it, not forward. 我们都是学生 means all of us are students, and it always sits before the verb however long the subject.",
   },
   {
     id: 17,
@@ -274,6 +294,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "他明天来。", pinyin: "Tā míngtiān lái.", ar: "هو سيأتي غداً.", en: "He is coming tomorrow." },
       { zh: "我们八点上课。", pinyin: "Wǒmen bā diǎn shàngkè.", ar: "نبدأ الدرس الساعة الثامنة.", en: "Our class starts at eight." },
     ],
+    tips: "الزمن يسبق الفعل دائماً، عكس العربية التي تؤخّره غالباً. «أدرس غداً» تصير 我明天学习 حرفياً «أنا غداً أدرس».",
+    tipsEn: "Time always precedes the verb, the reverse of Arabic's usual order. I study tomorrow becomes 我明天学习 — literally I-tomorrow-study.",
   },
   {
     id: 18,
@@ -305,6 +327,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "几岁？", pinyin: "Jǐ suì?", ar: "كم عمره؟ (للأطفال)", en: "How old (for a child)?" },
       { zh: "多大？", pinyin: "Duō dà?", ar: "كم عمره؟ (للكبار)", en: "How old (for an adult)?" },
     ],
+    tips: "几 تتوقّع جواباً أقل من عشرة وتلزمها معدّ: 几个人. أما 多少 فللأعداد الكبيرة ولا تحتاج معدّاً: 多少钱.",
+    tipsEn: "几 expects an answer under ten and requires a measure word: 几个人. 多少 is for larger numbers and needs none: 多少钱.",
   },
   {
     id: 20,
@@ -319,6 +343,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "书和笔", pinyin: "shū hé bǐ", ar: "الكتاب والقلم", en: "the book and the pen" },
       { zh: "他和她都是老师。", pinyin: "Tā hé tā dōu shì lǎoshī.", ar: "هو وهي كلاهما معلمان.", en: "He and she are both teachers." },
     ],
+    tips: "和 تربط الأسماء فقط. لا تربط بها جملتين كما تفعل الواو في العربية — «ذهبتُ وأكلتُ» لا تُترجم بـ和 إطلاقاً، بل تُفصل الجملتان أو تُربطان بأدوات أخرى.",
+    tipsEn: "和 joins nouns only. It cannot link two clauses the way Arabic's waw does — I went and ate never takes 和; the clauses are separated or joined by other connectors.",
   },
   {
     id: 21,
@@ -349,6 +375,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "你是学生吧？", pinyin: "Nǐ shì xuésheng ba?", ar: "أنت طالب، أليس كذلك؟", en: "You're a student, right?" },
       { zh: "吃饭吧。", pinyin: "Chīfàn ba.", ar: "هيا نأكل.", en: "Let's eat." },
     ],
+    tips: "吧 تخفّف الأمر إلى اقتراح. 走 وحدها أمر جافّ، و走吧 دعوة لطيفة. استعمالها مع الأكبر سناً أو في العمل أليق من الأمر المجرّد.",
+    tipsEn: "吧 softens a command into a suggestion. 走 alone is blunt; 走吧 invites. With elders or at work it is the more courteous choice.",
   },
   {
     id: 23,
@@ -363,6 +391,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "太贵了！", pinyin: "Tài guì le!", ar: "غالٍ جداً!", en: "Too expensive!" },
       { zh: "太冷了！", pinyin: "Tài lěng le!", ar: "بارد جداً!", en: "Too cold!" },
     ],
+    tips: "لا تنسَ 了 في آخرها — 太好 ناقصة، والصواب 太好了. وهي للمبالغة لا للمدح المحايد: 太贵了 تعني «غالٍ أكثر مما ينبغي» لا مجرد «غالٍ جداً».",
+    tipsEn: "Do not drop the final 了 — 太好 is incomplete; 太好了 is right. It carries excess, not neutral praise: 太贵了 means too expensive, not merely very expensive.",
   },
   {
     id: 24,
@@ -393,6 +423,8 @@ export const grammarRules: GrammarRule[] = [
       { zh: "不是 → bú shì", pinyin: "bú shì", ar: "قبل الرابعة تصبح ثانية", en: "Before a 4th tone, 不 becomes 2nd tone" },
       { zh: "不吃 → bù chī", pinyin: "bù chī", ar: "قبل غير الرابعة تبقى رابعة", en: "Before a non-4th tone, 不 stays 4th tone" },
     ],
+    tips: "هذا تغيّر في النطق لا في الكتابة — 不 تُكتب كما هي دائماً. جرّبها في 不是 (bú shì) مقابل 不好 (bù hǎo) وستسمع الفرق.",
+    tipsEn: "This is a change in sound, not in writing — 不 is always written the same. Hear it in 不是 (bú shì) against 不好 (bù hǎo).",
   },
   {
     id: 26,
@@ -407,5 +439,7 @@ export const grammarRules: GrammarRule[] = [
       { zh: "一天 → yì tiān", pinyin: "yì tiān", ar: "قبل 1،2،3 تصبح رابعة", en: "Before 1st/2nd/3rd tone, 一 becomes 4th tone" },
       { zh: "第一 → dì yī", pinyin: "dì yī", ar: "في نهاية الكلام تبقى أولى", en: "At the end of a phrase, 一 stays 1st tone" },
     ],
+    tips: "一 وحدها أو في العدّ تبقى yī، ولا تتغيّر إلا حين تسبق اسماً معدوداً. الرقم في الهاتف أو الحساب يبقى yī دائماً.",
+    tipsEn: "一 stays yī alone or when counting, and shifts only before a measured noun. In a phone number or an account it is always yī.",
   },
 ];

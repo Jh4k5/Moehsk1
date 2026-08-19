@@ -1,0 +1,407 @@
+{
+ "1": [
+  {
+   "zh": "不好意思，我不懂。",
+   "pinyin": "Bùhǎoyìsi, wǒ bù dǒng.",
+   "arabic": "المعذرة، لم أفهم."
+  },
+  {
+   "zh": "我给你介绍一下。",
+   "pinyin": "Wǒ gěi nǐ jièshào yíxià.",
+   "arabic": "دعني أعرّفك."
+  },
+  {
+   "zh": "你能帮我一个忙吗？",
+   "pinyin": "Nǐ néng bāng wǒ yí ge máng ma?",
+   "arabic": "هل يمكنك مساعدتي؟"
+  },
+  {
+   "zh": "我已经去过一次北京了。",
+   "pinyin": "Wǒ yǐjīng qùguo yí cì Běijīng le.",
+   "arabic": "سبق أن ذهبتُ إلى بكين مرة."
+  },
+  {
+   "zh": "他让我一起去旅游。",
+   "pinyin": "Tā ràng wǒ yìqǐ qù lǚyóu.",
+   "arabic": "طلب مني أن أسافر معه."
+  }
+ ],
+ "2": [
+  {
+   "zh": "车站离这儿远吗？",
+   "pinyin": "Chēzhàn lí zhèr yuǎn ma?",
+   "arabic": "هل المحطة بعيدة عن هنا؟"
+  },
+  {
+   "zh": "别打车，我们坐公交车吧。",
+   "pinyin": "Bié dǎchē, wǒmen zuò gōngjiāochē ba.",
+   "arabic": "لا تأخذ تاكسي، لنركب الحافلة."
+  },
+  {
+   "zh": "我在网上买了票。",
+   "pinyin": "Wǒ zài wǎngshang mǎile piào.",
+   "arabic": "اشتريتُ التذكرة عبر الإنترنت."
+  },
+  {
+   "zh": "你过来一下，教室在这间。",
+   "pinyin": "Nǐ guòlái yíxià, jiàoshì zài zhè jiān.",
+   "arabic": "تعال لحظة، الفصل في هذه الغرفة."
+  },
+  {
+   "zh": "你是中国人还是外国人？",
+   "pinyin": "Nǐ shì Zhōngguó rén háishi wàiguó rén?",
+   "arabic": "هل أنت صيني أم أجنبي؟"
+  }
+ ],
+ "3": [
+  {
+   "zh": "我今天很累，不想出去。",
+   "pinyin": "Wǒ jīntiān hěn lèi, bù xiǎng chūqù.",
+   "arabic": "أنا متعب اليوم، لا أريد الخروج."
+  },
+  {
+   "zh": "你为什么这么早回来？",
+   "pinyin": "Nǐ wèishénme zhème zǎo huílái?",
+   "arabic": "لماذا عدتَ مبكراً هكذا؟"
+  },
+  {
+   "zh": "我洗完手就来。",
+   "pinyin": "Wǒ xǐwán shǒu jiù lái.",
+   "arabic": "سآتي حالما أنتهي من غسل يديّ."
+  },
+  {
+   "zh": "这些东西我自己拿。",
+   "pinyin": "Zhèxiē dōngxi wǒ zìjǐ ná.",
+   "arabic": "سأحمل هذه الأغراض بنفسي."
+  },
+  {
+   "zh": "我每天送孩子上学。",
+   "pinyin": "Wǒ měi tiān sòng háizi shàngxué.",
+   "arabic": "أوصّل الطفل إلى المدرسة كل يوم."
+  }
+ ],
+ "4": [
+  {
+   "zh": "你喜欢什么颜色？",
+   "pinyin": "Nǐ xǐhuan shénme yánsè?",
+   "arabic": "أي لون تحبّ؟"
+  },
+  {
+   "zh": "这条裤子是黑色的。",
+   "pinyin": "Zhè tiáo kùzi shì hēisè de.",
+   "arabic": "هذا البنطال أسود."
+  },
+  {
+   "zh": "因为下雨，所以我没去商场。",
+   "pinyin": "Yīnwèi xiàyǔ, suǒyǐ wǒ méi qù shāngchǎng.",
+   "arabic": "لأن السماء أمطرت، لم أذهب إلى المركز التجاري."
+  },
+  {
+   "zh": "书包在右边。",
+   "pinyin": "Shūbāo zài yòubian.",
+   "arabic": "الحقيبة على اليمين."
+  },
+  {
+   "zh": "我们进去看看吧。",
+   "pinyin": "Wǒmen jìnqù kànkan ba.",
+   "arabic": "لندخل ونلقِ نظرة."
+  }
+ ],
+ "5": [
+  {
+   "zh": "请等一会儿。",
+   "pinyin": "Qǐng děng yíhuìr.",
+   "arabic": "انتظر لحظة من فضلك."
+  },
+  {
+   "zh": "我跟爷爷奶奶住在一起。",
+   "pinyin": "Wǒ gēn yéye nǎinai zhù zài yìqǐ.",
+   "arabic": "أسكن مع جدّي وجدّتي."
+  },
+  {
+   "zh": "酒店在下面，我们下去吧。",
+   "pinyin": "Jiǔdiàn zài xiàmian, wǒmen xiàqù ba.",
+   "arabic": "الفندق في الأسفل، لننزل."
+  },
+  {
+   "zh": "你快准备一下，我们走。",
+   "pinyin": "Nǐ kuài zhǔnbèi yíxià, wǒmen zǒu.",
+   "arabic": "استعدّ بسرعة، سنذهب."
+  },
+  {
+   "zh": "我想喝一杯奶茶。",
+   "pinyin": "Wǒ xiǎng hē yì bēi nǎichá.",
+   "arabic": "أريد كوب شاي بالحليب."
+  }
+ ],
+ "6": [
+  {
+   "zh": "生日快乐！",
+   "pinyin": "Shēngrì kuàilè!",
+   "arabic": "عيد ميلاد سعيد!"
+  },
+  {
+   "zh": "我忘了打开门。",
+   "pinyin": "Wǒ wàngle dǎkāi mén.",
+   "arabic": "نسيتُ أن أفتح الباب."
+  },
+  {
+   "zh": "他高兴地画了画儿。",
+   "pinyin": "Tā gāoxìng de huàle huàr.",
+   "arabic": "رسم بسعادة."
+  },
+  {
+   "zh": "我今天不太舒服。",
+   "pinyin": "Wǒ jīntiān bú tài shūfu.",
+   "arabic": "لستُ بحال جيدة اليوم."
+  },
+  {
+   "zh": "我没吃过这个鱼。",
+   "pinyin": "Wǒ méi chīguo zhège yú.",
+   "arabic": "لم يسبق أن أكلتُ هذا السمك."
+  }
+ ],
+ "7": [
+  {
+   "zh": "我的爱好是打篮球。",
+   "pinyin": "Wǒ de àihào shì dǎ lánqiú.",
+   "arabic": "هوايتي لعب كرة السلة."
+  },
+  {
+   "zh": "他跑得很快。",
+   "pinyin": "Tā pǎo de hěn kuài.",
+   "arabic": "يجري بسرعة."
+  },
+  {
+   "zh": "我们从八点开始运动。",
+   "pinyin": "Wǒmen cóng bā diǎn kāishǐ yùndòng.",
+   "arabic": "نبدأ الرياضة من الثامنة."
+  },
+  {
+   "zh": "你会踢足球吗？",
+   "pinyin": "Nǐ huì tī zúqiú ma?",
+   "arabic": "هل تجيد لعب كرة القدم؟"
+  },
+  {
+   "zh": "我每天早上去游泳。",
+   "pinyin": "Wǒ měi tiān zǎoshang qù yóuyǒng.",
+   "arabic": "أذهب للسباحة كل صباح."
+  }
+ ],
+ "8": [
+  {
+   "zh": "他比我高。",
+   "pinyin": "Tā bǐ wǒ gāo.",
+   "arabic": "هو أطول مني."
+  },
+  {
+   "zh": "虽然很累，但是很有意思。",
+   "pinyin": "Suīrán hěn lèi, dànshì hěn yǒu yìsi.",
+   "arabic": "رغم التعب، لكنه ممتع جداً."
+  },
+  {
+   "zh": "我的手表在左边。",
+   "pinyin": "Wǒ de shǒubiǎo zài zuǒbian.",
+   "arabic": "ساعتي على اليسار."
+  },
+  {
+   "zh": "你还记得那家饭馆吗？",
+   "pinyin": "Nǐ hái jìde nà jiā fànguǎn ma?",
+   "arabic": "هل ما زلت تتذكّر ذلك المطعم؟"
+  },
+  {
+   "zh": "我丈夫在饭馆工作。",
+   "pinyin": "Wǒ zhàngfu zài fànguǎn gōngzuò.",
+   "arabic": "زوجي يعمل في مطعم."
+  }
+ ],
+ "9": [
+  {
+   "zh": "请问，咖啡店离这儿远吗？",
+   "pinyin": "Qǐngwèn, kāfēi diàn lí zhèr yuǎn ma?",
+   "arabic": "عفواً، هل المقهى بعيد عن هنا؟"
+  },
+  {
+   "zh": "不远，就在旁边。",
+   "pinyin": "Bù yuǎn, jiù zài pángbiān.",
+   "arabic": "ليس بعيداً، إنه بالجوار تماماً."
+  },
+  {
+   "zh": "那个男孩儿个子很高。",
+   "pinyin": "Nàge nánháir gèzi hěn gāo.",
+   "arabic": "ذلك الصبي طويل القامة."
+  },
+  {
+   "zh": "我每周走路去学校。",
+   "pinyin": "Wǒ měi zhōu zǒulù qù xuéxiào.",
+   "arabic": "أمشي إلى المدرسة كل أسبوع."
+  },
+  {
+   "zh": "他在门口等你。",
+   "pinyin": "Tā zài ménkǒu děng nǐ.",
+   "arabic": "ينتظرك عند المدخل."
+  }
+ ],
+ "10": [
+  {
+   "zh": "快要考试了。",
+   "pinyin": "Kuàiyào kǎoshì le.",
+   "arabic": "الامتحان على وشك أن يبدأ."
+  },
+  {
+   "zh": "这个词我写错了。",
+   "pinyin": "Zhège cí wǒ xiěcuò le.",
+   "arabic": "كتبتُ هذه الكلمة خطأً."
+  },
+  {
+   "zh": "你能帮我看看这个题吗？",
+   "pinyin": "Nǐ néng bāng wǒ kànkan zhège tí ma?",
+   "arabic": "هل يمكنك أن تنظر في هذه المسألة؟"
+  },
+  {
+   "zh": "九月开学。",
+   "pinyin": "Jiǔ yuè kāixué.",
+   "arabic": "الدراسة تبدأ في سبتمبر."
+  },
+  {
+   "zh": "我的本子和笔在后面。",
+   "pinyin": "Wǒ de běnzi hé bǐ zài hòumiàn.",
+   "arabic": "دفتري وقلمي في الخلف."
+  }
+ ],
+ "11": [
+  {
+   "zh": "我头疼，想去药店买药。",
+   "pinyin": "Wǒ tóu téng, xiǎng qù yàodiàn mǎi yào.",
+   "arabic": "رأسي يؤلمني، أريد شراء دواء من الصيدلية."
+  },
+  {
+   "zh": "你身体怎么样？",
+   "pinyin": "Nǐ shēntǐ zěnmeyàng?",
+   "arabic": "كيف صحتك؟"
+  },
+  {
+   "zh": "他站着说话。",
+   "pinyin": "Tā zhànzhe shuōhuà.",
+   "arabic": "يتحدث وهو واقف."
+  },
+  {
+   "zh": "路上慢一点儿。",
+   "pinyin": "Lùshang màn yìdiǎnr.",
+   "arabic": "تمهّل في الطريق."
+  },
+  {
+   "zh": "我经常运动，这是最好的药。",
+   "pinyin": "Wǒ jīngcháng yùndòng, zhè shì zuì hǎo de yào.",
+   "arabic": "أمارس الرياضة كثيراً، وهي أفضل دواء."
+  }
+ ],
+ "12": [
+  {
+   "zh": "今天是晴天，不是阴天。",
+   "pinyin": "Jīntiān shì qíngtiān, bú shì yīntiān.",
+   "arabic": "اليوم صحو لا غائم."
+  },
+  {
+   "zh": "外面正下雨。",
+   "pinyin": "Wàimiàn zhèng xiàyǔ.",
+   "arabic": "تمطر في الخارج الآن."
+  },
+  {
+   "zh": "我从小住在这个楼里。",
+   "pinyin": "Wǒ cóngxiǎo zhù zài zhège lóu li.",
+   "arabic": "أسكن في هذا المبنى منذ صغري."
+  },
+  {
+   "zh": "我坐地铁去上班。",
+   "pinyin": "Wǒ zuò dìtiě qù shàngbān.",
+   "arabic": "أذهب إلى العمل بالمترو."
+  },
+  {
+   "zh": "小时候我常在这个站等车。",
+   "pinyin": "Xiǎoshíhou wǒ cháng zài zhège zhàn děng chē.",
+   "arabic": "في طفولتي كنتُ أنتظر الحافلة في هذه المحطة."
+  }
+ ],
+ "13": [
+  {
+   "zh": "老师告诉我们，明天上网课。",
+   "pinyin": "Lǎoshī gàosu wǒmen, míngtiān shàng wǎngkè.",
+   "arabic": "أخبرنا المعلم أن الدرس غداً عبر الإنترنت."
+  },
+  {
+   "zh": "洗手间在里面。",
+   "pinyin": "Xǐshǒujiān zài lǐmiàn.",
+   "arabic": "دورة المياه في الداخل."
+  },
+  {
+   "zh": "他是在这个班学的中文。",
+   "pinyin": "Tā shì zài zhège bān xué de Zhōngwén.",
+   "arabic": "تعلّم الصينية في هذا الصف تحديداً."
+  },
+  {
+   "zh": "我希望你能来。",
+   "pinyin": "Wǒ xīwàng nǐ néng lái.",
+   "arabic": "أتمنى أن تستطيع المجيء."
+  },
+  {
+   "zh": "上面的花很漂亮。",
+   "pinyin": "Shàngmiàn de huā hěn piàoliang.",
+   "arabic": "الزهور في الأعلى جميلة جداً."
+  }
+ ],
+ "14": [
+  {
+   "zh": "我们回家过年。",
+   "pinyin": "Wǒmen huí jiā guònián.",
+   "arabic": "نعود إلى البيت للاحتفال برأس السنة."
+  },
+  {
+   "zh": "那位女孩儿的眼睛很大。",
+   "pinyin": "Nà wèi nǚháir de yǎnjing hěn dà.",
+   "arabic": "عينا تلك الفتاة كبيرتان."
+  },
+  {
+   "zh": "你姓什么？",
+   "pinyin": "Nǐ xìng shénme?",
+   "arabic": "ما اسم عائلتك؟"
+  },
+  {
+   "zh": "我学过跳舞。",
+   "pinyin": "Wǒ xuéguo tiàowǔ.",
+   "arabic": "سبق أن تعلّمتُ الرقص."
+  },
+  {
+   "zh": "这个电影没意思。",
+   "pinyin": "Zhège diànyǐng méi yìsi.",
+   "arabic": "هذا الفيلم ممل."
+  }
+ ],
+ "15": [
+  {
+   "zh": "我买了去北京的机票。",
+   "pinyin": "Wǒ mǎile qù Běijīng de jīpiào.",
+   "arabic": "اشتريتُ تذكرة طيران إلى بكين."
+  },
+  {
+   "zh": "我们八点出门去机场。",
+   "pinyin": "Wǒmen bā diǎn chūmén qù jīchǎng.",
+   "arabic": "نخرج في الثامنة إلى المطار."
+  },
+  {
+   "zh": "颐和园的门票多少钱？",
+   "pinyin": "Yíhé Yuán de ménpiào duōshao qián?",
+   "arabic": "بكم تذكرة دخول قصر الصيف؟"
+  },
+  {
+   "zh": "鸟在天上飞。",
+   "pinyin": "Niǎo zài tiān shàng fēi.",
+   "arabic": "الطيور تطير في السماء."
+  },
+  {
+   "zh": "请写上你的姓名。",
+   "pinyin": "Qǐng xiě shàng nǐ de xìngmíng.",
+   "arabic": "من فضلك اكتب اسمك الكامل."
+  }
+ ]
+}

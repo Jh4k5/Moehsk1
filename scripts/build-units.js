@@ -346,7 +346,28 @@ function centralWords(sim, words, idx, count) {
  * its part-of-speech label, then the strongest topic narrowed by two of the
  * unit's own words — so two number units inside one lesson never share a name.
  */
-function makeTitle(unitWords, headline, used) {
+const AR_ORDINAL = [
+  '', 'الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة',
+  'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة',
+]
+
+/**
+ * The unit's title.
+ *
+ * When two units of a level would share a topic label, they are told apart by
+ * an ORDINAL — «الطعام والشراب (الثانية)» — not by listing their words.
+ *
+ * The previous version disambiguated with `meaningList(...)`, producing titles
+ * like «الطعام والشراب: يستخدم وجائع». `units.generated.ts` ships to the
+ * browser so the path can render, and it carries each unit's characters in
+ * `hanzi` — so those titles put paid character↔meaning pairs into a public
+ * bundle. Two survived every other fix and were caught only by probing all 324
+ * paid-only words instead of a 40-word sample.
+ *
+ * A learner reading the path gains nothing from two translations in a title
+ * anyway; they gain from knowing which of the two units this is.
+ */
+function makeTitle(unitWords, headline, used, unitIndex) {
   const candidates = [...rankedLabels(unitWords), posLabelFor(unitWords)]
   for (const c of candidates) {
     if (c && !used.has(c)) {
@@ -355,26 +376,35 @@ function makeTitle(unitWords, headline, used) {
     }
   }
   const base = candidates[0] || posLabelFor(unitWords)
-  const names = meaningList(headline.length ? headline : unitWords, 2)
-  const narrowed = names.length === 2 ? `${base}: ${names[0]} و${names[1]}` : `${base}: ${names[0] || ''}`
-  if (!used.has(narrowed)) {
-    used.add(narrowed)
-    return narrowed
-  }
   let n = 2
-  while (used.has(`${narrowed} (${n})`)) n++
-  used.add(`${narrowed} (${n})`)
-  return `${narrowed} (${n})`
+  while (used.has(`${base} (${AR_ORDINAL[n] || n})`)) n++
+  const titled = `${base} (${AR_ORDINAL[n] || n})`
+  used.add(titled)
+  return titled
 }
 
-function makeGoal(unitWords, headline, carriesExam) {
+/**
+ * The unit's one-line goal.
+ *
+ * It names the TOPIC and the count — never the words' Arabic meanings.
+ *
+ * It used to read «تتعلّم ست كلمات: يستقبل، يفقد، مفقود، وتستعملها…»: the first
+ * three translations, spelled out. `units.generated.ts` ships to the browser so
+ * the path can render, and the same file carries each unit's `hanzi` array —
+ * so between the two, a public bundle held roughly 570 character↔meaning pairs
+ * of paid vocabulary. The most valuable field of the product, in the file that
+ * was supposed to be its harmless index.
+ *
+ * The topic is public (it is the unit title, printed on the indexed lesson
+ * pages); the translations are the product.
+ */
+function makeGoal(unitWords, headline, carriesExam, title) {
   const n = unitWords.length
-  const names = meaningList([...headline, ...unitWords], 3)
-  const list = names.join('، ')
   const count = AR_COUNT[n] || `${n} كلمات`
+  const topic = title ? `عن ${title}` : 'من الدرس'
   return carriesExam
-    ? `تتعلّم ${count}: ${list}، ثم تراجع الدرس كلّه بأسئلة بنمط HSK.`
-    : `تتعلّم ${count}: ${list}، وتستعملها في جمل الدرس.`
+    ? `${count} جديدة ${topic}، ثم تراجع الدرس كلّه بأسئلة بنمط HSK.`
+    : `${count} جديدة ${topic}، تستعملها في جمل الدرس ومحادثاته.`
 }
 
 // ── build ───────────────────────────────────────────────────────────────────
@@ -433,11 +463,13 @@ function buildLevel(L, topicsOfWord) {
 
       const headline = centralWords(sim, words, seg, Math.min(3, unitWords.length))
 
+      const title = makeTitle(unitWords, headline, usedTitles, u + 1)
+
       units.push({
         ref: { level: L.n, lesson: lesson.id, unit: u + 1 },
         key: `${L.n}:${lesson.id}:${u + 1}`,
-        title: makeTitle(unitWords, headline, usedTitles),
-        goal: makeGoal(unitWords, headline, carriesExam),
+        title,
+        goal: makeGoal(unitWords, headline, carriesExam, title),
         wordIds,
         grammarIds: unitGrammar,
         keySentenceIndices,

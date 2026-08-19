@@ -1,4 +1,16 @@
+import 'server-only'
 // ─── One view over three levels of content ──────────────────────────────────
+//
+// SERVER ONLY, and the `import 'server-only'` above is load-bearing.
+//
+// This module holds all three levels' vocabulary. A client component that
+// imports it pulls the entire paid curriculum into a browser bundle — which is
+// exactly what happened: `HomeSection` and `PathSection` imported it, the shell
+// imports them, and a 918 KB chunk containing every HSK2 and HSK3 word with its
+// Arabic meaning was served to every visitor of every page.
+//
+// With this line, that mistake is a BUILD ERROR naming the offending file
+// instead of a silent giveaway that only a bundle scan would ever find.
 //
 // The activity engine must not know that HSK1 lives in `@/data/vocabulary` and
 // HSK2 in `@/data/hsk2/vocabulary2`. It asks this module for "the words of unit
@@ -33,56 +45,18 @@ import { dailyQA3 } from '@/data/hsk3/qa3'
 import { HSK1_EXAM_BANK } from '@/data/examBank'
 import type { HskLevelNo } from './types'
 
-// ── Normalised shapes the engine consumes ───────────────────────────────────
-
-export interface StoryLine {
-  zh: string
-  pinyin: string
-  ar: string
-}
-
-export interface StoryRecord {
-  id: number
-  titleAr: string
-  lines: StoryLine[]
-  questions: { zh: string; options: string[]; correct: number }[]
-}
-
-export interface PictureWord {
-  zh: string
-  pinyin: string
-  ar: string
-  emoji: string
-  category: string
-}
-
-export interface QaItem {
-  question: StoryLine
-  answer: StoryLine
-  categoryAr: string
-}
-
-export interface ExamItem {
-  /** HSK section this item imitates. */
-  section: string
-  promptAr: string
-  stimulus: string
-  stimulusPinyin: string
-  options: string[]
-  correct: number
-  explanationAr: string
-}
-
-export interface LevelContent {
-  level: HskLevelNo
-  vocabulary: VocabWord[]
-  lessons: Lesson[]
-  grammar: GrammarRule[]
-  stories: StoryRecord[]
-  pictures: PictureWord[]
-  qa: QaItem[]
-  exam: ExamItem[]
-}
+// Shapes and the pure `hanziOf` helper live in ./content-types — a module with
+// no data imports — so the engine and the session screen can describe content
+// without inheriting it. See the note at the top of that file.
+export * from './content-types'
+import type {
+  ExamItem,
+  LevelContent,
+  PictureWord,
+  QaItem,
+  StoryRecord,
+} from './content-types'
+import { hanziOf } from './content-types'
 
 // ── Adapters: each source file has its own shape, none of them the same ─────
 
@@ -238,8 +212,12 @@ function toExam(raw: unknown): ExamItem[] {
 
 // ── The three levels ────────────────────────────────────────────────────────
 
+function indexed(content: Omit<LevelContent, 'byId'>): LevelContent {
+  return { ...content, byId: new Map(content.vocabulary.map((w) => [w.id, w])) }
+}
+
 const LEVELS: Record<HskLevelNo, LevelContent> = {
-  1: {
+  1: indexed({
     level: 1,
     vocabulary,
     lessons,
@@ -248,8 +226,8 @@ const LEVELS: Record<HskLevelNo, LevelContent> = {
     pictures: toPictures(VISUAL_DICT_CATEGORIES),
     qa: [], // HSK1 has no authored daily-Q&A set yet; qa2/qa3 do.
     exam: toExam(HSK1_EXAM_BANK),
-  },
-  2: {
+  }),
+  2: indexed({
     level: 2,
     vocabulary: vocabulary2 as unknown as VocabWord[],
     lessons: lessons2 as unknown as Lesson[],
@@ -258,8 +236,8 @@ const LEVELS: Record<HskLevelNo, LevelContent> = {
     pictures: toPictures(VISUAL_DICT_CATEGORIES_2),
     qa: toQa(dailyQA2),
     exam: [], // unauthored above HSK1
-  },
-  3: {
+  }),
+  3: indexed({
     level: 3,
     vocabulary: vocabulary3 as unknown as VocabWord[],
     lessons: lessons3 as unknown as Lesson[],
@@ -268,7 +246,7 @@ const LEVELS: Record<HskLevelNo, LevelContent> = {
     pictures: toPictures(VISUAL_DICT_CATEGORIES_3),
     qa: toQa(dailyQA3),
     exam: [],
-  },
+  }),
 }
 
 export function levelContent(level: HskLevelNo): LevelContent {
@@ -304,12 +282,4 @@ export function grammarById(level: HskLevelNo, id: number): GrammarRule | null {
   return levelContent(level).grammar.find((g) => g.id === id) ?? null
 }
 
-/**
- * A word's Chinese characters, minus punctuation and Latin. Used to decide
- * which characters a unit is allowed to ask the learner to write.
- */
-export function hanziOf(text: string): string[] {
-  return [...text].filter((ch) => /[一-鿿]/.test(ch))
-}
-
-export type { VocabWord, GrammarRule, Lesson }
+export { hanziOf }

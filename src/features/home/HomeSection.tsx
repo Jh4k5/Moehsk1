@@ -12,14 +12,15 @@
 // button is the only filled button above the fold.
 
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { ChevronLeft, Flame } from 'lucide-react'
 import { BridgeArch, HanziWatermark } from '@/components/nav/BridgeArt'
 import { Logo } from '@/components/brand/Logo'
 import { useLocale } from '@/components/nav/use-locale'
 import { useLearningStore } from '@/lib/store'
 import { levelProgress, nextUnitFor } from '@/lib/curriculum/progress'
-import { levelContent, wordsByIds } from '@/lib/curriculum/content-source'
+import { publicLevel } from '@/data/public-index.generated'
+import { useActiveLevel } from '@/lib/levels'
 import { hrefFor } from '@/components/nav/nav-model'
 import { isDueForReview } from '@/lib/srs'
 import type { HskLevelNo } from '@/lib/curriculum/types'
@@ -56,17 +57,30 @@ export default function HomeSection() {
   const stats = levelProgress(level, progress)
   const next = nextUnitFor(level, progress)
 
+  // Words come from the level bundle, which for a paid level is fetched from
+  // `/api/content/[level]` and already filtered by entitlement. Importing the
+  // content source directly — as this did — put every HSK2 and HSK3 word into
+  // the public bundle.
+  const active = useActiveLevel()
+  const byId = useMemo(() => new Map(active.vocabulary.map((w) => [w.id, w])), [active.vocabulary])
+  const pick = useCallback(
+    (ids: readonly number[]) => ids.map((id) => byId.get(id)).filter((w): w is NonNullable<typeof w> => Boolean(w)),
+    [byId],
+  )
+
   const dueWords = useMemo(() => {
     const due = Object.values(store.srsCards).filter((card) => isDueForReview(card)).slice(0, 6)
-    return wordsByIds(level, due.map((c) => c.wordId))
-  }, [store.srsCards, level])
+    return pick(due.map((c) => c.wordId))
+  }, [store.srsCards, pick])
 
-  const nextWords = next ? wordsByIds(level, next.wordIds) : []
+  const nextWords = next ? pick(next.wordIds) : []
   // The rule's Arabic name. An earlier version took `title.slice(0, 1)` hoping
   // for a Chinese character; `title` is the ENGLISH name, so the card showed a
   // stray Latin letter next to «قاعدة».
   const grammarName = next?.grammarIds?.length
-    ? levelContent(level).grammar.find((g) => g.id === next.grammarIds[0])?.titleAr
+    // From the GATED bundle: a rule's Arabic name often glosses its Chinese
+    // («因为…所以… (لأنّ… لذلك…)»), which makes it paid content, not a label.
+    ? active.grammarRules.find((g) => g.id === next.grammarIds[0])?.titleAr
     : null
 
   const todayKey = new Date().toDateString()
@@ -74,9 +88,11 @@ export default function HomeSection() {
   const goal = store.profile?.dailyGoal ?? 10
   const goalPct = Math.min(100, Math.round((todayWords / goal) * 100))
 
-  const levelWords = levelContent(level).vocabulary
-  const levelIds = new Set(levelWords.map((w) => w.id))
-  const learned = store.learnedWords.filter((id) => levelIds.has(id)).length
+  // The level's total word count is public — it is printed on the landing page
+  // — so it comes from the index, not from holding the words themselves.
+  const levelWordCount = publicLevel(level).wordCount
+  const range = level === 1 ? [1, 1999] : level === 2 ? [2000, 2999] : [3000, 3999]
+  const learned = store.learnedWords.filter((id) => id >= range[0] && id <= range[1]).length
 
   const minutes = (next ? MINUTES_PER_UNIT : 0) + Math.ceil(dueWords.length / 3)
 
@@ -169,7 +185,7 @@ export default function HomeSection() {
           </div>
         </div>
         <div className="j-level-meter">
-          <span className="j-level-num" dir="ltr">{AR.format(learned)}<span>/{AR.format(levelWords.length)}</span></span>
+          <span className="j-level-num" dir="ltr">{AR.format(learned)}<span>/{AR.format(levelWordCount)}</span></span>
           <span className="j-level-label">كلمة محفوظة</span>
           <div className="j-level-track"><div className="j-level-fill" style={{ width: `${stats.percent}%` }} /></div>
         </div>

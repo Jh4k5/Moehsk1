@@ -17,7 +17,7 @@ import { useMounted } from '@/hooks/use-mounted'
 import { useLearningStore } from '@/lib/store'
 import { UNITS_BY_LEVEL } from '@/lib/curriculum'
 import { isUnitUnlocked, levelProgress, nextUnitFor } from '@/lib/curriculum/progress'
-import { levelContent } from '@/lib/curriculum/content-source'
+import { publicLevel } from '@/data/public-index.generated'
 import { useLocale } from '@/components/nav/use-locale'
 import type { HskLevelNo, Unit } from '@/lib/curriculum/types'
 
@@ -149,7 +149,9 @@ interface LessonNode {
 }
 
 function groupByLesson(level: HskLevelNo): LessonNode[] {
-  const content = levelContent(level)
+  // The PUBLIC index: titles and counts, no vocabulary. Importing the content
+  // source here is what put every HSK2 and HSK3 word into the shared bundle.
+  const content = publicLevel(level)
   const order = UNITS_BY_LEVEL[level] ?? []
   const seen: number[] = []
   for (const u of order) if (!seen.includes(u.ref.lesson)) seen.push(u.ref.lesson)

@@ -1,5 +1,29 @@
 'use client'
-// ─── Level dimension: HSK1 / HSK2 bundles + active-level selection ───────────
+// ─── Level dimension: which level's content this browser is allowed to hold ──
+//
+// HSK1 IS BUNDLED. HSK2 AND HSK3 ARE NOT, AND MUST NEVER BE.
+//
+// This file used to import all three levels statically. It is a client module,
+// and the navigation shell imports it, so every page — including the landing
+// page a stranger loads — shipped a 918 KB chunk containing every HSK2 and
+// HSK3 word together with its Arabic meaning. That is the entire paid product,
+// downloadable with "save as", with no account, no payment and no record.
+//
+// The rule now:
+//   * HSK1 stays a static import. It is the free level and the trial; an
+//     anonymous visitor legitimately uses it, and it must be there instantly.
+//   * HSK2 and HSK3 are fetched from `/api/content/[level]`, which returns only
+//     what the viewer is entitled to and a COUNT of what it withheld.
+//
+// `useActiveLevel()` stays SYNCHRONOUS on purpose: twenty components call it
+// during render, and making it async would have meant rewriting all of them to
+// close a hole that this shape closes on its own. While a paid level is in
+// flight it returns an empty bundle with `loading: true`, which every list in
+// the app already renders as "nothing yet".
+//
+// `scripts/check-paywall.js` scans the built chunks for exactly this
+// regression, so a future static import of `vocabulary2` or `vocabulary3` from
+// a client module fails the build gate rather than quietly reopening it.
 import { vocabulary, type VocabWord } from '@/data/vocabulary'
 import { grammarRules, type GrammarRule } from '@/data/grammar'
 import { grammarPracticeQuestions } from '@/data/grammarPracticeQuestions'
@@ -8,24 +32,7 @@ import { conversations } from '@/data/conversations'
 import { VISUAL_DICT_CATEGORIES } from '@/data/visualDict'
 import { roadmapUnits, stories, tonePairs } from '@/data/hsk1/extras'
 
-import { vocabulary2 } from '@/data/hsk2/vocabulary2'
-import { grammarRules2 } from '@/data/hsk2/grammar2'
-import { grammarPracticeQuestions2 } from '@/data/hsk2/grammarPracticeQuestions2'
-import { lessons2 } from '@/data/hsk2/lessons2'
-import { conversations2 } from '@/data/hsk2/conversations2'
-import { VISUAL_DICT_CATEGORIES_2 } from '@/data/hsk2/visualDict2'
-import { roadmapUnits2 } from '@/data/hsk2/roadmap2'
-import { stories2 } from '@/data/hsk2/stories2'
-
-import { vocabulary3 } from '@/data/hsk3/vocabulary3'
-import { grammarRules3 } from '@/data/hsk3/grammar3'
-import { grammarPracticeQuestions3 } from '@/data/hsk3/grammarPracticeQuestions3'
-import { lessons3 } from '@/data/hsk3/lessons3'
-import { conversations3 } from '@/data/hsk3/conversations3'
-import { VISUAL_DICT_CATEGORIES_3 } from '@/data/hsk3/visualDict3'
-import { roadmapUnits3 } from '@/data/hsk3/roadmap3'
-import { stories3 } from '@/data/hsk3/stories3'
-
+import { useSyncExternalStore } from 'react'
 import { useLearningStore } from '@/lib/store'
 
 export type HskLevel = 1 | 2 | 3
@@ -50,63 +57,146 @@ export interface LevelBundle {
   visualDict: any[]
   hanziChars: string[]
   vocabIdRange: [number, number]
+  /** True while a paid level's content is still being fetched. */
+  loading: boolean
+  /** How many words this viewer may not see. A number, never the words. */
+  lockedCount: number
+  /** Daily questions. Paid content above HSK1, so it arrives with the rest. */
+  dailyQA: unknown[]
 }
 
-export const LEVEL_BUNDLES: Record<HskLevel, LevelBundle> = {
-  1: {
-    level: 1,
-    label: 'HSK 1',
-    vocabulary,
-    grammarRules,
-    grammarPractice: grammarPracticeQuestions,
-    lessons,
-    conversations,
-    roadmapUnits,
-    stories,
-    tonePairs,
-    visualDict: VISUAL_DICT_CATEGORIES,
-    hanziChars: uniqueChars(vocabulary),
-    vocabIdRange: [1, 1000],
-  },
-  2: {
-    level: 2,
-    label: 'HSK 2',
-    vocabulary: vocabulary2,
-    grammarRules: grammarRules2,
-    grammarPractice: grammarPracticeQuestions2,
-    lessons: lessons2 as unknown as typeof lessons,
-    conversations: conversations2,
-    roadmapUnits: roadmapUnits2 as unknown as typeof roadmapUnits,
-    stories: stories2,
-    tonePairs,
-    visualDict: VISUAL_DICT_CATEGORIES_2,
-    hanziChars: uniqueChars(vocabulary2),
-    vocabIdRange: [2000, 3000],
-  },
-  3: {
-    level: 3,
-    label: 'HSK 3',
-    vocabulary: vocabulary3,
-    grammarRules: grammarRules3,
-    grammarPractice: grammarPracticeQuestions3,
-    lessons: lessons3 as unknown as typeof lessons,
-    conversations: conversations3,
-    roadmapUnits: roadmapUnits3 as unknown as typeof roadmapUnits,
-    stories: stories3,
-    tonePairs,
-    visualDict: VISUAL_DICT_CATEGORIES_3,
-    hanziChars: uniqueChars(vocabulary3),
-    vocabIdRange: [3000, 4000],
-  },
+/** The free level, in full. The only one that may sit in the bundle. */
+const HSK1_BUNDLE: LevelBundle = {
+  level: 1,
+  label: 'HSK 1',
+  vocabulary,
+  grammarRules,
+  grammarPractice: grammarPracticeQuestions,
+  lessons,
+  conversations,
+  roadmapUnits,
+  stories,
+  tonePairs,
+  visualDict: VISUAL_DICT_CATEGORIES,
+  hanziChars: uniqueChars(vocabulary),
+  vocabIdRange: [1, 1000],
+  loading: false,
+  lockedCount: 0,
+  dailyQA: [],
 }
 
-/** Non-hook accessor (for tutor engine / non-React code). */
+/** What a paid level looks like before its content has arrived. */
+function pendingBundle(level: HskLevel, loading: boolean): LevelBundle {
+  return {
+    level,
+    label: `HSK ${level}`,
+    vocabulary: [],
+    grammarRules: [],
+    grammarPractice: {},
+    lessons: [] as unknown as typeof lessons,
+    conversations: [] as unknown as typeof conversations,
+    roadmapUnits: [] as unknown as typeof roadmapUnits,
+    stories: [],
+    tonePairs,
+    visualDict: [],
+    hanziChars: [],
+    vocabIdRange: level === 2 ? [2000, 3000] : [3000, 4000],
+    loading,
+    lockedCount: 0,
+    dailyQA: [],
+  }
+}
+
+// ── The fetched-level cache ─────────────────────────────────────────────────
+// A tiny external store so `useActiveLevel` can stay synchronous while the
+// content arrives asynchronously.
+
+const CACHE = new Map<HskLevel, LevelBundle>([[1, HSK1_BUNDLE]])
+const INFLIGHT = new Set<HskLevel>()
+const LISTENERS = new Set<() => void>()
+
+function emit() {
+  for (const listener of LISTENERS) listener()
+}
+
+function subscribe(listener: () => void): () => void {
+  LISTENERS.add(listener)
+  return () => LISTENERS.delete(listener)
+}
+
+interface ContentResponse {
+  level: number
+  entitled: boolean
+  words: VocabWord[]
+  lockedCount: number
+  qa: unknown[]
+  stories: unknown[]
+  pictures: { zh: string; pinyin: string; ar: string; emoji: string; category: string }[]
+  grammar: GrammarRule[]
+}
+
+function request(level: HskLevel): void {
+  if (level === 1 || CACHE.has(level) || INFLIGHT.has(level)) return
+  INFLIGHT.add(level)
+  void fetch(`/api/content/${level}`, { credentials: 'same-origin' })
+    .then((res) => (res.ok ? (res.json() as Promise<ContentResponse>) : null))
+    .then((data) => {
+      const bundle = pendingBundle(level, false)
+      if (data) {
+        bundle.vocabulary = data.words ?? []
+        bundle.hanziChars = uniqueChars(bundle.vocabulary)
+        bundle.lockedCount = data.lockedCount ?? 0
+        bundle.grammarRules = data.grammar ?? []
+        bundle.stories = data.stories ?? []
+        bundle.dailyQA = data.qa ?? []
+        // Back into the category shape the picture screens expect.
+        const byCategory = new Map<string, { label: string; icon: string; words: unknown[] }>()
+        for (const p of data.pictures ?? []) {
+          const cat = byCategory.get(p.category) ?? { label: p.category, icon: '', words: [] }
+          cat.words.push({ hanzi: p.zh, pinyin: p.pinyin, arabic: p.ar, emoji: p.emoji })
+          byCategory.set(p.category, cat)
+        }
+        bundle.visualDict = [...byCategory.values()]
+      }
+      CACHE.set(level, bundle)
+    })
+    .catch(() => {
+      // A failed fetch must not wedge the level in "loading" forever; an empty
+      // bundle renders the same empty state, and a later visit retries.
+      CACHE.set(level, pendingBundle(level, false))
+    })
+    .finally(() => {
+      INFLIGHT.delete(level)
+      emit()
+    })
+}
+
+function snapshot(level: HskLevel): LevelBundle {
+  const cached = CACHE.get(level)
+  if (cached) return cached
+  request(level)
+  return pendingBundle(level, true)
+}
+
+/** Non-hook accessor (tutor engine and other non-React code). */
 export function getLevelBundle(level: HskLevel): LevelBundle {
-  return LEVEL_BUNDLES[level] || LEVEL_BUNDLES[1]
+  return CACHE.get(level) ?? (level === 1 ? HSK1_BUNDLE : pendingBundle(level, true))
 }
 
-/** Hook: the active level's data, reactive to store.currentLevel. */
+/**
+ * The active level's content, reactive to `store.currentLevel`.
+ *
+ * Synchronous by design — see the note at the top of this file. Check
+ * `.loading` before treating an empty `vocabulary` as "this level is empty".
+ */
 export function useActiveLevel(): LevelBundle {
-  const level = useLearningStore((s) => s.currentLevel)
-  return LEVEL_BUNDLES[level] || LEVEL_BUNDLES[1]
+  const level = useLearningStore((s) => s.currentLevel) as HskLevel
+  const bundle = useSyncExternalStore(
+    subscribe,
+    () => snapshot(level),
+    // The server has no cache and must not start a fetch: it renders the
+    // pending shape, and the browser fills it in on the next render.
+    () => (level === 1 ? HSK1_BUNDLE : pendingBundle(level, true)),
+  )
+  return bundle
 }

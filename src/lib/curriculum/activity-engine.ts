@@ -40,14 +40,19 @@ import {
   type Unit,
   type UnitRef,
 } from './types'
-import {
-  grammarById,
-  hanziOf,
-  lessonById,
-  levelContent,
-  wordsByIds,
-  type VocabWord,
-} from './content-source'
+// TYPE-only import of the content source. The engine no longer READS the data
+// modules: it is handed the content it may use.
+//
+// That is not a style choice. `content-source` statically imports all three
+// levels; this file imported it, `SessionRunner` imports this file, and the
+// shell imports `SessionRunner` — so the entire paid curriculum rode into every
+// public bundle through this one line. Taking content as an argument means the
+// caller decides what the engine can see, and on the client that caller is an
+// entitlement-filtered API response.
+//
+// It also makes the engine testable with a handful of fabricated words instead
+// of the real 1,079.
+import { hanziOf, type LevelContent, type VocabWord } from './content-types'
 import { makeRng, type Rng } from './rng'
 
 export { ACTIVITY_KIND_LABEL_AR }
@@ -86,10 +91,29 @@ const MAX_GAME_BREAKS = 3
 
 // ── Building blocks ─────────────────────────────────────────────────────────
 
+/**
+ * Words by id, out of the content the caller supplied.
+ *
+ * Ids that are absent are SKIPPED, not faked. For a viewer who is not entitled
+ * to this level the API returns only the free lessons' words, so a locked
+ * unit's ids resolve to nothing and the stream comes back empty — which is the
+ * correct outcome, and the reason the gate can be trusted.
+ */
+function pickWords(ctx: Ctx, ids: readonly number[]): VocabWord[] {
+  const out: VocabWord[] = []
+  for (const id of ids) {
+    const word = ctx.content.byId.get(id)
+    if (word) out.push(word)
+  }
+  return out
+}
+
 interface Ctx {
   unit: Unit
   ref: UnitRef
   rng: Rng
+  /** Everything the engine may draw on. Supplied by the caller, never imported. */
+  content: LevelContent
   /** The unit's own words, in unit order. */
   words: VocabWord[]
   /** Every word of the level — the distractor pool. */
@@ -296,7 +320,7 @@ function pronounce(ctx: Ctx, word: VocabWord): Draft {
 }
 
 function imageMatch(ctx: Ctx, word: VocabWord): Draft | null {
-  const pictures = levelContent(ctx.ref.level).pictures
+  const pictures = ctx.content.pictures
   const match = pictures.find((p) => p.zh === word.zh)
   if (!match) return null
   const question = multipleChoice(
@@ -319,7 +343,7 @@ function imageMatch(ctx: Ctx, word: VocabWord): Draft | null {
 }
 
 function grammarBrief(ctx: Ctx, grammarId: number): Draft | null {
-  const rule = grammarById(ctx.ref.level, grammarId)
+  const rule = ctx.content.grammar.find((g) => g.id === grammarId)
   if (!rule) return null
   return {
     kind: 'grammar-brief',
@@ -336,14 +360,14 @@ function grammarBrief(ctx: Ctx, grammarId: number): Draft | null {
 }
 
 function grammarApply(ctx: Ctx, grammarId: number): Draft | null {
-  const rule = grammarById(ctx.ref.level, grammarId)
+  const rule = ctx.content.grammar.find((g) => g.id === grammarId)
   const example = rule?.examples?.[0]
   if (!rule || !example) return null
 
   // Ask which sentence follows the pattern. The wrong answers are other rules'
   // examples, so the question tests the pattern rather than the vocabulary.
-  const others = levelContent(ctx.ref.level)
-    .grammar.filter((g) => g.id !== grammarId)
+  const others = ctx.content.grammar
+    .filter((g) => g.id !== grammarId)
     .flatMap((g) => g.examples ?? [])
     .filter((e) => e.zh && e.zh !== example.zh)
   const distractors = ctx.rng.sample(others, DISTRACTORS).map((e) => ({ label: e.zh, sub: e.pinyin }))
@@ -372,7 +396,7 @@ function sentenceOrder(ctx: Ctx, sentence: SentenceRef, wordIds: number[]): Draf
   const chars = hanziOf(sentence.zh)
   if (chars.length < 3 || chars.length > 12) return null
   const tokens: string[] = []
-  const zhWords = wordsByIds(ctx.ref.level, wordIds).map((w) => w.zh).filter((z) => z.length > 1)
+  const zhWords = pickWords(ctx, wordIds).map((w) => w.zh).filter((z) => z.length > 1)
   let rest = chars.join('')
   while (rest.length > 0) {
     const hit = zhWords.find((w) => rest.startsWith(w))
@@ -418,7 +442,7 @@ function fillBlank(ctx: Ctx, sentence: SentenceRef, word: VocabWord): Draft | nu
 }
 
 function translate(ctx: Ctx, sentence: SentenceRef, wordIds: number[], direction: 'zh-to-ar' | 'ar-to-zh'): Draft | null {
-  const lesson = lessonById(ctx.ref.level, ctx.ref.lesson)
+  const lesson = ctx.content.lessons.find((l) => l.id === ctx.ref.lesson)
   const others = (lesson?.keySentences ?? [])
     .filter((s) => s.zh !== sentence.zh)
     .map((s) => ({ zh: s.zh, pinyin: s.pinyin, ar: s.arabic }))
@@ -447,7 +471,7 @@ function translate(ctx: Ctx, sentence: SentenceRef, wordIds: number[], direction
 }
 
 function roleplay(ctx: Ctx): Draft | null {
-  const lesson = lessonById(ctx.ref.level, ctx.ref.lesson)
+  const lesson = ctx.content.lessons.find((l) => l.id === ctx.ref.lesson)
   const conversations = lesson?.conversations ?? []
   if (conversations.length === 0) return null
   const conv = ctx.rng.pick(conversations)
@@ -483,7 +507,7 @@ function roleplay(ctx: Ctx): Draft | null {
 }
 
 function storyExcerpt(ctx: Ctx): Draft | null {
-  const all = levelContent(ctx.ref.level).stories.filter((s) => s.questions.length > 0)
+  const all = ctx.content.stories.filter((s) => s.questions.length > 0)
   if (all.length === 0) return null
   // Pick the story that uses most of this unit's characters — the excerpt
   // should read like a use of what was just learned, not a random passage.
@@ -520,7 +544,7 @@ function storyExcerpt(ctx: Ctx): Draft | null {
 }
 
 function dailyQa(ctx: Ctx): Draft | null {
-  const items = levelContent(ctx.ref.level).qa
+  const items = ctx.content.qa
   const item = ctx.rng.pick(items)
   if (!item) return null
   return {
@@ -557,7 +581,7 @@ function gameBreak(ctx: Ctx, poolWordIds: number[]): Draft {
 }
 
 function examStyle(ctx: Ctx, count: number): Draft[] {
-  const bank = levelContent(ctx.ref.level).exam
+  const bank = ctx.content.exam
   if (bank.length === 0) return []
   return ctx.rng.sample(bank, count).map((item) => {
     const choices: Choice[] = item.options.map((label) => ({ label }))
@@ -696,7 +720,7 @@ function dueReviewWords(ctx: Ctx): VocabWord[] {
     // closest to being forgotten.
     .sort((a, b) => Date.parse(a.nextReview ?? '0') - Date.parse(b.nextReview ?? '0'))
     .slice(0, MAX_REVIEW_PER_UNIT)
-  return wordsByIds(ctx.ref.level, due.map((c) => c.wordId))
+  return pickWords(ctx, due.map((c) => c.wordId))
 }
 
 export interface BuildOptions {
@@ -715,24 +739,31 @@ export interface BuildOptions {
 export function buildActivityStream(
   unit: Unit,
   learner: LearnerState,
+  content: LevelContent,
   options: BuildOptions = {},
 ): Activity[] {
   const ref = unit.ref
   const seed = options.seed ?? learner.seed
   const rng = makeRng(seed, unit.key)
-  const words = wordsByIds(ref.level, unit.wordIds)
-  if (words.length === 0) return []
 
   const ctx: Ctx = {
     unit,
     ref,
     rng,
-    words,
-    pool: levelContent(ref.level).vocabulary,
+    words: [],
+    pool: content.vocabulary,
     learner,
+    content,
   }
 
-  const lesson = lessonById(ref.level, ref.lesson)
+  const words = pickWords(ctx, unit.wordIds)
+  // No words means the viewer may not see this unit's content. An empty stream
+  // is the honest answer; the screen shows its locked state rather than a
+  // session made of nothing.
+  if (words.length === 0) return []
+  ctx.words = words
+
+  const lesson = content.lessons.find((l) => l.id === ref.lesson)
   const keySentences = (unit.keySentenceIndices ?? [])
     .map((i) => lesson?.keySentences?.[i])
     .filter((s): s is NonNullable<typeof s> => Boolean(s))
@@ -788,7 +819,7 @@ export function buildActivityStream(
 
   // ── Interleaving: review and remediation, mixed into the produce phase. ──
   for (const w of dueReviewWords(ctx)) recognise.push(wordRecall(ctx, w, 'zh-to-ar', 'review'))
-  const missed = wordsByIds(ref.level, learner.missedWordIds.slice(0, MAX_REMEDIATION_PER_UNIT))
+  const missed = pickWords(ctx, learner.missedWordIds.slice(0, MAX_REMEDIATION_PER_UNIT))
   for (const w of missed) produce.push(wordRecall(ctx, w, 'ar-to-zh', 'remediation'))
 
   // ── Assembly ──

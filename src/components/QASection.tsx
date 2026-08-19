@@ -2,8 +2,6 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useActiveLevel } from '@/lib/levels'
-import { dailyQA2 } from '@/data/hsk2/qa2'
-import { dailyQA3 } from '@/data/hsk3/qa3'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -484,14 +482,16 @@ function FlashcardPractice({ question, category }: {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════
 export default function QASection() {
-  const { level } = useActiveLevel()
+  const active = useActiveLevel()
+  const { level } = active
+  // HSK1's set is bundled — it is the free level. HSK2's and HSK3's arrive with
+  // the rest of the level from `/api/content/[level]`, already filtered by
+  // entitlement. Importing `@/data/hsk3/qa3` here is what kept a handful of
+  // paid character↔meaning pairs in the public bundle after the vocabulary
+  // itself had been gated.
   const dailyQA = useMemo<QACategory[]>(
-    () => ({
-      1: DEFAULT_DAILY_QA,
-      2: dailyQA2 as unknown as QACategory[],
-      3: dailyQA3 as unknown as QACategory[],
-    }[level] ?? DEFAULT_DAILY_QA),
-    [level],
+    () => (level === 1 ? DEFAULT_DAILY_QA : ((active.dailyQA as QACategory[]) ?? [])),
+    [level, active.dailyQA],
   )
   const allQuestions = useMemo(
     () => dailyQA.flatMap(cat => cat.questions.map(q => ({ category: cat.category, color: cat.color, ...q }))),

@@ -20,6 +20,7 @@ const { load } = require('./ts-load')
 
 const { unitsGenerated } = load('src/data/units/units.generated.ts')
 const { buildActivityStream } = load('src/lib/curriculum/activity-engine.ts')
+const { levelContent } = load('src/lib/curriculum/content-source.ts')
 const { emptyLearnerState, MAX_KIND_RUN, ACTIVITY_KINDS } = load('src/lib/curriculum/types.ts')
 
 const failures = []
@@ -30,7 +31,7 @@ let totalActivities = 0
 for (const unit of unitsGenerated) {
   const where = `unit ${unit.key} (${unit.title})`
   const learner = emptyLearnerState(7)
-  const stream = buildActivityStream(unit, learner)
+  const stream = buildActivityStream(unit, learner, levelContent(unit.ref.level))
 
   if (stream.length === 0) { failures.push(`${where}: produced NO activities`); continue }
   lengths.push(stream.length)
@@ -81,7 +82,7 @@ for (const unit of unitsGenerated) {
   }
 
   // Determinism: same seed, same stream.
-  const again = buildActivityStream(unit, emptyLearnerState(7))
+  const again = buildActivityStream(unit, emptyLearnerState(7), levelContent(unit.ref.level))
   if (JSON.stringify(again) !== JSON.stringify(stream)) {
     failures.push(`${where}: NOT deterministic — two builds with seed 7 differ`)
   }

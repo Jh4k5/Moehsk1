@@ -16,6 +16,8 @@ import { Check, Flame, HelpCircle, X } from 'lucide-react'
 import { ActivityView } from './ActivityView'
 import { UnitComplete } from './UnitComplete'
 import { buildActivityStream } from '@/lib/curriculum/activity-engine'
+import { useActiveLevel } from '@/lib/levels'
+import type { LevelContent } from '@/lib/curriculum/content-types'
 import { unitPassed } from '@/lib/curriculum/progress'
 import { useLearningStore } from '@/lib/store'
 import { hrefFor } from '@/components/nav/nav-model'
@@ -32,16 +34,44 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
   const toggleLearned = useLearningStore((s) => s.toggleLearned)
   const dailyStreak = useLearningStore((s) => s.dailyStreak)
 
-  // Built once, deliberately. `srsCards` is read at mount, not subscribed to.
+  // The level's content, fetched and already filtered by entitlement. The
+  // engine used to import the data modules itself, which put all three levels
+  // into this component's bundle — and this component mounts on a public route.
+  const active = useActiveLevel()
+
+  const content = useMemo<LevelContent>(
+    () => ({
+      level: unit.ref.level,
+      vocabulary: active.vocabulary,
+      byId: new Map(active.vocabulary.map((w) => [w.id, w])),
+      lessons: active.lessons,
+      grammar: active.grammarRules,
+      stories: active.stories,
+      pictures: active.visualDict.flatMap((cat: { label?: string; words?: { hanzi: string; pinyin: string; arabic: string; emoji: string }[] }) =>
+        (cat.words ?? []).map((w) => ({ zh: w.hanzi, pinyin: w.pinyin, ar: w.arabic, emoji: w.emoji, category: cat.label ?? '' })),
+      ),
+      qa: [],
+      exam: [],
+    }),
+    [unit.ref.level, active],
+  )
+
+  // Built once per content load, deliberately. Rebuilding on every answer would
+  // reshuffle the drills under someone mid-unit, because SRS state changes with
+  // every grade.
   const stream = useMemo<Activity[]>(() => {
     const state = useLearningStore.getState()
-    return buildActivityStream(unit, {
-      srsCards: state.srsCards as never,
-      completedUnits: Object.keys(state.unitProgress) as never,
-      missedWordIds: state.getWeakWordIds?.(5) ?? [],
-      seed: unit.ref.lesson * 100 + unit.ref.unit,
-    })
-  }, [unit])
+    return buildActivityStream(
+      unit,
+      {
+        srsCards: state.srsCards as never,
+        completedUnits: Object.keys(state.unitProgress) as never,
+        missedWordIds: state.getWeakWordIds?.(5) ?? [],
+        seed: unit.ref.lesson * 100 + unit.ref.unit,
+      },
+      content,
+    )
+  }, [unit, content])
 
   const [at, setAt] = useState(0)
   const [answered, setAnswered] = useState(false)
@@ -92,10 +122,20 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
     router.push(hrefFor(locale, 'lessons'))
   }, [unit, correct, scored, completeUnit, toggleLearned, router, locale])
 
+  // A paid level's content arrives over the network, so "no activities" has two
+  // very different causes and they must not look the same to the learner.
+  if (active.loading) {
+    return <div className="j-section-skeleton" aria-busy="true" aria-label="جارٍ تحميل الوحدة" />
+  }
+
   if (stream.length === 0) {
     return (
       <div className="j-session j-session-empty">
-        <p>لا يوجد محتوى لهذه الوحدة بعد.</p>
+        <p>
+          {active.lockedCount > 0
+            ? 'هذه الوحدة ضمن الاشتراك. الدرسان الأولان مفتوحان بالكامل — جرّبهما أولاً.'
+            : 'لا يوجد محتوى لهذه الوحدة بعد.'}
+        </p>
         <Link href={hrefFor(locale, 'lessons')} className="j-ready">العودة إلى المسار</Link>
       </div>
     )

@@ -28,7 +28,6 @@
 import { useLearningStore } from '@/lib/store'
 import { createClient } from './client'
 import { parseUnitKey } from '@/lib/curriculum/types'
-import { levelContent } from '@/lib/curriculum/content-source'
 
 export interface ImportResult {
   ok: boolean
@@ -179,10 +178,15 @@ export async function importLocalProgress(force = false): Promise<ImportResult> 
   }
 }
 
-/** Level content is imported for its side-effect-free presence in the bundle
- *  graph, so the word-id ranges above stay checkable against real data. */
+/**
+ * The id ranges `levelOfWord` sorts by.
+ *
+ * Arithmetic, deliberately — this used to read `levelContent(n).vocabulary`
+ * for a COUNT it never used, and that single import dragged all three levels'
+ * vocabulary into every client bundle that touched progress migration.
+ */
 export const LEVEL_WORD_RANGES = {
-  1: { min: 1, max: 1999, count: levelContent(1).vocabulary.length },
-  2: { min: 2000, max: 2999, count: levelContent(2).vocabulary.length },
-  3: { min: 3000, max: 3999, count: levelContent(3).vocabulary.length },
-}
+  1: { min: 1, max: 1999 },
+  2: { min: 2000, max: 2999 },
+  3: { min: 3000, max: 3999 },
+} as const

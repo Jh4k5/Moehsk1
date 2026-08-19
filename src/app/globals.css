@@ -2314,3 +2314,154 @@
 .j-handoff-spin { animation: j-spin 0.9s linear infinite; }
 @keyframes j-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .j-handoff-spin { animation: none; } }
+
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║  23. ADMIN — لوحة التحكم                              ║
+   ╚═══════════════════════════════════════════════════════╝
+   The owner's screens. Denser than the learning UI on purpose: this is a desk
+   tool, read on a laptop, and the tables want rows not cards. It still has to
+   work on a phone — the owner will check a number from wherever they are — so
+   every table scrolls inside its own box rather than widening the page. */
+.j-admin { max-width: 64rem; margin-inline: auto; padding: 0 1rem 3rem; }
+.j-admin-unconfigured { padding: 3rem 1rem; display: flex; flex-direction: column; gap: 1rem; }
+.j-admin-unconfigured code { padding: 0.125rem 0.375rem; border-radius: 0.25rem; background: var(--surface-card); font-size: 0.8125rem; }
+
+.j-admin-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+  padding: 1.5rem 0 1rem;
+}
+.j-admin-head h1 { font-family: 'Cairo', sans-serif; font-size: 1.5rem; font-weight: 900; color: var(--text-primary); }
+.j-admin-head p { font-size: 0.8125rem; color: var(--text-muted); }
+.j-admin-back { font-size: 0.8125rem; color: var(--action); white-space: nowrap; }
+
+.j-admin-tabs {
+  display: flex; gap: 0.375rem; overflow-x: auto; scrollbar-width: none;
+  border-bottom: 1px solid var(--line-default);
+  margin-bottom: 1.5rem;
+}
+.j-admin-tabs::-webkit-scrollbar { display: none; }
+.j-admin-tab {
+  flex: none;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.875rem; font-weight: 600; white-space: nowrap;
+}
+.j-admin-tab.is-active { color: var(--text-primary); border-bottom-color: var(--brand-gold); }
+
+.j-admin-body { display: flex; flex-direction: column; gap: 1.25rem; }
+.j-admin-card {
+  padding: 1.125rem;
+  border-radius: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+}
+.j-admin-card h2 { font-family: 'Cairo', sans-serif; font-size: 1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.875rem; }
+.j-admin-empty { font-size: 0.875rem; line-height: 1.8; color: var(--text-muted); }
+.j-admin-error { padding: 1rem; border-radius: 0.875rem; background: var(--verdict-wrong-bg); font-size: 0.875rem; }
+
+/* ── Settings ── */
+.j-settings { display: flex; flex-direction: column; gap: 1.25rem; }
+.j-settings-group {
+  padding: 1.125rem;
+  border-radius: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+}
+.j-settings-group h2 { font-family: 'Cairo', sans-serif; font-size: 1rem; font-weight: 800; color: var(--text-primary); }
+.j-settings-note {
+  margin: 0.5rem 0 0.875rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--brand-gold);
+  background: color-mix(in srgb, var(--brand-gold) 8%, transparent);
+  font-size: 0.78125rem; line-height: 1.7; color: var(--text-primary);
+}
+.j-settings-rows { display: grid; gap: 0.875rem; margin-top: 0.875rem; }
+@media (min-width: 640px) { .j-settings-rows { grid-template-columns: 1fr 1fr; } }
+
+.j-field { display: flex; flex-direction: column; gap: 0.3125rem; min-width: 0; }
+.j-field-wide { grid-column: 1 / -1; }
+.j-field-label { font-size: 0.8125rem; font-weight: 700; color: var(--text-primary); }
+.j-field-hint { font-size: 0.71875rem; line-height: 1.6; color: var(--text-muted); }
+.j-field input[type='text'], .j-field input[type='number'], .j-field select {
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  border-radius: 0.625rem;
+  border: 1.5px solid var(--line-default);
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-size: 1rem;   /* 16px, or iOS Safari zooms the page on focus */
+}
+.j-field input:focus-visible, .j-field select:focus-visible { outline: 2px solid var(--action); outline-offset: 1px; }
+.j-field-toggle { flex-direction: row; align-items: center; gap: 0.625rem; flex-wrap: wrap; }
+.j-field-toggle input { width: 1.25rem; height: 1.25rem; accent-color: var(--action); }
+.j-field-toggle .j-field-hint { flex-basis: 100%; }
+
+.j-settings-bar {
+  position: sticky; bottom: 0;
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+  padding: 0.875rem 0;
+  padding-bottom: max(0.875rem, env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, var(--surface-page) 70%, transparent);
+}
+.j-admin-save {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  min-height: 2.875rem; padding: 0 1.125rem;
+  border: 0; border-radius: 0.75rem;
+  background: var(--action); color: var(--action-fg);
+  font-family: 'Cairo', sans-serif; font-size: 0.9375rem; font-weight: 800;
+}
+.j-admin-save:disabled { opacity: 0.5; }
+.j-settings-ok { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; color: var(--verdict-right); }
+.j-settings-err { font-size: 0.8125rem; color: var(--verdict-wrong); }
+
+/* ── Codes ── */
+.j-codes { display: flex; flex-direction: column; gap: 1.25rem; }
+.j-codes-form { display: grid; gap: 0.875rem; margin-bottom: 1rem; }
+@media (min-width: 640px) { .j-codes-form { grid-template-columns: repeat(3, 1fr); } }
+.j-codes-minted-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.j-codes-minted-head button {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  min-height: 2.25rem; padding: 0 0.75rem;
+  border: 1px solid var(--line-default); border-radius: 0.5rem;
+  background: var(--surface-page); color: var(--text-secondary);
+  font-size: 0.78125rem;
+}
+.j-codes-minted textarea {
+  width: 100%; margin-top: 0.75rem; padding: 0.75rem;
+  border-radius: 0.625rem; border: 1px solid var(--line-default);
+  background: var(--surface-page); color: var(--text-primary);
+  font-family: ui-monospace, monospace; font-size: 0.8125rem; line-height: 1.7;
+  resize: vertical;
+}
+
+/* ── Tables ── */
+/* Scroll inside the box, never widen the page — the owner may be on a phone. */
+.j-table-wrap { overflow-x: auto; margin-inline: -0.5rem; padding-inline: 0.5rem; }
+.j-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; white-space: nowrap; }
+.j-table th {
+  text-align: start; padding: 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--line-default);
+  font-size: 0.71875rem; font-weight: 700; color: var(--text-muted);
+}
+.j-table td { padding: 0.625rem; border-bottom: 1px solid color-mix(in srgb, var(--line-default) 60%, transparent); color: var(--text-primary); }
+.j-mono { font-family: ui-monospace, monospace; }
+.j-code-state.is-available { color: var(--verdict-right); font-weight: 700; }
+.j-code-state.is-revoked, .j-code-state.is-expired { color: var(--verdict-wrong); }
+.j-code-state.is-exhausted { color: var(--text-muted); }
+
+/* ── Metrics ── */
+.j-metrics { display: flex; flex-direction: column; gap: 1rem; }
+.j-metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.625rem; }
+@media (min-width: 640px) { .j-metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.j-metric {
+  display: flex; flex-direction: column; gap: 0.25rem;
+  padding: 0.875rem;
+  border-radius: 0.875rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+}
+.j-metric-num { font-family: 'Cairo', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--text-primary); }
+.j-metric-label { font-size: 0.71875rem; color: var(--text-muted); }

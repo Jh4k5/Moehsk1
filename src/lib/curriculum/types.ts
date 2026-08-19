@@ -414,6 +414,37 @@ export const ACTIVITY_KIND_LABEL_AR: Record<ActivityKind, string> = {
   'exam-style': 'سؤال امتحان',
 }
 
+/**
+ * English label per kind — the same pill, on `/en`. It sits BESIDE the Arabic
+ * map rather than replacing it: `activity-engine.ts` and
+ * `scripts/check-activities.js` both import `ACTIVITY_KIND_LABEL_AR` by name,
+ * and this codebase keeps both languages at the call site on purpose.
+ */
+export const ACTIVITY_KIND_LABEL_EN: Record<ActivityKind, string> = {
+  'word-intro': 'New word',
+  'word-recall': 'Recall the word',
+  'hanzi-write': 'Write the character',
+  'tone-discriminate': 'Spot the tone',
+  'pinyin-match': 'Match the pinyin',
+  pronounce: 'Say it',
+  'image-match': 'Match the picture',
+  'grammar-brief': 'Quick rule',
+  'grammar-apply': 'Use the rule',
+  'sentence-order': 'Order the sentence',
+  'fill-blank': 'Fill the blank',
+  translate: 'Translate',
+  roleplay: 'Role-play',
+  'story-excerpt': 'Story excerpt',
+  'daily-qa': "Today's question",
+  'game-break': 'Game break',
+  'exam-style': 'Exam question',
+}
+
+/** The pill label for a kind, in the locale the route is serving. */
+export function activityKindLabel(kind: ActivityKind, locale: 'ar' | 'en'): string {
+  return locale === 'en' ? ACTIVITY_KIND_LABEL_EN[kind] : ACTIVITY_KIND_LABEL_AR[kind]
+}
+
 // ── Learner state the engine reads ──────────────────────────────────────────
 
 /**

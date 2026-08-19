@@ -40,10 +40,36 @@ export interface TutorContext {
   grammarPractice?: Record<number, { zh: string; options: string[]; correct: number }[]>
 }
 
+/**
+ * لماذا عجز المحرك عن الإجابة — وهو المفتاح الذي يقرر إن كان السؤال يستحق
+ * استدعاء النموذج اللغوي المدفوع أم لا.
+ */
+export type TutorGap =
+  /** سؤال لم يُفهم أصلاً */
+  | 'unknown-intent'
+  /** طلب مقارنة، وأحد طرفيها على الأقل خارج بيانات المستوى */
+  | 'comparison'
+  /** سؤال «لماذا» لا تغطيه قاعدة نحوية مفهرسة */
+  | 'why'
+  /** نص صيني أو طلب ترجمة خارج معجم المستوى */
+  | 'out-of-corpus'
+
 export interface TutorReply {
   text: string
   followUps?: string[]
   quiz?: TutorQuiz | null // undefined = لا تغيير، null = مسح الاختبار المعلق
+  /**
+   * هل أجاب المحرك فعلاً؟ `false` تعني أن النص أعلاه اعتذار لا جواب، وأن
+   * السؤال مرشّح للتصعيد إلى النموذج اللغوي عبر POST /api/tutor.
+   * تُضبط تلقائياً في answerMessage: كل مسار لم يعلن ثغرة يُعدّ مُجيباً.
+   */
+  resolved?: boolean
+  gap?: TutorGap
+}
+
+/** مسار عاجز: نصّه يُعرض كما هو متى تعذّر النموذج، وسببه يقرر التصعيد. */
+function gap(g: TutorGap, reply: TutorReply): TutorReply {
+  return { ...reply, resolved: false, gap: g }
 }
 
 const TONE_NAMES = ['محايدة', 'الأولى (ـ مسطحة عالية)', 'الثانية (↗ صاعدة)', 'الثالثة (∨ هابطة صاعدة)', 'الرابعة (↘ حادة هابطة)']
@@ -160,18 +186,70 @@ function formatQuiz(q: TutorQuiz): string {
   return `🎯 ${q.question}\n\n${q.options.map((o, i) => `${letters[i]}. ${o}`).join('\n')}\n\n${L('أجب برقم الخيار (1-4)', 'Answer with the option number (1-4)')}`
 }
 
+/** أفضل قاعدة نحوية تطابق الرسالة، أو null. يستعملها مسار القواعد ومسار «لماذا». */
+function findGrammarRule(message: string, index: ReturnType<typeof getTutorIndex>) {
+  const msgTokens = new Set(tokenize(message))
+  const msgHanzi = new Set(extractHanzi(message).join('').split(''))
+  let best: { score: number; entry: (typeof index.grammarKeywords)[0] } | null = null
+  for (const gk of index.grammarKeywords) {
+    let score = 0
+    for (const kw of gk.keywords) if (msgTokens.has(kw)) score += 2
+    for (const p of gk.particles) if (msgHanzi.has(p)) score += 3
+    if (score > 0 && (!best || score > best.score)) best = { score, entry: gk }
+  }
+  return best
+}
+
+/** بطاقة قاعدة كاملة + سؤال تدريبي إن وُجد له تمرين مفهرس. */
+function grammarCard(rule: any): { text: string; quiz: TutorQuiz | null } {
+  const lines = [`📐 **${rule.titleAr}**`, '', rule.description, `🔧 النمط: ${rule.pattern}`, '', '📝 أمثلة:']
+  for (const ex of rule.examples.slice(0, 2)) {
+    lines.push(`• ${ex.zh}`)
+    lines.push(`  ${ex.pinyin} — ${ex.ar}`)
+  }
+  if (rule.tips) lines.push('', `💡 ${rule.tips}`)
+  const practice = _grammarPractice[rule.id]
+  let quiz: TutorQuiz | null = null
+  if (practice?.length) {
+    const p = practice[Math.floor(Math.random() * practice.length)]
+    quiz = {
+      question: p.zh,
+      options: p.options,
+      correctIndex: p.correct,
+      explanation: `القاعدة: ${rule.titleAr} — ${rule.pattern}`,
+    }
+    lines.push('', '🎯 سؤال تدريبي:', formatQuiz(quiz))
+  }
+  return { text: lines.join('\n'), quiz }
+}
+
 const GRAMMAR_TRIGGERS = ['قاعده', 'قواعد', 'نحو', 'grammar', 'تركيب', 'صيغه', 'rule', 'explain']
 const TONE_TRIGGERS = ['نطق', 'انطق', 'نبره', 'نبرات', 'تون', 'tone', 'بينيين', 'pinyin', 'صوت', 'pronounce', 'pronunciation', 'say']
 const QUIZ_TRIGGERS = ['اختبر', 'اختبار', 'كويز', 'quiz', 'امتحن', 'سؤال لي', 'اسالني', 'اسئلني', 'test me']
 const ADVICE_TRIGGERS = ['اراجع', 'مراجعه', 'نصيحه', 'نصائح', 'خطه', 'تقدمي', 'اذاكر', 'ادرس', 'مستواي', 'review', 'advice', 'plan', 'progress', 'study']
 const EXAMPLE_TRIGGERS = ['مثال', 'امثله', 'جمله', 'جمل', 'example', 'sentence']
 const NUMBER_TRIGGERS = ['رقم', 'ارقام', 'اعداد', 'عد ', 'الاعداد', 'number', 'count']
+const COMPARE_TRIGGERS = ['الفرق', 'فرق بين', 'مقارنه', 'ايهما', 'متي استخدم', 'difference', 'vs', 'versus', 'compare']
+const WHY_TRIGGERS = ['لماذا', 'ليش', 'لم نستخدم', 'why', 'سبب']
+const WRITE_TRIGGERS = ['اكتب', 'كتابه', 'ضربات', 'ضربه', 'رسم الحرف', 'ترتيب الضربات', 'stroke', 'write', 'radical', 'جذر', 'جذور']
 
 function matchTriggers(normalized: string, triggers: string[]): boolean {
   return triggers.some((t) => normalized.includes(t))
 }
 
+/**
+ * الطبقة الأولى: جواب مجاني مبني على بيانات المنصة نفسها.
+ *
+ * كل مسار يُرجع نصاً هو جواب فعلي، إلا ما مرّ عبر gap() — فذاك اعتذار يحمل سبب
+ * العجز، وهو وحده ما يستحق استدعاء النموذج المدفوع.
+ */
 export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
+  const reply = runRules(raw, ctx)
+  // من لم يعلن ثغرة فقد أجاب. gap() تكتب resolved:false فوق هذه القيمة.
+  return { resolved: true, ...reply }
+}
+
+function runRules(raw: string, ctx: TutorContext): TutorReply {
   // ضبط بيانات المستوى النشط لهذه المعالجة
   _level = ctx.level ?? 1
   _lang = ctx.lang ?? 'ar'
@@ -194,6 +272,67 @@ export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
       return { text, quiz: null, followUps: [L('اختبرني مرة أخرى', 'Quiz me again'), L('ماذا أراجع اليوم؟', 'What should I review today?')] }
     }
     // ليست إجابة → يكمل التحليل الطبيعي مع مسح الاختبار
+  }
+
+  // ── 0.1) مقارنة بين طرفين ─────────────────────────────────────────────
+  // «ما الفرق بين 的 و 得؟» — المنصة تملك بطاقة كل طرف، فتُبنى المقارنة منها
+  // مجاناً. إن لم يُعرف طرفان فالسؤال خارج المعجم ويستحق النموذج.
+  if (matchTriggers(normalized, COMPARE_TRIGGERS)) {
+    const sides = findWords(message)
+    if (sides.length >= 2) {
+      const [a, b] = sides
+      const lines = [
+        `⚖️ الفرق بين **${a.zh}** و **${b.zh}**:`,
+        '',
+        `• **${a.zh}** (${a.pinyin}) — ${M(a)} • ${posLabel(a.pos)}`,
+        a.sentences?.[0] ? `  مثال: ${a.sentences[0].zh} — ${a.sentences[0].ar}` : '',
+        '',
+        `• **${b.zh}** (${b.pinyin}) — ${M(b)} • ${posLabel(b.pos)}`,
+        b.sentences?.[0] ? `  مثال: ${b.sentences[0].zh} — ${b.sentences[0].ar}` : '',
+        '',
+        a.pos === b.pos
+          ? `🔎 كلاهما ${posLabel(a.pos)}، فالفرق في المعنى والاستعمال — قارن المثالين أعلاه.`
+          : `🔎 الأول ${posLabel(a.pos)} والثاني ${posLabel(b.pos)}، فموقعهما في الجملة مختلف.`,
+      ].filter(Boolean)
+      return { text: lines.join('\n'), followUps: [`أمثلة على ${a.zh}`, `أمثلة على ${b.zh}`], quiz: null }
+    }
+    const known = sides.length === 1 ? `عرفت **${sides[0].zh}** وحدها من سؤالك، ` : ''
+    return gap('comparison', {
+      text: `⚖️ ${known}ولا أملك الطرف الآخر في بيانات هذا المستوى، فلا أبني لك مقارنة دقيقة بنفسي.`,
+      followUps: sides.length === 1 ? [`اشرح ${sides[0].zh}`] : ['اشرح قاعدة 的', 'اختبرني'],
+      quiz: null,
+    })
+  }
+
+  // ── 0.2) كتابة الحرف: الضربات والجذور ─────────────────────────────────
+  if (matchTriggers(normalized, WRITE_TRIGGERS)) {
+    const words = findWords(message)
+    if (words.length) {
+      const w = words[0]
+      const lines = [
+        `✍️ كتابة **${w.zh}** (${w.pinyin} — ${M(w)}):`,
+        `• عدد الضربات: ${w.strokeCount}`,
+        w.radicals?.length ? `• الجذور: ${w.radicals.join(' + ')}` : '',
+        w.mnemonic ? `🧠 للتذكر: ${w.mnemonic}` : '',
+        '',
+        '💡 افتح قسم «الحروف» وتتبّع ترتيب الضربات بإصبعك — الترتيب جزء من الحفظ لا زينة.',
+      ].filter(Boolean)
+      return { text: lines.join('\n'), followUps: [`أمثلة على ${w.zh}`, `كيف أنطق ${w.zh}؟`], quiz: null }
+    }
+  }
+
+  // ── 0.3) «لماذا»: قاعدة إن وُجدت، وإلا فهو تعليل يحتاج النموذج ─────────
+  if (matchTriggers(normalized, WHY_TRIGGERS)) {
+    const best = findGrammarRule(message, index)
+    if (best) {
+      const card = grammarCard(best.entry.rule)
+      return { text: card.text, quiz: card.quiz, followUps: card.quiz ? undefined : ['اختبرني', 'اشرح قاعدة أخرى'] }
+    }
+    return gap('why', {
+      text: 'سؤالك سؤال تعليل («لماذا»)، ولا أجد قاعدة مفهرسة في هذا المستوى تغطيه.',
+      followUps: ['اشرح قاعدة النفي', 'اختبرني'],
+      quiz: null,
+    })
   }
 
   // ── 1) طلب اختبار ─────────────────────────────────────────────────────
@@ -227,43 +366,10 @@ export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
 
   // ── 3) قاعدة نحوية ────────────────────────────────────────────────────
   if (matchTriggers(normalized, GRAMMAR_TRIGGERS) || (extractHanzi(message).join('').length === 1 && '的吗呢吧了和比太不没'.includes(extractHanzi(message).join('')))) {
-    const msgTokens = new Set(tokenize(message))
-    const msgHanzi = new Set(extractHanzi(message).join('').split(''))
-    let best: { score: number; rule: (typeof index.grammarKeywords)[0] } | null = null
-    for (const gk of index.grammarKeywords) {
-      let score = 0
-      for (const kw of gk.keywords) if (msgTokens.has(kw)) score += 2
-      for (const p of gk.particles) if (msgHanzi.has(p)) score += 3
-      if (score > 0 && (!best || score > best.score)) best = { score, rule: gk }
-    }
+    const best = findGrammarRule(message, index)
     if (best) {
-      const r = best.rule.rule
-      const lines = [
-        `📐 **${r.titleAr}**`,
-        '',
-        r.description,
-        `🔧 النمط: ${r.pattern}`,
-        '',
-        '📝 أمثلة:',
-      ]
-      for (const ex of r.examples.slice(0, 2)) {
-        lines.push(`• ${ex.zh}`)
-        lines.push(`  ${ex.pinyin} — ${ex.ar}`)
-      }
-      if (r.tips) lines.push('', `💡 ${r.tips}`)
-      const practice = _grammarPractice[r.id]
-      let quiz: TutorQuiz | undefined
-      if (practice?.length) {
-        const p = practice[Math.floor(Math.random() * practice.length)]
-        quiz = {
-          question: p.zh,
-          options: p.options,
-          correctIndex: p.correct,
-          explanation: `القاعدة: ${r.titleAr} — ${r.pattern}`,
-        }
-        lines.push('', '🎯 سؤال تدريبي:', formatQuiz(quiz))
-      }
-      return { text: lines.join('\n'), quiz: quiz ?? null, followUps: quiz ? undefined : ['اختبرني', 'اشرح قاعدة أخرى'] }
+      const card = grammarCard(best.entry.rule)
+      return { text: card.text, quiz: card.quiz, followUps: card.quiz ? undefined : ['اختبرني', 'اشرح قاعدة أخرى'] }
     }
     return {
       text: '📐 أهم قواعد HSK 1:\n\n• ترتيب الجملة: فاعل + فعل + مفعول — 我吃饭\n• 是 للهوية: 我是学生 (أنا طالب)\n• 有 للملكية: 我有一本书 — نفيها بـ 没有 فقط\n• 不 لنفي الحاضر، 没 لنفي الماضي\n• 吗 تحوّل أي جملة لسؤال: 你好吗？\n• 的 للملكية والوصف: 我的书 (كتابي)\n\nاسألني عن أي قاعدة بالتحديد، مثل: "اشرح قاعدة 吗"',
@@ -374,12 +480,39 @@ export function answerMessage(raw: string, ctx: TutorContext): TutorReply {
     }
   }
 
-  // ── 9) الرد الافتراضي ─────────────────────────────────────────────────
-  return {
+  // ── 9) عجز المحرك ─────────────────────────────────────────────────────
+  // النص نفسه لم يتغير — يُعرض كما هو متى تعذّر النموذج — لكنه صار يحمل سبب
+  // العجز، فتقرر POST /api/tutor التصعيد عن علم لا عن تخمين.
+  const wantsTranslation = /(ترجم|بالصيني|بالعربي|translate)/.test(normalized)
+  const outOfCorpus = extractHanzi(message).length > 0 || wantsTranslation
+  return gap(outOfCorpus ? 'out-of-corpus' : 'unknown-intent', {
     text: L(
       `لم أفهم سؤالك تماماً 🤔 — لكن يمكنني مساعدتك في:\n\n📚 **شرح الكلمات**: اكتب أي كلمة بالصيني (你好) أو البينيين (nihao) أو العربي (مرحبا)\n📐 **القواعد**: "اشرح قاعدة 吗" أو "قاعدة النفي"\n🎯 **اختبار**: "اختبرني" — أسئلة مبنية على كلماتك الضعيفة\n📊 **خطة مراجعة**: "ماذا أراجع اليوم؟"`,
       `I didn't quite get that 🤔 — but I can help with:\n\n📚 **Word meanings**: type any word in Chinese (你好), pinyin (nihao), or English\n📐 **Grammar**: "explain the 吗 rule" or "negation rule"\n🎯 **Quiz**: "quiz me" — questions based on your weak words\n📊 **Review plan**: "what should I review today?"`),
     followUps: [L('ما معنى 你好؟', 'What does 你好 mean?'), L('اختبرني', 'Quiz me'), L('ماذا أراجع اليوم؟', 'What should I review today?')],
     quiz: null,
-  }
+  })
+}
+
+/**
+ * ما تعرفه المنصة عن رسالة بعينها: كلماتها المعجمية والقاعدة المطابقة.
+ *
+ * تستعملها طبقة النموذج لتغذية السؤال بحقائق المنهج (النطق، المعنى، نمط
+ * القاعدة) حتى لا يخترع النموذج نبرة أو معنى يخالف ما يدرسه الطالب في القسم
+ * الآخر من المنصة.
+ */
+export function collectGrounding(
+  raw: string,
+  ctx: Pick<TutorContext, 'level' | 'lang' | 'vocabulary' | 'grammarRules' | 'grammarPractice'>,
+): { words: VocabWord[]; rule: any | null } {
+  _level = ctx.level ?? 1
+  _lang = ctx.lang ?? 'ar'
+  _vocab = ctx.vocabulary ?? vocabulary1
+  _grammarRules = ctx.grammarRules ?? grammarRules1
+  _grammarPractice = ctx.grammarPractice ?? grammarPractice1
+
+  const message = raw.trim()
+  const index = getTutorIndex(_level, _vocab, _grammarRules)
+  const best = findGrammarRule(message, index)
+  return { words: findWords(message).slice(0, 5), rule: best ? best.entry.rule : null }
 }

@@ -21,13 +21,14 @@ import type { LevelContent } from '@/lib/curriculum/content-types'
 import { unitPassed } from '@/lib/curriculum/progress'
 import { useLearningStore } from '@/lib/store'
 import { hrefFor } from '@/components/nav/nav-model'
-import type { Locale } from '@/lib/locale'
+import { makeT, type Locale } from '@/lib/locale'
 import type { Activity, Unit } from '@/lib/curriculum/types'
 
 /** Activities that grade nothing — a card the learner reads and moves past. */
 const PRESENTATION = new Set(['word-intro', 'grammar-brief', 'daily-qa', 'game-break'])
 
 export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) {
+  const t = makeT(locale)
   const router = useRouter()
   const rateWord = useLearningStore((s) => s.rateWord)
   const completeUnit = useLearningStore((s) => s.completeUnit)
@@ -125,7 +126,13 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
   // A paid level's content arrives over the network, so "no activities" has two
   // very different causes and they must not look the same to the learner.
   if (active.loading) {
-    return <div className="j-section-skeleton" aria-busy="true" aria-label="جارٍ تحميل الوحدة" />
+    return (
+      <div
+        className="j-section-skeleton"
+        aria-busy="true"
+        aria-label={t('جارٍ تحميل الوحدة', 'Loading the unit')}
+      />
+    )
   }
 
   if (stream.length === 0) {
@@ -133,10 +140,15 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
       <div className="j-session j-session-empty">
         <p>
           {active.lockedCount > 0
-            ? 'هذه الوحدة ضمن الاشتراك. الدرسان الأولان مفتوحان بالكامل — جرّبهما أولاً.'
-            : 'لا يوجد محتوى لهذه الوحدة بعد.'}
+            ? t(
+                'هذه الوحدة ضمن الاشتراك. الدرسان الأولان مفتوحان بالكامل — جرّبهما أولاً.',
+                'This unit is part of the subscription. The first two lessons are open in full — start with those.',
+              )
+            : t('لا يوجد محتوى لهذه الوحدة بعد.', 'There is no content for this unit yet.')}
         </p>
-        <Link href={hrefFor(locale, 'lessons')} className="j-ready">العودة إلى المسار</Link>
+        <Link href={hrefFor(locale, 'lessons')} className="j-ready">
+          {t('العودة إلى المسار', 'Back to the path')}
+        </Link>
       </div>
     )
   }
@@ -162,7 +174,11 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
   return (
     <div className="j-session">
       <header className="j-session-bar">
-        <Link href={hrefFor(locale, 'lessons')} className="j-session-close" aria-label="أغلق الوحدة">
+        <Link
+          href={hrefFor(locale, 'lessons')}
+          className="j-session-close"
+          aria-label={t('أغلق الوحدة', 'Close the unit')}
+        >
           <X size={20} aria-hidden />
         </Link>
         <div className="j-session-track" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
@@ -191,17 +207,21 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
           <div className="j-verdict-head">
             <span className="j-verdict-icon" aria-hidden>{lastCorrect ? <Check size={15} /> : <X size={15} />}</span>
             <div>
-              <span className="j-verdict-title">{lastCorrect ? 'إجابة صحيحة' : 'ليست الإجابة الصحيحة'}</span>
+              <span className="j-verdict-title">
+                {lastCorrect ? t('إجابة صحيحة', 'Correct') : t('ليست الإجابة الصحيحة', 'Not the right answer')}
+              </span>
               {'question' in activity && activity.question && 'explanation' in activity.question && (
                 <p className="j-verdict-why">{activity.question.explanation}</p>
               )}
             </div>
           </div>
           <div className="j-verdict-actions">
-            <button type="button" className="j-verdict-help" aria-label="اشرح لي أكثر">
+            <button type="button" className="j-verdict-help" aria-label={t('اشرح لي أكثر', 'Explain further')}>
               <HelpCircle size={20} aria-hidden />
             </button>
-            <button type="button" className="j-verdict-next" onClick={advance}>تابع</button>
+            <button type="button" className="j-verdict-next" onClick={advance}>
+              {t('تابع', 'Continue')}
+            </button>
           </div>
         </div>
       )}

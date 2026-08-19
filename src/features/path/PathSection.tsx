@@ -19,13 +19,18 @@ import { UNITS_BY_LEVEL } from '@/lib/curriculum'
 import { isUnitUnlocked, levelProgress, nextUnitFor } from '@/lib/curriculum/progress'
 import { publicLevel } from '@/data/public-index.generated'
 import { useLocale } from '@/components/nav/use-locale'
+import { makeT, type Locale } from '@/lib/locale'
 import type { HskLevelNo, Unit } from '@/lib/curriculum/types'
 
-const AR = new Intl.NumberFormat('ar-EG')
+// `ar-EG` gives Arabic-Indic digits — ٧, not 7. The formatter follows the
+// route's locale so an English reader gets numerals they can read.
+const NUM = { ar: new Intl.NumberFormat('ar-EG'), en: new Intl.NumberFormat('en-US') } as const
 const LEVELS: HskLevelNo[] = [1, 2, 3]
 
 export default function PathSection() {
   const locale = useLocale()
+  const t = makeT(locale)
+  const AR = NUM[locale]
   const mounted = useMounted()
   const level = useLearningStore((s) => s.currentLevel) as HskLevelNo
   const setLevel = useLearningStore((s) => s.setLevel)
@@ -41,8 +46,8 @@ export default function PathSection() {
       <header className="j-path-head">
         <HanziWatermark char="路" size={92} style={{ top: '-8px', insetInlineEnd: '-6px' }} />
         <div className="j-path-title">
-          <h1>مساري</h1>
-          <div className="j-level-switch" role="tablist" aria-label="المستوى">
+          <h1>{t('مساري', 'My path')}</h1>
+          <div className="j-level-switch" role="tablist" aria-label={t('المستوى', 'Level')}>
             {LEVELS.map((lv) => (
               <button
                 key={lv}
@@ -58,8 +63,13 @@ export default function PathSection() {
         </div>
         <div className="j-path-meter">
           <div className="j-path-meter-row">
-            <span>{AR.format(stats.doneUnits)} من {AR.format(stats.totalUnits)} وحدة</span>
-            <span>{AR.format(stats.percent)}٪</span>
+            <span>
+              {t(
+                `${AR.format(stats.doneUnits)} من ${AR.format(stats.totalUnits)} وحدة`,
+                `${AR.format(stats.doneUnits)} of ${AR.format(stats.totalUnits)} units`,
+              )}
+            </span>
+            <span>{AR.format(stats.percent)}{locale === 'en' ? '%' : '٪'}</span>
           </div>
           <div className="j-path-track"><div className="j-path-fill" style={{ width: `${stats.percent}%` }} /></div>
         </div>
@@ -75,11 +85,14 @@ export default function PathSection() {
           {primerDone ? <Check size={17} /> : <BookOpen size={17} />}
         </span>
         <span className="j-primer-entry-body">
-          <span className="j-primer-entry-title">تمهيد المبتدئ</span>
+          <span className="j-primer-entry-title">{t('تمهيد المبتدئ', 'Beginner primer')}</span>
           <span className="j-primer-entry-sub">
             {primerDone
-              ? 'أتممته — عُد إليه متى شئت.'
-              : 'ابدأ من هنا: ما هي الصينية، الجذور، النبرات الأربع، والبينين. مجاني بالكامل.'}
+              ? t('أتممته — عُد إليه متى شئت.', 'Finished — come back to it whenever you like.')
+              : t(
+                  'ابدأ من هنا: ما هي الصينية، الجذور، النبرات الأربع، والبينين. مجاني بالكامل.',
+                  'Start here: what Chinese is, radicals, the four tones, and pinyin. Free, all of it.',
+                )}
           </span>
         </span>
       </Link>
@@ -169,6 +182,9 @@ interface LessonNode {
 }
 
 function groupByLesson(level: HskLevelNo): LessonNode[] {
+  // The fallback title is the bare number: the lesson number is already
+  // rendered as its own badge beside it, and «الدرس ٣» in an English column
+  // would be the only Arabic on the row.
   // The PUBLIC index: titles and counts, no vocabulary. Importing the content
   // source here is what put every HSK2 and HSK3 word into the shared bundle.
   const content = publicLevel(level)
@@ -179,7 +195,7 @@ function groupByLesson(level: HskLevelNo): LessonNode[] {
     const meta = content.lessons.find((l) => l.id === lesson)
     return {
       lesson,
-      title: meta?.title ?? `الدرس ${lesson}`,
+      title: meta?.title ?? `${lesson}`,
       titleZh: meta?.titleZh ?? '',
       units: order.filter((u) => u.ref.lesson === lesson),
     }

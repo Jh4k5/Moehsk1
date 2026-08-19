@@ -6,15 +6,23 @@
 
 import { Volume2 } from 'lucide-react'
 import { speak } from '@/lib/tts'
-import { ACTIVITY_KIND_LABEL_AR, type ActivityKind, type Choice } from '@/lib/curriculum/types'
+import {
+  ACTIVITY_KIND_LABEL_AR,
+  ACTIVITY_KIND_LABEL_EN,
+  type ActivityKind,
+  type Choice,
+} from '@/lib/curriculum/types'
+import { ts, tsPick } from '@/lib/i18n'
 
-/** Arabic-Indic digits — the design numbers the options ١ ٢ ٣ ٤. */
+/** Arabic-Indic digits — the design numbers the options ١ ٢ ٣ ٤. An English
+ *  reader gets Latin ones; ٣ is not a numeral they can read at a glance. */
 const AR_DIGITS = ['١', '٢', '٣', '٤', '٥', '٦']
+const EN_DIGITS = ['1', '2', '3', '4', '5', '6']
 
 export function KindPill({ kind }: { kind: ActivityKind }) {
   return (
     <div className="j-kind-pill">
-      <span>{ACTIVITY_KIND_LABEL_AR[kind]}</span>
+      <span>{tsPick(ACTIVITY_KIND_LABEL_AR[kind], ACTIVITY_KIND_LABEL_EN[kind])}</span>
     </div>
   )
 }
@@ -28,11 +36,11 @@ export function Hanzi({ text, size = 'md' }: { text: string; size?: 'sm' | 'md' 
 }
 
 /** Speak-aloud button. Silently inert where the browser has no voice for it. */
-export function Listen({ text, label = 'استمع' }: { text: string; label?: string }) {
+export function Listen({ text, label }: { text: string; label?: string }) {
   return (
     <button type="button" className="j-listen" onClick={() => speak(text)}>
       <Volume2 size={14} aria-hidden />
-      <span>{label}</span>
+      <span>{label ?? ts('استمع', 'Listen')}</span>
     </button>
   )
 }
@@ -74,7 +82,11 @@ export function ChoiceList({ choices, picked, correct, onPick, chinese }: Choice
               aria-pressed={isPick}
             >
               <span className="j-choice-num" aria-hidden>
-                {answered && isRight ? '✓' : answered && isPick ? '✗' : AR_DIGITS[i] ?? i + 1}
+                {answered && isRight
+                  ? '✓'
+                  : answered && isPick
+                    ? '✗'
+                    : tsPick(AR_DIGITS[i], EN_DIGITS[i]) ?? i + 1}
               </span>
               <span className="j-choice-body">
                 {chinese ? <Hanzi text={choice.label} size="md" /> : <span className="j-choice-label">{choice.label}</span>}
@@ -97,7 +109,7 @@ export function Prompt({ title, sub }: { title: string; sub?: string }) {
   )
 }
 
-/** A Chinese sentence with its pinyin and Arabic, the shape used everywhere. */
+/** A Chinese sentence with its pinyin and its gloss, the shape used everywhere. */
 export function SentenceBlock({
   zh,
   pinyin,

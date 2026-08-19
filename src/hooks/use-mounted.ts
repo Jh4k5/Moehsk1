@@ -26,3 +26,25 @@ const onServer = () => false
 export function useMounted(): boolean {
   return useSyncExternalStore(noopSubscribe, onClient, onServer)
 }
+
+/**
+ * Read a value that only exists in the browser, safely across hydration.
+ *
+ * Returns `serverValue` on the server AND on the first client render, then the
+ * real value. Use it for anything derived from the persisted store in a
+ * component that the server prerenders.
+ *
+ * This exists because the failure it prevents is silent and structural. The
+ * bottom bar rendered its review badge as `{dueCount > 0 && <span/>}`: with no
+ * stored progress the server omitted the element, and a returning learner's
+ * first client render added it — a different tree, so React threw the whole
+ * page away and rebuilt it (hydration error #418). Nothing looked wrong on
+ * screen; it just cost a full re-render on every navigation, and only appeared
+ * for learners who had actually used the app.
+ *
+ * A conditional ELEMENT is the dangerous case. Differing text is a warning;
+ * a differing tree is a rebuild.
+ */
+export function usePersisted<T>(value: T, serverValue: T): T {
+  return useMounted() ? value : serverValue
+}

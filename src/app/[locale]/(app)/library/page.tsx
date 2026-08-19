@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { AppHeader } from '@/components/nav/AppHeader'
 import { DRAWER_GROUPS, NAV, hrefFor } from '@/components/nav/nav-model'
 import { isLocale, makeT, type Locale } from '@/lib/locale'
 
@@ -34,7 +35,9 @@ export default async function LibraryIndexPage({
   const t = makeT(locale)
 
   return (
-    <div className="j-library-index">
+    <>
+      <AppHeader locale={locale} />
+      <div className="j-library-index">
       <header className="j-library-head">
         <h1>{t('المكتبة', 'Library')}</h1>
         <p>
@@ -69,6 +72,7 @@ export default async function LibraryIndexPage({
           </ul>
         </section>
       ))}
-    </div>
+      </div>
+    </>
   )
 }

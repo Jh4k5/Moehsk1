@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import { AppHeader } from '@/components/nav/AppHeader'
 import { BottomNav } from '@/components/nav/BottomNav'
 import { DesktopSidebar } from '@/components/nav/DesktopSidebar'
 import Paywall from '@/components/Paywall'
@@ -35,7 +34,13 @@ export default async function AppShellLayout({
     <div className="j-app-shell">
       <DesktopSidebar locale={locale} />
       <div className="j-app-column">
-        <AppHeader locale={locale} />
+        {/*
+          No `AppHeader` here. It used to mount on every route, but `/home` and
+          `/path` draw their own identity header — brand, level, streak — so
+          those two screens rendered the whole lot twice, stacked. Pages that
+          need a plain header import it themselves; the shell owns only what is
+          the same on every screen.
+        */}
         <Paywall />
         <main id="main" className="j-main-content">
           {children}

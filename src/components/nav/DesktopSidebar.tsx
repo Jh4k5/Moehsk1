@@ -13,15 +13,22 @@ import { BOTTOM_TABS, DRAWER_GROUPS, NAV, hrefFor, pathAfterLocale } from './nav
 import { useI18n } from '@/lib/i18n'
 import { useActiveLevel } from '@/lib/levels'
 import { useLearningStore } from '@/lib/store'
+import { usePersisted } from '@/hooks/use-mounted'
 import { Logo } from '@/components/brand/Logo'
 import type { Locale } from '@/lib/locale'
+
+/** A stable empty array — a fresh `[]` each render would defeat memoisation. */
+const EMPTY: number[] = []
 
 export function DesktopSidebar({ locale }: { locale: Locale }) {
   const [railExpanded, setRailExpanded] = useState(true)
   const pathname = usePathname()
   const { t } = useI18n()
   const activeLevel = useActiveLevel()
-  const learnedWords = useLearningStore((s) => s.learnedWords)
+  // Same reason as the bottom bar's badge: this feeds a percentage the server
+  // renders as 0 and a returning learner's first client render renders as
+  // something else.
+  const learnedWords = usePersisted(useLearningStore((s) => s.learnedWords), EMPTY)
   const here = pathAfterLocale(pathname)
 
   const total = activeLevel.vocabulary.length

@@ -81,7 +81,13 @@ export default function PathSection() {
               <div className="j-spine-card">
                 <div className="j-spine-header">
                   <div className="j-spine-name">
-                    <span>{AR.format(lesson)} · {title}</span>
+                    {/* The lesson number is a badge, not "١ · العنوان". A dot
+                        directly after an Arabic-Indic digit reads as the zero
+                        — ٠ is a dot — so «١ · التحيّة» can be read as «١٠». */}
+                    <span className="j-spine-label">
+                      <span className="j-spine-no">{AR.format(lesson)}</span>
+                      {title}
+                    </span>
                     <span className="font-chinese j-spine-zh" lang="zh-Hans">{titleZh}</span>
                   </div>
                   <span className="j-spine-count">{AR.format(done)}/{AR.format(units.length)}</span>

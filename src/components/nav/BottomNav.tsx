@@ -11,12 +11,16 @@ import { usePathname } from 'next/navigation'
 import { BOTTOM_TABS, pathAfterLocale } from './nav-model'
 import { useI18n } from '@/lib/i18n'
 import { useLearningStore } from '@/lib/store'
+import { usePersisted } from '@/hooks/use-mounted'
 import type { Locale } from '@/lib/locale'
 
 export function BottomNav({ locale }: { locale: Locale }) {
   const pathname = usePathname()
   const { t } = useI18n()
-  const dueCount = useLearningStore((s) => s.getDueCardIds().length)
+  // Held at 0 until after the first client render. The badge is a conditional
+  // ELEMENT, so a learner with due cards used to hydrate into a different tree
+  // than the server sent and React rebuilt the page on every navigation.
+  const dueCount = usePersisted(useLearningStore((s) => s.getDueCardIds().length), 0)
   const here = pathAfterLocale(pathname)
 
   return (

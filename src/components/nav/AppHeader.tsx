@@ -13,14 +13,15 @@ import { Logo } from '@/components/brand/Logo'
 import { useI18n } from '@/lib/i18n'
 import { useActiveLevel } from '@/lib/levels'
 import { useLearningStore } from '@/lib/store'
+import { usePersisted } from '@/hooks/use-mounted'
 import type { Locale } from '@/lib/locale'
 
 export function AppHeader({ locale }: { locale: Locale }) {
   const { t } = useI18n()
   const activeLevel = useActiveLevel()
   const setLevel = useLearningStore((s) => s.setLevel)
-  const currentLevel = useLearningStore((s) => s.currentLevel)
-  const dailyStreak = useLearningStore((s) => s.dailyStreak)
+  const currentLevel = usePersisted(useLearningStore((s) => s.currentLevel), 1)
+  const dailyStreak = usePersisted(useLearningStore((s) => s.dailyStreak), 0)
 
   return (
     <header className="j-app-header">

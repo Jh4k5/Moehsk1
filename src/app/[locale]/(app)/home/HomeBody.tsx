@@ -1,6 +1,7 @@
 'use client'
 import { useLearningStore } from '@/lib/store'
-import DashboardSection from '@/features/dashboard/DashboardSection'
+import { useMounted } from '@/hooks/use-mounted'
+import HomeSection from '@/features/home/HomeSection'
 import OnboardingScreen from '@/components/OnboardingScreen'
 
 // Onboarding used to be a wall in front of the entire app: the root component
@@ -13,11 +14,21 @@ import OnboardingScreen from '@/components/OnboardingScreen'
 export function HomeBody() {
   const profile = useLearningStore((s) => s.profile)
   const hydrated = useLearningStore((s) => s._hasHydrated)
+  const mounted = useMounted()
 
-  // Until the persisted store is read back, neither branch is known to be
-  // right. Rendering the prompt first would flash a name request at a learner
-  // who named themselves months ago.
-  if (!hydrated) return <div className="j-section-skeleton" aria-busy="true" />
+  // BOTH conditions, and `mounted` is not redundant.
+  //
+  // `_hasHydrated` alone was a hydration mismatch: zustand's persist middleware
+  // reads `localStorage` synchronously while the store module loads, so the
+  // flag is already TRUE on the very first client render and FALSE on the
+  // server. The server sent this skeleton and the client immediately rendered
+  // the dashboard in its place — a structural mismatch (React #418), which
+  // makes React throw the tree away and re-render it.
+  //
+  // `mounted` is false on that first client render by construction, so the
+  // first pass matches what the server sent, and the real screen appears one
+  // render later.
+  if (!mounted || !hydrated) return <div className="j-section-skeleton" aria-busy="true" />
 
-  return profile ? <DashboardSection /> : <OnboardingScreen />
+  return profile ? <HomeSection /> : <OnboardingScreen />
 }

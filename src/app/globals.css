@@ -2001,3 +2001,205 @@
   text-underline-offset: 4px;
 }
 .j-board-skip:hover { color: var(--text-primary); }
+
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║  21. HOME — الرئيسية                                  ║
+   ╚═══════════════════════════════════════════════════════╝
+   One screen, one subject: the unit to open now. Everything below the next-unit
+   card reports; nothing below it competes. The screen this replaces opened on
+   three rows of statistics, which told a learner how they were doing and never
+   what to do. */
+.j-home { max-width: 30rem; margin-inline: auto; padding: 0 1rem 2rem; }
+
+/* ── Identity header ── */
+.j-home-head {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin: 0 -1rem;
+  /* Deep bottom padding: the next-unit card is pulled up over this edge, so the
+     brand stays visible behind it instead of being covered. */
+  padding: 1.125rem 1rem 3.5rem;
+  background: linear-gradient(162deg, var(--navy-600), var(--navy-800) 70%, var(--navy-900));
+  color: var(--brand-ivory);
+}
+.j-home-brandrow { position: relative; display: flex; align-items: center; gap: 0.625rem; }
+.j-home-mark {
+  display: grid; place-items: center; flex: none;
+  width: 2.25rem; height: 2.25rem;
+  border-radius: 0.625rem;
+  background: var(--brand-ivory);
+}
+.j-home-brand { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.j-home-brand-ar { font-family: 'Cairo', sans-serif; font-size: 0.84375rem; font-weight: 700; line-height: 1.3; }
+.j-home-brand-level { font-size: 0.6875rem; color: var(--navy-200); }
+.j-home-streak {
+  display: inline-flex; align-items: center; gap: 0.3125rem; flex: none;
+  padding: 0.25rem 0.625rem; border-radius: 999px;
+  background: rgba(212, 175, 55, 0.14);
+  /* Gold as text is legible here and only here: the ground is navy (8.62:1). */
+  color: var(--gold-300);
+  font-family: 'Cairo', sans-serif; font-size: 0.8125rem; font-weight: 800;
+}
+
+.j-home-greeting { position: relative; margin-top: 1.375rem; }
+.j-home-greeting h1 { font-family: 'Cairo', sans-serif; font-size: 1.5rem; font-weight: 900; line-height: 1.35; }
+.j-home-greeting p { margin-top: 0.375rem; font-size: 0.84375rem; line-height: 1.7; color: var(--navy-100); }
+
+/* ── The next unit ── */
+.j-next-card {
+  position: relative;
+  z-index: 1;
+  margin-top: -2.25rem;      /* lifted over the header's lower edge */
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 1.125rem;
+  border-radius: 1.25rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+  /* The one raised surface on the page. Elevation is the cheapest way to say
+     "this one" without another colour. */
+  box-shadow: 0 12px 34px rgba(12, 22, 38, 0.16);
+}
+.j-next-eyebrow { font-size: 0.71875rem; font-weight: 700; color: var(--text-muted); }
+.j-next-card h2 { font-family: 'Cairo', sans-serif; font-size: 1.1875rem; font-weight: 800; line-height: 1.4; color: var(--text-primary); }
+.j-next-meta { font-size: 0.75rem; color: var(--text-muted); }
+.j-next-goal { font-size: 0.8125rem; line-height: 1.7; color: var(--text-secondary); }
+
+.j-next-words { display: flex; flex-wrap: wrap; gap: 0.375rem; list-style: none; padding: 0; margin: 0.25rem 0 0; }
+.j-next-words li {
+  padding: 0.3125rem 0.625rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--brand-navy) 7%, transparent);
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  font-size: 0.9375rem; font-weight: 700; color: var(--text-primary);
+}
+.j-next-more { font-family: 'Tajawal', sans-serif !important; font-size: 0.75rem !important; color: var(--text-muted) !important; }
+
+.j-next-cta {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  margin-top: 0.75rem;
+  min-height: 3.25rem;
+  border-radius: 0.875rem;
+  background: var(--action);
+  color: var(--action-fg);
+  font-family: 'Cairo', sans-serif; font-size: 1rem; font-weight: 800;
+}
+.j-next-cta:hover { background: var(--action-h); }
+.j-next-done { align-items: center; text-align: center; }
+
+/* ── Today / level ── */
+.j-home-row { display: flex; gap: 0.625rem; margin-top: 1rem; }
+.j-goal, .j-level-meter {
+  flex: 1;
+  padding: 0.875rem;
+  border-radius: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+}
+.j-goal { display: flex; align-items: center; gap: 0.75rem; }
+.j-ring { position: relative; display: grid; place-items: center; flex: none; }
+.j-ring svg { position: absolute; inset: 0; }
+.j-ring-label { font-family: 'Cairo', sans-serif; font-size: 0.8125rem; font-weight: 800; color: var(--text-primary); }
+.j-goal-text { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
+.j-goal-title { font-size: 0.78125rem; font-weight: 700; color: var(--text-primary); }
+.j-goal-sub { font-size: 0.6875rem; color: var(--text-muted); }
+
+.j-level-meter { display: flex; flex-direction: column; gap: 0.25rem; }
+.j-level-num { font-family: 'Cairo', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); }
+.j-level-num span { font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); }
+.j-level-label { font-size: 0.6875rem; color: var(--text-muted); }
+.j-level-track { margin-top: 0.25rem; height: 6px; border-radius: 999px; background: var(--line-default); overflow: hidden; }
+.j-level-fill { height: 100%; border-radius: 999px; background: var(--brand-gold); }
+
+/* ── Due review ── */
+.j-due { margin-top: 1rem; }
+.j-due-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.625rem; }
+.j-due-head h3 { display: flex; align-items: center; gap: 0.5rem; font-family: 'Cairo', sans-serif; font-size: 0.9375rem; font-weight: 800; color: var(--text-primary); }
+.j-due-count {
+  display: grid; place-items: center; min-width: 1.375rem; height: 1.375rem; padding: 0 0.375rem;
+  border-radius: 999px; background: var(--brand-red); color: #FFF;
+  font-size: 0.6875rem; font-weight: 700;
+}
+.j-due-all { font-size: 0.78125rem; color: var(--action); }
+/* A horizontal rail: the queue can be long, and stacking it would push the
+   streak card off a phone screen entirely. */
+.j-due-list {
+  display: flex; gap: 0.5rem; list-style: none; padding: 0 0 0.25rem; margin: 0;
+  overflow-x: auto; scrollbar-width: none;
+}
+.j-due-list::-webkit-scrollbar { display: none; }
+.j-due-word {
+  flex: none; width: 7rem;
+  display: flex; flex-direction: column; gap: 0.125rem;
+  padding: 0.75rem;
+  border-radius: 0.875rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+}
+.j-due-zh { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+.j-due-pinyin { font-size: 0.6875rem; color: var(--text-muted); }
+.j-due-ar { font-size: 0.71875rem; color: var(--text-secondary); }
+
+/* ── Streak ── */
+.j-streak-card {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--line-default);
+}
+.j-streak-card h3 { font-family: 'Cairo', sans-serif; font-size: 0.9375rem; font-weight: 800; color: var(--text-primary); }
+.j-streak-card p { margin-top: 0.75rem; font-size: 0.75rem; line-height: 1.7; color: var(--text-muted); }
+.j-week { display: flex; justify-content: space-between; gap: 0.375rem; margin-top: 0.875rem; }
+.j-week-day { display: flex; flex-direction: column; align-items: center; gap: 0.3125rem; }
+.j-week-dot {
+  width: 1.75rem; height: 1.75rem; border-radius: 50%;
+  background: color-mix(in srgb, var(--text-primary) 7%, transparent);
+  border: 1.5px solid transparent;
+}
+.j-week-dot.is-on { background: var(--brand-gold); border-color: var(--gold-600); }
+.j-week-letter { font-size: 0.625rem; color: var(--text-muted); }
+
+/* Facts about the next unit, as separate boxes.
+   They were one "·"-separated line until the Arabic-Indic zero — which is
+   literally a dot, ٠ — made the separator read as a digit between the lesson
+   number and the word count. Never put a dot separator between two
+   Arabic-Indic numbers. */
+.j-next-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.j-next-facts li {
+  padding: 0.1875rem 0.5rem;
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  font-size: 0.71875rem;
+  color: var(--text-muted);
+}
+.j-next-fact-wide {
+  /* The grammar rule's Arabic name can be long; let it take the row. */
+  flex-basis: 100%;
+  max-width: 100%;
+}
+
+/* The lesson number as a badge rather than a dot-separated prefix — see the
+   note in PathSection: a dot after an Arabic-Indic digit reads as a zero. */
+.j-spine-label { display: flex; align-items: center; gap: 0.4375rem; min-width: 0; }
+.j-spine-no {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.25rem;
+  border-radius: 0.3125rem;
+  background: color-mix(in srgb, var(--text-primary) 7%, transparent);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}

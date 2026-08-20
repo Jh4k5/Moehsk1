@@ -56,28 +56,13 @@ import type {
   QaItem,
   StoryRecord,
 } from './content-types'
-import { hanziOf } from './content-types'
+import { hanziOf, toStoryRecords } from './content-types'
 
 // ── Adapters: each source file has its own shape, none of them the same ─────
-
-type RawStory = {
-  id: number
-  title: string
-  content: { zh: string; pinyin: string; ar: string }[]
-  questions?: { zh: string; options: string[]; correct: number }[]
-}
-
-function toStories(raw: unknown): StoryRecord[] {
-  if (!Array.isArray(raw)) return []
-  return (raw as RawStory[])
-    .filter((s) => Array.isArray(s?.content) && s.content.length > 0)
-    .map((s) => ({
-      id: s.id,
-      titleAr: s.title,
-      lines: s.content,
-      questions: Array.isArray(s.questions) ? s.questions : [],
-    }))
-}
+//
+// Story normalisation lives in `content-types.ts` as `toStoryRecords`, shared
+// with `SessionRunner.tsx` — see the comment there for why that sharing is
+// load-bearing, not a style choice.
 
 type RawDictCategory = {
   label: string
@@ -222,7 +207,7 @@ const LEVELS: Record<HskLevelNo, LevelContent> = {
     vocabulary,
     lessons,
     grammar: grammarRules,
-    stories: toStories(stories),
+    stories: toStoryRecords(stories),
     pictures: toPictures(VISUAL_DICT_CATEGORIES),
     qa: [], // HSK1 has no authored daily-Q&A set yet; qa2/qa3 do.
     exam: toExam(HSK1_EXAM_BANK),
@@ -232,7 +217,7 @@ const LEVELS: Record<HskLevelNo, LevelContent> = {
     vocabulary: vocabulary2 as unknown as VocabWord[],
     lessons: lessons2 as unknown as Lesson[],
     grammar: grammarRules2 as unknown as GrammarRule[],
-    stories: toStories(stories2),
+    stories: toStoryRecords(stories2),
     pictures: toPictures(VISUAL_DICT_CATEGORIES_2),
     qa: toQa(dailyQA2),
     exam: [], // unauthored above HSK1
@@ -242,7 +227,7 @@ const LEVELS: Record<HskLevelNo, LevelContent> = {
     vocabulary: vocabulary3 as unknown as VocabWord[],
     lessons: lessons3 as unknown as Lesson[],
     grammar: grammarRules3 as unknown as GrammarRule[],
-    stories: toStories(stories3),
+    stories: toStoryRecords(stories3),
     pictures: toPictures(VISUAL_DICT_CATEGORIES_3),
     qa: toQa(dailyQA3),
     exam: [],

@@ -17,7 +17,7 @@ import { ActivityView } from './ActivityView'
 import { UnitComplete } from './UnitComplete'
 import { buildActivityStream } from '@/lib/curriculum/activity-engine'
 import { useActiveLevel } from '@/lib/levels'
-import type { LevelContent } from '@/lib/curriculum/content-types'
+import { toStoryRecords, type LevelContent, type QaItem } from '@/lib/curriculum/content-types'
 import { unitPassed } from '@/lib/curriculum/progress'
 import { useLearningStore } from '@/lib/store'
 import { hrefFor } from '@/components/nav/nav-model'
@@ -47,11 +47,11 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
       byId: new Map(active.vocabulary.map((w) => [w.id, w])),
       lessons: active.lessons,
       grammar: active.grammarRules,
-      stories: active.stories,
+      stories: toStoryRecords(active.stories),
       pictures: active.visualDict.flatMap((cat: { label?: string; words?: { hanzi: string; pinyin: string; arabic: string; emoji: string }[] }) =>
         (cat.words ?? []).map((w) => ({ zh: w.hanzi, pinyin: w.pinyin, ar: w.arabic, emoji: w.emoji, category: cat.label ?? '' })),
       ),
-      qa: [],
+      qa: active.dailyQA as QaItem[],
       exam: [],
     }),
     [unit.ref.level, active],

@@ -14,7 +14,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { RotateCcw, Eye, SkipForward } from 'lucide-react'
 import { Hanzi } from './parts'
-import { ts } from '@/lib/i18n'
+import { makeT, type Locale } from '@/lib/locale'
 
 const CDN = 'https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js'
 
@@ -41,12 +41,15 @@ export function HanziBoard({
   char,
   disabled,
   onComplete,
+  locale,
 }: {
   char: string
   disabled: boolean
   /** `true` when the character was drawn with no mistakes. */
   onComplete: (clean: boolean) => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   const hostRef = useRef<HTMLDivElement>(null)
   const writerRef = useRef<WriterInstance | null>(null)
   const [load, setLoad] = useState<LoadState>(() =>
@@ -122,13 +125,13 @@ export function HanziBoard({
       <div className="j-board j-board-fallback">
         <Hanzi text={char} size="xl" />
         <p>
-          {ts(
+          {t(
             'تعذّر تحميل لوح التتبّع. تابع، وسنعيد المحاولة في الحرف القادم.',
             'The tracing board would not load. Carry on — we will try again on the next character.',
           )}
         </p>
         <button type="button" className="j-ready" onClick={() => onComplete(true)}>
-          {ts('تابع', 'Continue')}
+          {t('تابع', 'Continue')}
         </button>
       </div>
     )
@@ -139,12 +142,12 @@ export function HanziBoard({
       <div
         ref={hostRef}
         className="j-board-canvas"
-        aria-label={ts(`لوح كتابة الحرف ${char}`, `Tracing board for the character ${char}`)}
+        aria-label={t(`لوح كتابة الحرف ${char}`, `Tracing board for the character ${char}`)}
       />
       {load === 'loading' && <div className="j-board-loading" aria-busy="true" />}
       <div className="j-board-tools">
         <button type="button" className="j-board-tool" onClick={startQuiz} disabled={disabled}>
-          <RotateCcw size={16} aria-hidden /> <span>{ts('من البداية', 'Start over')}</span>
+          <RotateCcw size={16} aria-hidden /> <span>{t('من البداية', 'Start over')}</span>
         </button>
         <button
           type="button"
@@ -152,11 +155,11 @@ export function HanziBoard({
           onClick={() => writerRef.current?.animateCharacter()}
           disabled={disabled}
         >
-          <Eye size={16} aria-hidden /> <span>{ts('أرِني', 'Show me')}</span>
+          <Eye size={16} aria-hidden /> <span>{t('أرِني', 'Show me')}</span>
         </button>
         {mistakes > 0 && (
           <span className="j-board-mistakes">
-            {ts(`${mistakes} خطأ`, `${mistakes} ${mistakes === 1 ? 'mistake' : 'mistakes'}`)}
+            {t(`${mistakes} خطأ`, `${mistakes} ${mistakes === 1 ? 'mistake' : 'mistakes'}`)}
           </span>
         )}
       </div>
@@ -171,7 +174,7 @@ export function HanziBoard({
       */}
       <button type="button" className="j-board-skip" onClick={() => onComplete(false)} disabled={disabled}>
         <SkipForward size={14} aria-hidden />
-        <span>{ts('تخطَّ هذا الحرف — سيعود عليك لاحقاً', 'Skip this character — it will come back to you later')}</span>
+        <span>{t('تخطَّ هذا الحرف — سيعود عليك لاحقاً', 'Skip this character — it will come back to you later')}</span>
       </button>
     </div>
   )

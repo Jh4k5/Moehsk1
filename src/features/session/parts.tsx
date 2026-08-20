@@ -6,23 +6,25 @@
 
 import { Volume2 } from 'lucide-react'
 import { speak } from '@/lib/tts'
-import {
-  ACTIVITY_KIND_LABEL_AR,
-  ACTIVITY_KIND_LABEL_EN,
-  type ActivityKind,
-  type Choice,
-} from '@/lib/curriculum/types'
-import { ts, tsPick } from '@/lib/i18n'
+import { activityKindLabel, type ActivityKind, type Choice } from '@/lib/curriculum/types'
+import type { Locale } from '@/lib/locale'
+
+// These take `locale` as a prop rather than reading the `ts()` store helper:
+// this whole tree renders once per activity with nothing that forces a second
+// render on mount (no fetch, no timer), so a value read from the store at
+// first paint — before `LocaleSync`'s effect has run — would stick at the
+// server's default ('ar') for the activity's entire lifetime. `locale` comes
+// down from the route via `SessionRunner`, so it is right from the first frame.
 
 /** Arabic-Indic digits — the design numbers the options ١ ٢ ٣ ٤. An English
  *  reader gets Latin ones; ٣ is not a numeral they can read at a glance. */
 const AR_DIGITS = ['١', '٢', '٣', '٤', '٥', '٦']
 const EN_DIGITS = ['1', '2', '3', '4', '5', '6']
 
-export function KindPill({ kind }: { kind: ActivityKind }) {
+export function KindPill({ kind, locale }: { kind: ActivityKind; locale: Locale }) {
   return (
     <div className="j-kind-pill">
-      <span>{tsPick(ACTIVITY_KIND_LABEL_AR[kind], ACTIVITY_KIND_LABEL_EN[kind])}</span>
+      <span>{activityKindLabel(kind, locale)}</span>
     </div>
   )
 }
@@ -36,11 +38,11 @@ export function Hanzi({ text, size = 'md' }: { text: string; size?: 'sm' | 'md' 
 }
 
 /** Speak-aloud button. Silently inert where the browser has no voice for it. */
-export function Listen({ text, label }: { text: string; label?: string }) {
+export function Listen({ text, label, locale }: { text: string; label?: string; locale: Locale }) {
   return (
     <button type="button" className="j-listen" onClick={() => speak(text)}>
       <Volume2 size={14} aria-hidden />
-      <span>{label ?? ts('استمع', 'Listen')}</span>
+      <span>{label ?? (locale === 'en' ? 'Listen' : 'استمع')}</span>
     </button>
   )
 }
@@ -54,6 +56,7 @@ export interface ChoiceListProps {
   onPick: (index: number) => void
   /** Render Chinese choices in the Hanzi face. */
   chinese?: boolean
+  locale: Locale
 }
 
 /**
@@ -64,8 +67,9 @@ export interface ChoiceListProps {
  * The state is carried by a border and an icon as well as colour, because a
  * red/green-only verdict is invisible to a good share of readers.
  */
-export function ChoiceList({ choices, picked, correct, onPick, chinese }: ChoiceListProps) {
+export function ChoiceList({ choices, picked, correct, onPick, chinese, locale }: ChoiceListProps) {
   const answered = picked !== null
+  const digits = locale === 'en' ? EN_DIGITS : AR_DIGITS
   return (
     <ul className="j-choices">
       {choices.map((choice, i) => {
@@ -82,11 +86,7 @@ export function ChoiceList({ choices, picked, correct, onPick, chinese }: Choice
               aria-pressed={isPick}
             >
               <span className="j-choice-num" aria-hidden>
-                {answered && isRight
-                  ? '✓'
-                  : answered && isPick
-                    ? '✗'
-                    : tsPick(AR_DIGITS[i], EN_DIGITS[i]) ?? i + 1}
+                {answered && isRight ? '✓' : answered && isPick ? '✗' : digits[i] ?? i + 1}
               </span>
               <span className="j-choice-body">
                 {chinese ? <Hanzi text={choice.label} size="md" /> : <span className="j-choice-label">{choice.label}</span>}
@@ -115,18 +115,20 @@ export function SentenceBlock({
   pinyin,
   ar,
   listen = true,
+  locale,
 }: {
   zh: string
   pinyin?: string
   ar?: string
   listen?: boolean
+  locale: Locale
 }) {
   return (
     <div className="j-sentence">
       <Hanzi text={zh} size="lg" />
       {pinyin && <span className="j-sentence-pinyin" dir="ltr">{pinyin}</span>}
       {ar && <span className="j-sentence-ar">{ar}</span>}
-      {listen && <Listen text={zh} />}
+      {listen && <Listen text={zh} locale={locale} />}
     </div>
   )
 }

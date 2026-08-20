@@ -14,7 +14,7 @@ import { BookOpen, Check, Gamepad2, Lightbulb, Mic, PenLine } from 'lucide-react
 import { ChoiceList, Hanzi, KindPill, Listen, Prompt, SentenceBlock } from './parts'
 import { HanziBoard } from './HanziBoard'
 import { speak } from '@/lib/tts'
-import { ts } from '@/lib/i18n'
+import { makeT, type Locale } from '@/lib/locale'
 import { hashString, makeRng } from '@/lib/curriculum/rng'
 import type { Activity } from '@/lib/curriculum/types'
 
@@ -25,36 +25,38 @@ export interface ActivityViewProps {
   onAnswer: (correct: boolean) => void
   /** For cards with nothing to grade — the runner shows «تابع» / "Continue". */
   onReady: () => void
+  locale: Locale
 }
 
 export function ActivityView(props: ActivityViewProps) {
-  const { activity } = props
+  const { activity, locale } = props
   return (
     <div className="j-activity">
-      <KindPill kind={activity.kind} />
+      <KindPill kind={activity.kind} locale={locale} />
       <Body {...props} />
     </div>
   )
 }
 
-function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
+function Body({ activity, answered, onAnswer, onReady, locale }: ActivityViewProps) {
+  const t = makeT(locale)
   switch (activity.kind) {
     case 'word-intro':
-      return <WordIntro activity={activity} onReady={onReady} />
+      return <WordIntro activity={activity} onReady={onReady} locale={locale} />
     case 'grammar-brief':
-      return <GrammarBrief activity={activity} onReady={onReady} />
+      return <GrammarBrief activity={activity} onReady={onReady} locale={locale} />
     case 'hanzi-write':
-      return <HanziWrite activity={activity} onAnswer={onAnswer} answered={answered} />
+      return <HanziWrite activity={activity} onAnswer={onAnswer} answered={answered} locale={locale} />
     case 'pronounce':
-      return <Pronounce activity={activity} onAnswer={onAnswer} answered={answered} />
+      return <Pronounce activity={activity} onAnswer={onAnswer} answered={answered} locale={locale} />
     case 'pinyin-match':
-      return <PinyinMatch activity={activity} onAnswer={onAnswer} answered={answered} />
+      return <PinyinMatch activity={activity} onAnswer={onAnswer} answered={answered} locale={locale} />
     case 'sentence-order':
-      return <SentenceOrder activity={activity} onAnswer={onAnswer} answered={answered} />
+      return <SentenceOrder activity={activity} onAnswer={onAnswer} answered={answered} locale={locale} />
     case 'daily-qa':
-      return <DailyQa activity={activity} onReady={onReady} />
+      return <DailyQa activity={activity} onReady={onReady} locale={locale} />
     case 'game-break':
-      return <GameBreak activity={activity} onReady={onReady} />
+      return <GameBreak activity={activity} onReady={onReady} locale={locale} />
 
     // ── The nine "read this, pick one" drills ──
     case 'word-recall':
@@ -65,21 +67,22 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
           onAnswer={onAnswer}
           title={
             activity.direction === 'zh-to-ar'
-              ? ts('ما معنى هذه الكلمة؟', 'What does this word mean?')
-              : ts('اختر الكلمة الصينية', 'Pick the Chinese word')
+              ? t('ما معنى هذه الكلمة؟', 'What does this word mean?')
+              : t('اختر الكلمة الصينية', 'Pick the Chinese word')
           }
           stimulus={
             activity.direction === 'zh-to-ar' ? (
               <div className="j-stimulus">
                 <Hanzi text={activity.prompt} size="xl" />
                 {activity.promptSub && <span className="j-stimulus-sub" dir="ltr">{activity.promptSub}</span>}
-                <Listen text={activity.prompt} />
+                <Listen text={activity.prompt} locale={locale} />
               </div>
             ) : (
               <div className="j-stimulus"><span className="j-stimulus-ar">{activity.prompt}</span></div>
             )
           }
           chinese={activity.direction !== 'zh-to-ar'}
+          locale={locale}
         />
       )
     case 'tone-discriminate':
@@ -88,14 +91,15 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
           activity={activity}
           answered={answered}
           onAnswer={onAnswer}
-          title={ts('أيّ نبرة هي الصحيحة؟', 'Which tone is the right one?')}
+          title={t('أيّ نبرة هي الصحيحة؟', 'Which tone is the right one?')}
           stimulus={
             <div className="j-stimulus">
               <Hanzi text={activity.target.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/g, '')} size="xl" />
               <span className="j-stimulus-sub" dir="ltr">{activity.syllable}</span>
-              <Listen text={activity.target} label={ts('اسمع النطق', 'Hear it said')} />
+              <Listen text={activity.target} label={t('اسمع النطق', 'Hear it said')} locale={locale} />
             </div>
           }
+          locale={locale}
         />
       )
     case 'image-match':
@@ -104,7 +108,7 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
           activity={activity}
           answered={answered}
           onAnswer={onAnswer}
-          title={ts('أيّ كلمة تطابق الصورة؟', 'Which word matches the picture?')}
+          title={t('أيّ كلمة تطابق الصورة؟', 'Which word matches the picture?')}
           stimulus={
             <div className="j-stimulus">
               <span className="j-emoji" role="img" aria-label={activity.category}>{activity.emoji}</span>
@@ -112,17 +116,27 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
             </div>
           }
           chinese
+          locale={locale}
         />
       )
     case 'grammar-apply':
-      return <Choose activity={activity} answered={answered} onAnswer={onAnswer} title={activity.prompt} chinese />
+      return (
+        <Choose
+          activity={activity}
+          answered={answered}
+          onAnswer={onAnswer}
+          title={activity.prompt}
+          chinese
+          locale={locale}
+        />
+      )
     case 'fill-blank':
       return (
         <Choose
           activity={activity}
           answered={answered}
           onAnswer={onAnswer}
-          title={ts('أكمل الفراغ', 'Fill in the blank')}
+          title={t('أكمل الفراغ', 'Fill in the blank')}
           stimulus={
             <div className="j-stimulus">
               <Hanzi text={activity.masked} size="lg" />
@@ -131,6 +145,7 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
             </div>
           }
           chinese
+          locale={locale}
         />
       )
     case 'translate':
@@ -141,8 +156,8 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
           onAnswer={onAnswer}
           title={
             activity.direction === 'zh-to-ar'
-              ? ts('ما معنى هذه الجملة؟', 'What does this sentence mean?')
-              : ts('كيف تُقال بالصينية؟', 'How do you say it in Chinese?')
+              ? t('ما معنى هذه الجملة؟', 'What does this sentence mean?')
+              : t('كيف تُقال بالصينية؟', 'How do you say it in Chinese?')
           }
           stimulus={
             <div className="j-stimulus">
@@ -150,7 +165,7 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
                 <>
                   <Hanzi text={activity.prompt} size="lg" />
                   {activity.promptSub && <span className="j-stimulus-sub" dir="ltr">{activity.promptSub}</span>}
-                  <Listen text={activity.prompt} />
+                  <Listen text={activity.prompt} locale={locale} />
                 </>
               ) : (
                 <span className="j-stimulus-ar">{activity.prompt}</span>
@@ -158,6 +173,7 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
             </div>
           }
           chinese={activity.direction !== 'zh-to-ar'}
+          locale={locale}
         />
       )
     case 'roleplay':
@@ -176,12 +192,13 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
                   <Hanzi text={activity.cue.zh} size="md" />
                   <span className="j-sentence-pinyin" dir="ltr">{activity.cue.pinyin}</span>
                   <span className="j-sentence-ar">{activity.cue.ar}</span>
-                  <Listen text={activity.cue.zh} />
+                  <Listen text={activity.cue.zh} locale={locale} />
                 </div>
               </div>
             </div>
           }
           chinese
+          locale={locale}
         />
       )
     case 'story-excerpt':
@@ -190,15 +207,16 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
           activity={activity}
           answered={answered}
           onAnswer={onAnswer}
-          title={activity.question.choices.length > 0 ? ts('اقرأ ثم أجب', 'Read it, then answer') : activity.titleAr}
+          title={activity.question.choices.length > 0 ? t('اقرأ ثم أجب', 'Read it, then answer') : activity.titleAr}
           stimulus={
             <div className="j-excerpt">
               <span className="j-excerpt-title"><BookOpen size={14} aria-hidden /> {activity.titleAr}</span>
               {activity.lines.map((line) => (
-                <SentenceBlock key={line.zh} zh={line.zh} pinyin={line.pinyin} ar={line.ar} listen={false} />
+                <SentenceBlock key={line.zh} zh={line.zh} pinyin={line.pinyin} ar={line.ar} listen={false} locale={locale} />
               ))}
             </div>
           }
+          locale={locale}
         />
       )
     case 'exam-style':
@@ -214,10 +232,11 @@ function Body({ activity, answered, onAnswer, onReady }: ActivityViewProps) {
                 {activity.stimulus.split('\n').map((line) => (
                   <Hanzi key={line} text={line} size="md" />
                 ))}
-                <Listen text={activity.stimulus.replace(/^[^:]*:\s*/gm, '')} />
+                <Listen text={activity.stimulus.replace(/^[^:]*:\s*/gm, '')} locale={locale} />
               </div>
             ) : null
           }
+          locale={locale}
         />
       )
   }
@@ -232,6 +251,7 @@ function Choose({
   title,
   stimulus,
   chinese,
+  locale,
 }: {
   activity: Extract<Activity, { question: { choices: unknown[] } }>
   answered: boolean
@@ -239,6 +259,7 @@ function Choose({
   title: string
   stimulus?: React.ReactNode
   chinese?: boolean
+  locale: Locale
 }) {
   const [picked, setPicked] = useState<number | null>(null)
   // A new activity re-mounts this component (the runner keys on activity.id),
@@ -252,6 +273,7 @@ function Choose({
         picked={answered ? picked : null}
         correct={activity.question.correct}
         chinese={chinese}
+        locale={locale}
         onPick={(i) => {
           if (answered) return
           setPicked(i)
@@ -272,28 +294,31 @@ function Choose({
 function WordIntro({
   activity,
   onReady,
+  locale,
 }: {
   activity: Extract<Activity, { kind: 'word-intro' }>
   onReady: () => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   const { word, parts, mnemonic, example } = activity
   return (
     <>
       <div className="j-word-hero">
         <span className="j-word-ordinal">
-          {ts(`${activity.wordOrdinal} من ${activity.wordTotal}`, `${activity.wordOrdinal} of ${activity.wordTotal}`)}
+          {t(`${activity.wordOrdinal} من ${activity.wordTotal}`, `${activity.wordOrdinal} of ${activity.wordTotal}`)}
         </span>
         <Hanzi text={word.zh} size="xl" />
         <span className="j-word-pinyin" dir="ltr">{word.pinyin}</span>
         <span className="j-word-meaning">{word.meaning}</span>
         <button type="button" className="j-listen j-listen-big" onClick={() => speak(word.zh)}>
-          <Mic size={16} aria-hidden /> <span>{ts('اسمعها', 'Hear it')}</span>
+          <Mic size={16} aria-hidden /> <span>{t('اسمعها', 'Hear it')}</span>
         </button>
       </div>
 
       {parts.length > 0 && (
         <section className="j-word-block">
-          <h2><PenLine size={14} aria-hidden /> {ts('من أي شيء يتكوّن', 'What it is built from')}</h2>
+          <h2><PenLine size={14} aria-hidden /> {t('من أي شيء يتكوّن', 'What it is built from')}</h2>
           <div className="j-parts">
             {parts.map((part) => (
               <span key={part.char} className="j-part">
@@ -302,7 +327,7 @@ function WordIntro({
               </span>
             ))}
             <span className="j-part j-part-count">
-              {ts(`${word.strokeCount} ضربة`, `${word.strokeCount} ${word.strokeCount === 1 ? 'stroke' : 'strokes'}`)}
+              {t(`${word.strokeCount} ضربة`, `${word.strokeCount} ${word.strokeCount === 1 ? 'stroke' : 'strokes'}`)}
             </span>
           </div>
         </section>
@@ -310,19 +335,19 @@ function WordIntro({
 
       {mnemonic && (
         <section className="j-word-block j-word-mnemonic">
-          <h2><Lightbulb size={14} aria-hidden /> {ts('تعبير الحفظ', 'Memory hook')}</h2>
+          <h2><Lightbulb size={14} aria-hidden /> {t('تعبير الحفظ', 'Memory hook')}</h2>
           <p>{mnemonic}</p>
         </section>
       )}
 
       {example && (
         <section className="j-word-block">
-          <h2><Check size={14} aria-hidden /> {ts('في جملة', 'In a sentence')}</h2>
-          <SentenceBlock zh={example.zh} pinyin={example.pinyin} ar={example.ar} />
+          <h2><Check size={14} aria-hidden /> {t('في جملة', 'In a sentence')}</h2>
+          <SentenceBlock zh={example.zh} pinyin={example.pinyin} ar={example.ar} locale={locale} />
         </section>
       )}
 
-      <ReadyButton onReady={onReady} label={ts('فهمت', 'Got it')} />
+      <ReadyButton onReady={onReady} label={t('فهمت', 'Got it')} />
     </>
   )
 }
@@ -330,19 +355,22 @@ function WordIntro({
 function GrammarBrief({
   activity,
   onReady,
+  locale,
 }: {
   activity: Extract<Activity, { kind: 'grammar-brief' }>
   onReady: () => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   return (
     <>
       <Prompt title={activity.titleAr} />
       <div className="j-pattern" dir="rtl">{activity.pattern}</div>
       <p className="j-grammar-desc">{activity.description}</p>
       {activity.examples.map((ex) => (
-        <SentenceBlock key={ex.zh} zh={ex.zh} pinyin={ex.pinyin} ar={ex.ar} />
+        <SentenceBlock key={ex.zh} zh={ex.zh} pinyin={ex.pinyin} ar={ex.ar} locale={locale} />
       ))}
-      <ReadyButton onReady={onReady} label={ts('فهمت القاعدة', 'Got the rule')} />
+      <ReadyButton onReady={onReady} label={t('فهمت القاعدة', 'Got the rule')} />
     </>
   )
 }
@@ -350,29 +378,33 @@ function GrammarBrief({
 function DailyQa({
   activity,
   onReady,
+  locale,
 }: {
   activity: Extract<Activity, { kind: 'daily-qa' }>
   onReady: () => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   const [revealed, setRevealed] = useState(false)
   return (
     <>
-      <Prompt title={ts('أجب بأسلوبك', 'Answer it your own way')} sub={activity.hint} />
-      <SentenceBlock zh={activity.ask.zh} pinyin={activity.ask.pinyin} ar={activity.ask.ar} />
+      <Prompt title={t('أجب بأسلوبك', 'Answer it your own way')} sub={activity.hint} />
+      <SentenceBlock zh={activity.ask.zh} pinyin={activity.ask.pinyin} ar={activity.ask.ar} locale={locale} />
       {revealed ? (
         <>
           <div className="j-model-answer">
-            <span className="j-model-label">{ts('إجابة نموذجية', 'A model answer')}</span>
+            <span className="j-model-label">{t('إجابة نموذجية', 'A model answer')}</span>
             <SentenceBlock
               zh={activity.modelAnswer.zh}
               pinyin={activity.modelAnswer.pinyin}
               ar={activity.modelAnswer.ar}
+              locale={locale}
             />
           </div>
-          <ReadyButton onReady={onReady} label={ts('تابع', 'Continue')} />
+          <ReadyButton onReady={onReady} label={t('تابع', 'Continue')} />
         </>
       ) : (
-        <ReadyButton onReady={() => setRevealed(true)} label={ts('أرِني إجابة نموذجية', 'Show me a model answer')} />
+        <ReadyButton onReady={() => setRevealed(true)} label={t('أرِني إجابة نموذجية', 'Show me a model answer')} />
       )}
     </>
   )
@@ -381,16 +413,19 @@ function DailyQa({
 function GameBreak({
   activity,
   onReady,
+  locale,
 }: {
   activity: Extract<Activity, { kind: 'game-break' }>
   onReady: () => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   return (
     <div className="j-break">
       <Gamepad2 size={40} aria-hidden />
       <h1>{activity.titleAr}</h1>
-      <p>{ts('خذ نفَساً — فاصل قصير قبل أن نكمل.', 'Take a breath — a short break before we carry on.')}</p>
-      <ReadyButton onReady={onReady} label={ts('أكمل', 'Carry on')} />
+      <p>{t('خذ نفَساً — فاصل قصير قبل أن نكمل.', 'Take a breath — a short break before we carry on.')}</p>
+      <ReadyButton onReady={onReady} label={t('أكمل', 'Carry on')} />
     </div>
   )
 }
@@ -401,20 +436,23 @@ function HanziWrite({
   activity,
   answered,
   onAnswer,
+  locale,
 }: {
   activity: Extract<Activity, { kind: 'hanzi-write' }>
   answered: boolean
   onAnswer: (correct: boolean) => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   return (
     <>
-      <Prompt title={ts(`اكتب ${activity.char}`, `Write ${activity.char}`)} sub={activity.hint} />
+      <Prompt title={t(`اكتب ${activity.char}`, `Write ${activity.char}`)} sub={activity.hint} />
       <div className="j-write-context">
         <Hanzi text={activity.inWord.zh} size="md" />
         <span className="j-sentence-pinyin" dir="ltr">{activity.inWord.pinyin}</span>
         <span className="j-sentence-ar">{activity.inWord.meaning}</span>
       </div>
-      <HanziBoard char={activity.char} disabled={answered} onComplete={(clean) => onAnswer(clean)} />
+      <HanziBoard char={activity.char} disabled={answered} onComplete={(clean) => onAnswer(clean)} locale={locale} />
     </>
   )
 }
@@ -423,16 +461,19 @@ function Pronounce({
   activity,
   answered,
   onAnswer,
+  locale,
 }: {
   activity: Extract<Activity, { kind: 'pronounce' }>
   answered: boolean
   onAnswer: (correct: boolean) => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   return (
     <>
       <Prompt
-        title={ts('انطقها', 'Say it')}
-        sub={ts(
+        title={t('انطقها', 'Say it')}
+        sub={t(
           `قُلها بوضوح — تحتاج ${activity.passScore}% للنجاح.`,
           `Say it clearly — you need ${activity.passScore}% to pass.`,
         )}
@@ -441,13 +482,14 @@ function Pronounce({
         <Hanzi text={activity.targetZh} size="xl" />
         <span className="j-stimulus-sub" dir="ltr">{activity.targetPinyin}</span>
         <span className="j-stimulus-ar">{activity.meaning}</span>
-        <Listen text={activity.targetZh} label={ts('اسمع أولاً', 'Listen first')} />
+        <Listen text={activity.targetZh} label={t('اسمع أولاً', 'Listen first')} locale={locale} />
       </div>
       <PronounceRecorder
         target={activity.targetZh}
         passScore={activity.passScore}
         disabled={answered}
         onResult={onAnswer}
+        locale={locale}
       />
     </>
   )
@@ -457,11 +499,14 @@ function PinyinMatch({
   activity,
   answered,
   onAnswer,
+  locale,
 }: {
   activity: Extract<Activity, { kind: 'pinyin-match' }>
   answered: boolean
   onAnswer: (correct: boolean) => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   const [selected, setSelected] = useState<number | null>(null)
   const [matched, setMatched] = useState<number[]>([])
   const [wrong, setWrong] = useState(0)

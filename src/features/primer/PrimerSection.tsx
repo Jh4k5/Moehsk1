@@ -19,8 +19,13 @@ import { useLearningStore } from '@/lib/store'
 import { useLocale } from '@/components/nav/use-locale'
 import { hrefFor } from '@/components/nav/nav-model'
 import { speak } from '@/lib/tts'
-import { ts } from '@/lib/i18n'
 import { makeT, type Locale } from '@/lib/locale'
+
+/** The shape `makeT(locale)` returns — threaded down instead of the non-hook
+ *  `ts()` helper, because `Card`/`CheckCard` never re-render on their own
+ *  after mount, so a store-read value picked up once at first paint would
+ *  never catch up to a `lang` that flips shortly after. */
+type T = (ar: string, en?: string) => string
 
 // Follows the route's locale: `ar-EG` prints Arabic-Indic digits, which is not
 // a count an English reader can parse.
@@ -101,13 +106,14 @@ export default function PrimerSection() {
         <div className="j-kind-pill"><span>{chapter.title}</span></div>
 
         {step.kind === 'card' ? (
-          <Card card={chapter.cards[step.index]} onNext={advance} />
+          <Card card={chapter.cards[step.index]} onNext={advance} t={t} />
         ) : (
           <CheckCard
             check={chapter.checks[step.index]}
             picked={picked}
             onPick={setPicked}
             onNext={advance}
+            t={t}
           />
         )}
       </div>
@@ -115,7 +121,7 @@ export default function PrimerSection() {
   )
 }
 
-function Card({ card, onNext }: { card: PrimerChapter['cards'][number]; onNext: () => void }) {
+function Card({ card, onNext, t }: { card: PrimerChapter['cards'][number]; onNext: () => void; t: T }) {
   return (
     <>
       <h1 className="j-primer-title">{card.title}</h1>
@@ -125,13 +131,13 @@ function Card({ card, onNext }: { card: PrimerChapter['cards'][number]; onNext: 
           {card.pinyin && <span className="j-primer-pinyin" dir="ltr">{card.pinyin}</span>}
           {card.gloss && <span className="j-primer-gloss">{card.gloss}</span>}
           <button type="button" className="j-listen" onClick={() => speak(card.hanzi!)}>
-            <Volume2 size={14} aria-hidden /> <span>{ts('استمع', 'Listen')}</span>
+            <Volume2 size={14} aria-hidden /> <span>{t('استمع', 'Listen')}</span>
           </button>
         </div>
       )}
       <p className="j-primer-text">{card.body}</p>
       <button type="button" className="j-ready" onClick={onNext}>
-        {ts('متابعة', 'Continue')} <ArrowLeft size={16} aria-hidden />
+        {t('متابعة', 'Continue')} <ArrowLeft size={16} aria-hidden />
       </button>
     </>
   )
@@ -142,11 +148,13 @@ function CheckCard({
   picked,
   onPick,
   onNext,
+  t,
 }: {
   check: PrimerChapter['checks'][number]
   picked: number | null
   onPick: (i: number) => void
   onNext: () => void
+  t: T
 }) {
   const answered = picked !== null
   const right = picked === check.correct
@@ -178,14 +186,14 @@ function CheckCard({
             <span className="j-verdict-icon" aria-hidden>{right ? <Check size={15} /> : <X size={15} />}</span>
             <div>
               <span className="j-verdict-title">
-                {right ? ts('صحيح', 'Correct') : ts('ليست الإجابة الصحيحة', 'Not the right answer')}
+                {right ? t('صحيح', 'Correct') : t('ليست الإجابة الصحيحة', 'Not the right answer')}
               </span>
               <p className="j-verdict-why">{check.because}</p>
             </div>
           </div>
           <div className="j-verdict-actions">
             <button type="button" className="j-verdict-next" onClick={onNext}>
-              {ts('تابع', 'Continue')}
+              {t('تابع', 'Continue')}
             </button>
           </div>
         </div>

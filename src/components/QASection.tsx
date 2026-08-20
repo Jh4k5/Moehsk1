@@ -66,21 +66,28 @@ const colorMap: Record<string, {
 }
 
 // ─── Daily QA Data ────────────────────────────────────────────
+// Both languages sit at the call site, as everywhere else here: `arabic` is the
+// Arabic gloss, `en` the English one. HSK2 and HSK3 sets arrive from
+// `/api/content/[level]` carrying Arabic only, so `en` is optional and
+// `tsPick` falls back to the Arabic for them.
 interface QAAnswer {
   zh: string
   pinyin: string
   arabic: string
+  en?: string
 }
 
 interface QAQuestion {
   q: string
   pinyin: string
   arabic: string
+  en?: string
   answers: QAAnswer[]
 }
 
 interface QACategory {
   category: string
+  categoryEn?: string
   icon: string
   color: string
   questions: QAQuestion[]
@@ -89,6 +96,7 @@ interface QACategory {
 const DEFAULT_DAILY_QA: QACategory[] = [
   {
     category: "🛒 في المتجر",
+    categoryEn: "🛒 At the shop",
     icon: "🛒",
     color: "blue",
     questions: [
@@ -96,42 +104,48 @@ const DEFAULT_DAILY_QA: QACategory[] = [
         q: "这个多少钱？",
         pinyin: "Zhège duōshao qián?",
         arabic: "بكم هذا؟",
+        en: "How much is this?",
         answers: [
-          { zh: "二十块钱", pinyin: "Èrshí kuài qián", arabic: "عشرون يواناً" },
+          { zh: "二十块钱", pinyin: "Èrshí kuài qián", arabic: "عشرون يواناً", en: "Twenty yuan" },
         ],
       },
       {
         q: "有没有...？",
         pinyin: "Yǒu méiyǒu...?",
         arabic: "هل يوجد...؟",
+        en: "Do you have...?",
         answers: [
-          { zh: "有/没有", pinyin: "Yǒu/Méiyǒu", arabic: "يوجد/لا يوجد" },
+          { zh: "有/没有", pinyin: "Yǒu/Méiyǒu", arabic: "يوجد/لا يوجد", en: "We do / we don't" },
         ],
       },
       {
         q: "可以便宜一点吗？",
         pinyin: "Kěyǐ piányí yīdiǎn ma?",
         arabic: "هل يمكن تخفيض السعر؟",
+        en: "Could you make it a bit cheaper?",
         answers: [
-          { zh: "可以/不行", pinyin: "Kěyǐ/Bùxíng", arabic: "ممكن/لا يمكن" },
+          { zh: "可以/不行", pinyin: "Kěyǐ/Bùxíng", arabic: "ممكن/لا يمكن", en: "Sure / Sorry, no" },
         ],
       },
       {
         q: "我要这个",
         pinyin: "Wǒ yào zhège",
         arabic: "أريد هذا",
+        en: "I'll take this one",
         answers: [],
       },
       {
         q: "给我看看",
         pinyin: "Gěi wǒ kànkan",
         arabic: "أرني إياه",
+        en: "Let me have a look",
         answers: [],
       },
     ],
   },
   {
     category: "🍜 في المطعم",
+    categoryEn: "🍜 At the restaurant",
     icon: "🍜",
     color: "green",
     questions: [
@@ -139,38 +153,44 @@ const DEFAULT_DAILY_QA: QACategory[] = [
         q: "菜单在哪里？",
         pinyin: "Càidān zài nǎlǐ?",
         arabic: "أين القائمة؟",
+        en: "Where is the menu?",
         answers: [
-          { zh: "在这里", pinyin: "Zài zhèlǐ", arabic: "هنا" },
+          { zh: "在这里", pinyin: "Zài zhèlǐ", arabic: "هنا", en: "Right here" },
         ],
       },
       {
         q: "我要一个...",
         pinyin: "Wǒ yào yī gè...",
         arabic: "أريد واحد من...",
+        en: "I'd like one...",
         answers: [],
       },
       {
         q: "不辣的，谢谢",
         pinyin: "Bù là de, xièxie",
         arabic: "بدون حار، شكراً",
+        en: "Not spicy, thank you",
         answers: [],
       },
       {
         q: "买单！",
         pinyin: "Mǎidān!",
         arabic: "الحساب من فضلك!",
+        en: "The bill, please!",
         answers: [],
       },
       {
         q: "好吃！",
         pinyin: "Hǎo chī!",
         arabic: "لذيذ!",
+        en: "Delicious!",
         answers: [],
       },
     ],
   },
   {
     category: "👋 التعارف",
+    categoryEn: "👋 Getting to know someone",
     icon: "👋",
     color: "purple",
     questions: [
@@ -178,38 +198,43 @@ const DEFAULT_DAILY_QA: QACategory[] = [
         q: "你叫什么名字？",
         pinyin: "Nǐ jiào shénme míngzì?",
         arabic: "ما اسمك؟",
+        en: "What is your name?",
         answers: [
-          { zh: "我叫...", pinyin: "Wǒ jiào...", arabic: "اسمي..." },
+          { zh: "我叫...", pinyin: "Wǒ jiào...", arabic: "اسمي...", en: "My name is..." },
         ],
       },
       {
         q: "你是哪国人？",
         pinyin: "Nǐ shì nǎ guó rén?",
         arabic: "من أي بلد أنت؟",
+        en: "Which country are you from?",
         answers: [
-          { zh: "我是也门人", pinyin: "Wǒ shì Yěmén rén", arabic: "أنا يمني" },
+          { zh: "我是也门人", pinyin: "Wǒ shì Yěmén rén", arabic: "أنا يمني", en: "I am Yemeni" },
         ],
       },
       {
         q: "你多大了？",
         pinyin: "Nǐ duō dà le?",
         arabic: "كم عمرك؟",
+        en: "How old are you?",
         answers: [
-          { zh: "我...岁", pinyin: "Wǒ...suì", arabic: "عمري ... سنة" },
+          { zh: "我...岁", pinyin: "Wǒ...suì", arabic: "عمري ... سنة", en: "I am ... years old" },
         ],
       },
       {
         q: "你做什么工作？",
         pinyin: "Nǐ zuò shénme gōngzuò?",
         arabic: "ما عملك؟",
+        en: "What do you do for work?",
         answers: [
-          { zh: "我是学生", pinyin: "Wǒ shì xuéshēng", arabic: "أنا طالب" },
+          { zh: "我是学生", pinyin: "Wǒ shì xuéshēng", arabic: "أنا طالب", en: "I am a student" },
         ],
       },
     ],
   },
   {
     category: "🚌 المواصلات",
+    categoryEn: "🚌 Getting around",
     icon: "🚌",
     color: "orange",
     questions: [
@@ -217,26 +242,30 @@ const DEFAULT_DAILY_QA: QACategory[] = [
         q: "去...怎么走？",
         pinyin: "Qù...zěnme zǒu?",
         arabic: "كيف أذهب إلى...؟",
+        en: "How do I get to...?",
         answers: [
-          { zh: "向左/右转", pinyin: "Xiàng zuǒ/yòu zhuǎn", arabic: "اتجه يساراً/يميناً" },
+          { zh: "向左/右转", pinyin: "Xiàng zuǒ/yòu zhuǎn", arabic: "اتجه يساراً/يميناً", en: "Turn left / right" },
         ],
       },
       {
         q: "这里是哪里？",
         pinyin: "Zhèlǐ shì nǎlǐ?",
         arabic: "أين هذا المكان؟",
+        en: "Where is this place?",
         answers: [],
       },
       {
         q: "多少钱一张票？",
         pinyin: "Duōshao qián yī zhāng piào?",
         arabic: "بكم التذكرة؟",
+        en: "How much is a ticket?",
         answers: [],
       },
     ],
   },
   {
     category: "🆘 طلب المساعدة",
+    categoryEn: "🆘 Asking for help",
     icon: "🆘",
     color: "red",
     questions: [
@@ -244,30 +273,35 @@ const DEFAULT_DAILY_QA: QACategory[] = [
         q: "请问...在哪里？",
         pinyin: "Qǐngwèn...zài nǎlǐ?",
         arabic: "عذراً، أين يوجد...؟",
+        en: "Excuse me, where is...?",
         answers: [],
       },
       {
         q: "我不明白",
         pinyin: "Wǒ bù míngbái",
         arabic: "لم أفهم",
+        en: "I do not understand",
         answers: [],
       },
       {
         q: "请再说一遍",
         pinyin: "Qǐng zài shuō yībiàn",
         arabic: "من فضلك أعد",
+        en: "Please say that again",
         answers: [],
       },
       {
         q: "你会说英语吗？",
         pinyin: "Nǐ huì shuō Yīngyǔ ma?",
         arabic: "هل تتكلم الإنجليزية؟",
+        en: "Do you speak English?",
         answers: [],
       },
       {
         q: "请写下来",
         pinyin: "Qǐng xiě xia lái",
         arabic: "من فضلك اكتبها",
+        en: "Please write it down",
         answers: [],
       },
     ],
@@ -275,6 +309,7 @@ const DEFAULT_DAILY_QA: QACategory[] = [
 ]
 
 import { speak } from '@/lib/tts'
+import { ts, tsPick } from '@/lib/i18n'
 
 // ─── Fisher-Yates Shuffle ─────────────────────────────────────
 function shuffleArray<T>(arr: T[]): T[] {
@@ -330,6 +365,7 @@ function generateQuizQuestions(
     questionZh: string;
     questionPinyin: string;
     questionAr: string;
+    questionEn?: string;
     correctCategory: string;
     options: string[];
     correctIndex: number;
@@ -349,6 +385,7 @@ function generateQuizQuestions(
       questionZh: ex.q,
       questionPinyin: ex.pinyin,
       questionAr: ex.arabic,
+      questionEn: ex.en,
       correctCategory: ex.category,
       options,
       correctIndex: options.indexOf(ex.category),
@@ -394,7 +431,7 @@ function FlashcardPractice({ question, category }: {
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-[var(--clr-info)]">السؤال</span>
+                  <span className="text-xs font-bold text-[var(--clr-info)]">{ts('السؤال', 'Question')}</span>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -411,10 +448,12 @@ function FlashcardPractice({ question, category }: {
                   {question.pinyin}
                 </p>
                 <p className="text-sm text-[var(--clr-info)] text-center mt-1 font-bold">
-                  {question.arabic}
+                  {tsPick(question.arabic, question.en)}
                 </p>
                 <p className="text-xs text-center text-muted-foreground mt-3">
-                  اضغط لقلب البطاقة {hasAnswers ? 'ورؤية الجواب' : ''}
+                  {hasAnswers
+                    ? ts('اضغط لقلب البطاقة ورؤية الجواب', 'Tap the card to flip it and see the answer')
+                    : ts('اضغط لقلب البطاقة', 'Tap the card to flip it')}
                 </p>
               </div>
 
@@ -427,7 +466,7 @@ function FlashcardPractice({ question, category }: {
                 }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-[var(--clr-success)]">الجواب</span>
+                  <span className="text-xs font-bold text-[var(--clr-success)]">{ts('الجواب', 'Answer')}</span>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -446,15 +485,17 @@ function FlashcardPractice({ question, category }: {
                       <div key={i} className="text-center space-y-1">
                         <p className="font-chinese-serif text-lg font-bold">{ans.zh}</p>
                         <p className="font-chinese-sans text-sm text-muted-foreground">{ans.pinyin}</p>
-                        <p className="text-sm text-[var(--clr-success)] font-bold">{ans.arabic}</p>
+                        <p className="text-sm text-[var(--clr-success)] font-bold">{tsPick(ans.arabic, ans.en)}</p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center text-muted-foreground my-6">لا يوجد جواب محدد لهذا السؤال</p>
+                  <p className="text-center text-muted-foreground my-6">
+                    {ts('لا يوجد جواب محدد لهذا السؤال', 'There is no set answer for this one')}
+                  </p>
                 )}
                 <p className="text-xs text-center text-muted-foreground mt-3">
-                  اضغط للعودة
+                  {ts('اضغط للعودة', 'Tap to go back')}
                 </p>
               </div>
             </motion.div>
@@ -469,7 +510,7 @@ function FlashcardPractice({ question, category }: {
               onClick={() => setFlipped(false)}
             >
               <RotateCcw className="w-3 h-3" />
-              أعد البطاقة
+              {ts('أعد البطاقة', 'Flip it back')}
             </Button>
           </div>
         </motion.div>
@@ -496,6 +537,17 @@ export default function QASection() {
   const allQuestions = useMemo(
     () => dailyQA.flatMap(cat => cat.questions.map(q => ({ category: cat.category, color: cat.color, ...q }))),
     [dailyQA],
+  )
+  // The Arabic category name stays the identity everywhere — accordion values,
+  // answer keys, quiz options — and only the label a learner reads is swapped.
+  const categoryEnByAr = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const cat of dailyQA) if (cat.categoryEn) map[cat.category] = cat.categoryEn
+    return map
+  }, [dailyQA])
+  const catLabel = useCallback(
+    (category: string) => tsPick(category, categoryEnByAr[category]),
+    [categoryEnByAr],
   )
   // ─── State ──────────────────────────────────────────────────
   const [revealedAnswers, setRevealedAnswers] = useState<Set<string>>(new Set())
@@ -684,10 +736,13 @@ export default function QASection() {
       >
         <div className="flex items-center justify-center gap-2 mb-2">
           <HelpCircle className="w-7 h-7 text-[var(--clr-info)]" />
-          <h2 className="text-2xl font-bold">الأسئلة اليومية</h2>
+          <h2 className="text-2xl font-bold">{ts('الأسئلة اليومية', 'Everyday questions')}</h2>
         </div>
         <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-          {totalQ} سؤالاً وعبارة صينية شائعة للمواقف اليومية مع الترجمة العربية والنطق
+          {ts(
+            `${totalQ} سؤالاً وعبارة صينية شائعة للمواقف اليومية مع الترجمة العربية والنطق`,
+            `${totalQ} common Chinese questions and phrases for everyday situations, with the translation and how to say them`,
+          )}
         </p>
         <div className="flex justify-center gap-2 flex-wrap mt-3">
           {dailyQA.map(cat => {
@@ -706,16 +761,16 @@ export default function QASection() {
       <Tabs defaultValue="patterns" className="w-full">
         <TabsList className="w-full grid grid-cols-3 mb-4">
           <TabsTrigger value="patterns" className="text-xs sm:text-sm">
-            <HelpCircle className="w-4 h-4 ml-1 hidden sm:inline" />
-            الأسئلة اليومية
+            <HelpCircle className="w-4 h-4 me-1 hidden sm:inline" />
+            {ts('الأسئلة اليومية', 'Everyday questions')}
           </TabsTrigger>
           <TabsTrigger value="exercise" className="text-xs sm:text-sm">
-            <Move className="w-4 h-4 ml-1 hidden sm:inline" />
-            ترتيب الكلمات
+            <Move className="w-4 h-4 me-1 hidden sm:inline" />
+            {ts('ترتيب الكلمات', 'Word order')}
           </TabsTrigger>
           <TabsTrigger value="quiz" className="text-xs sm:text-sm">
-            <Lightbulb className="w-4 h-4 ml-1 hidden sm:inline" />
-            اختبار سريع
+            <Lightbulb className="w-4 h-4 me-1 hidden sm:inline" />
+            {ts('اختبار سريع', 'Quick quiz')}
           </TabsTrigger>
         </TabsList>
 
@@ -741,12 +796,15 @@ export default function QASection() {
                         className="border-b last:border-b-0"
                       >
                         <AccordionTrigger className={"px-4 sm:px-6 py-4 hover:no-underline hover:bg-muted/30 transition-colors " + cm.bgLight}>
-                          <div className="flex items-center gap-3 text-right">
+                          <div className="flex items-center gap-3 text-start">
                             <span className="text-lg sm:text-xl font-bold">
-                              {cat.category}
+                              {catLabel(cat.category)}
                             </span>
                             <Badge className={"text-xs " + cm.badgeBg + " " + cm.badgeText}>
-                              {cat.questions.length} {cat.questions.length === 1 ? 'سؤال' : 'أسئلة'}
+                              {ts(
+                                `${cat.questions.length} ${cat.questions.length === 1 ? 'سؤال' : 'أسئلة'}`,
+                                `${cat.questions.length} ${cat.questions.length === 1 ? 'question' : 'questions'}`,
+                              )}
                             </Badge>
                           </div>
                         </AccordionTrigger>
@@ -777,7 +835,7 @@ export default function QASection() {
                                         {question.pinyin}
                                       </p>
                                       <p className={"text-sm font-bold " + cm.text}>
-                                        {question.arabic}
+                                        {tsPick(question.arabic, question.en)}
                                       </p>
                                     </div>
                                     <Button
@@ -803,12 +861,12 @@ export default function QASection() {
                                         {isRevealed ? (
                                           <>
                                             <EyeOff className="w-3.5 h-3.5" />
-                                            إخفاء الجواب
+                                            {ts('إخفاء الجواب', 'Hide the answer')}
                                           </>
                                         ) : (
                                           <>
                                             <Eye className="w-3.5 h-3.5" />
-                                            أظهر الجواب
+                                            {ts('أظهر الجواب', 'Show the answer')}
                                           </>
                                         )}
                                       </Button>
@@ -822,7 +880,7 @@ export default function QASection() {
                                       onClick={() => toggleFlashcard(flashcardKey)}
                                     >
                                       <Lightbulb className="w-3.5 h-3.5" />
-                                      تدرب على هذا السؤال
+                                      {ts('تدرب على هذا السؤال', 'Practice this one')}
                                     </Button>
                                   </div>
 
@@ -841,7 +899,7 @@ export default function QASection() {
                                             <div className="flex items-center justify-between">
                                               <span className="text-xs font-bold text-[var(--clr-success)] flex items-center gap-1">
                                                 <Check className="w-3 h-3" />
-                                                الإجابة
+                                                {ts('الإجابة', 'Answer')}
                                               </span>
                                               <Button
                                                 variant="ghost"
@@ -862,7 +920,7 @@ export default function QASection() {
                                                     {ans.pinyin}
                                                   </p>
                                                   <p className="text-sm text-[var(--clr-success)]">
-                                                    {ans.arabic}
+                                                    {tsPick(ans.arabic, ans.en)}
                                                   </p>
                                                 </div>
                                               </div>
@@ -910,7 +968,7 @@ export default function QASection() {
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <Move className="w-5 h-5 text-[var(--clr-info)]" />
-                    <span className="font-bold">تمرين ترتيب الكلمات</span>
+                    <span className="font-bold">{ts('تمرين ترتيب الكلمات', 'Word order drill')}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge variant="outline" className="gap-1">
@@ -929,7 +987,7 @@ export default function QASection() {
                       className="gap-1"
                     >
                       <RotateCcw className="w-3 h-3" />
-                      سؤال جديد
+                      {ts('سؤال جديد', 'New question')}
                     </Button>
                   </div>
                 </div>
@@ -945,14 +1003,16 @@ export default function QASection() {
                       <Move className="w-8 h-8 text-[var(--clr-info)]" />
                     </div>
                   </div>
-                  <p className="font-bold text-lg">تمرين ترتيب الكلمات</p>
+                  <p className="font-bold text-lg">{ts('تمرين ترتيب الكلمات', 'Word order drill')}</p>
                   <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                    سيظهر لك سؤال صيني مقسّم لكلمات. اسحب الكلمات وأفلتها بالترتيب الصحيح
-                    لتكوين الجملة الكاملة.
+                    {ts(
+                      'سيظهر لك سؤال صيني مقسّم لكلمات. اسحب الكلمات وأفلتها بالترتيب الصحيح لتكوين الجملة الكاملة.',
+                      'You will get a Chinese question broken up into words. Drag them into the right order to build the whole sentence.',
+                    )}
                   </p>
                   <Button onClick={initDnDExercise} className="gap-2">
                     <Play className="w-4 h-4" />
-                    ابدأ التمرين
+                    {ts('ابدأ التمرين', 'Start the drill')}
                   </Button>
                 </CardContent>
               </Card>
@@ -968,7 +1028,7 @@ export default function QASection() {
                 {/* Category info */}
                 <div className="flex items-center gap-2">
                   <Badge className="text-sm px-3 py-1 bg-[var(--clr-info-bg)] text-[var(--clr-info)] border-[var(--clr-info)]/40">
-                    {dndCategory}
+                    {dndCategory ? catLabel(dndCategory) : null}
                   </Badge>
                 </div>
 
@@ -979,7 +1039,9 @@ export default function QASection() {
                     animate={{ opacity: 1, y: 0 }}
                     className="p-3 rounded-lg bg-[var(--clr-danger-bg)] border border-[var(--clr-danger)]/30 space-y-1"
                   >
-                    <p className="text-xs text-[var(--clr-danger)] font-bold">الجملة الصحيحة:</p>
+                    <p className="text-xs text-[var(--clr-danger)] font-bold">
+                      {ts('الجملة الصحيحة:', 'The correct sentence:')}
+                    </p>
                     <p className="font-chinese-serif text-lg">{dndSentence}</p>
                   </motion.div>
                 )}
@@ -996,8 +1058,8 @@ export default function QASection() {
                 >
                   <CardContent className="p-3">
                     <p className="text-xs text-muted-foreground mb-2">
-                      <GripVertical className="w-3 h-3 inline ml-1" />
-                      اسحب الكلمات هنا بالترتيب الصحيح
+                      <GripVertical className="w-3 h-3 inline me-1" />
+                      {ts('اسحب الكلمات هنا بالترتيب الصحيح', 'Drag the words here in the right order')}
                     </p>
                     <div
                       ref={dndDropRef}
@@ -1005,7 +1067,7 @@ export default function QASection() {
                     >
                       {droppedWords.length === 0 && !dndChecked && (
                         <p className="text-sm text-muted-foreground/50 italic m-auto">
-                          المنطقة فارغة...
+                          {ts('المنطقة فارغة...', 'Nothing here yet...')}
                         </p>
                       )}
                       {droppedWords.map((word, idx) => (
@@ -1077,7 +1139,7 @@ export default function QASection() {
                 {/* Source words pool */}
                 <Card className="shadow-sm">
                   <CardContent className="p-3">
-                    <p className="text-xs text-muted-foreground mb-2">الكلمات المتاحة:</p>
+                    <p className="text-xs text-muted-foreground mb-2">{ts('الكلمات المتاحة:', 'Words to use:')}</p>
                     <div className="flex flex-wrap gap-2">
                       {shuffledWords.map((word, idx) => {
                         const wordIndexInPool = shuffledWords
@@ -1121,7 +1183,7 @@ export default function QASection() {
                       onClick={checkDnDAnswer}
                     >
                       <Check className="w-4 h-4" />
-                      تحقق من الإجابة
+                      {ts('تحقق من الإجابة', 'Check the answer')}
                     </Button>
                   ) : (
                     <Button
@@ -1129,7 +1191,7 @@ export default function QASection() {
                       onClick={initDnDExercise}
                     >
                       <RotateCcw className="w-4 h-4" />
-                      السؤال التالي
+                      {ts('السؤال التالي', 'Next question')}
                     </Button>
                   )}
                   <Button
@@ -1140,7 +1202,7 @@ export default function QASection() {
                       setDndTotal(0)
                       initDnDExercise()
                     }}
-                    title="إعادة تعيين النتيجة"
+                    title={ts('إعادة تعيين النتيجة', 'Reset the score')}
                   >
                     <RotateCcw className="w-4 h-4" />
                   </Button>
@@ -1157,7 +1219,7 @@ export default function QASection() {
                     >
                       <div className="flex items-center justify-center gap-2 text-[var(--clr-success)]">
                         <Check className="w-5 h-5" />
-                        <span className="font-bold">أحسنت! إجابة صحيحة! 🎉</span>
+                        <span className="font-bold">{ts('أحسنت! إجابة صحيحة! 🎉', 'Well done — that is right! 🎉')}</span>
                       </div>
                       <Button
                         variant="ghost"
@@ -1166,7 +1228,7 @@ export default function QASection() {
                         onClick={() => speak(dndSentence ?? '')}
                       >
                         <Volume2 className="w-3 h-3" />
-                        استمع للجملة
+                        {ts('استمع للجملة', 'Listen to the sentence')}
                       </Button>
                     </motion.div>
                   )}
@@ -1179,7 +1241,7 @@ export default function QASection() {
                     >
                       <div className="flex items-center justify-center gap-2 text-[var(--clr-danger)]">
                         <X className="w-5 h-5" />
-                        <span className="font-bold">ليس تماماً... حاول مرة أخرى!</span>
+                        <span className="font-bold">{ts('ليس تماماً... حاول مرة أخرى!', 'Not quite... try again!')}</span>
                       </div>
                     </motion.div>
                   )}
@@ -1208,21 +1270,23 @@ export default function QASection() {
                       <Lightbulb className="w-8 h-8 text-[var(--clr-info)]" />
                     </div>
                   </div>
-                  <p className="font-bold text-lg">اختبار التصنيف السريع</p>
+                  <p className="font-bold text-lg">{ts('اختبار التصنيف السريع', 'Quick category quiz')}</p>
                   <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                    سيظهر لك سؤال بالصينية والترجمة العربية. اختر التصنيف الصحيح
-                    من بين الخيارات المتاحة.
+                    {ts(
+                      'سيظهر لك سؤال بالصينية والترجمة العربية. اختر التصنيف الصحيح من بين الخيارات المتاحة.',
+                      'You will see a question in Chinese with its translation. Pick the situation it belongs to from the options.',
+                    )}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 justify-center">
                     <div className="text-sm text-muted-foreground space-y-1">
-                      <p>• 10 أسئلة عشوائية</p>
-                      <p>• 30 ثانية لكل سؤال</p>
-                      <p>• تابع نتيجتك في النهاية</p>
+                      <p>{ts('• 10 أسئلة عشوائية', '• 10 questions, picked at random')}</p>
+                      <p>{ts('• 30 ثانية لكل سؤال', '• 30 seconds per question')}</p>
+                      <p>{ts('• تابع نتيجتك في النهاية', '• Your score at the end')}</p>
                     </div>
                   </div>
                   <Button onClick={startQuiz} className="gap-2">
                     <Play className="w-4 h-4" />
-                    ابدأ الاختبار
+                    {ts('ابدأ الاختبار', 'Start the quiz')}
                   </Button>
                 </CardContent>
               </Card>
@@ -1243,16 +1307,16 @@ export default function QASection() {
                         {quizScore}
                       </div>
                     </div>
-                    <p className="font-bold text-xl">نتيجتك</p>
+                    <p className="font-bold text-xl">{ts('نتيجتك', 'Your score')}</p>
                     <p className="text-2xl font-bold">
                       {quizScore} / {quizQuestions.length}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {quizScore >= 8
-                        ? 'ممتاز! أنت متمكّن من الأسئلة اليومية! 🌟'
+                        ? ts('ممتاز! أنت متمكّن من الأسئلة اليومية! 🌟', 'Excellent — you have the everyday questions down! 🌟')
                         : quizScore >= 5
-                          ? 'جيد! واصل التمرين لتحسين مستواك 💪'
-                          : 'لا بأس! راجع الأسئلة وحاول مرة أخرى 📚'}
+                          ? ts('جيد! واصل التمرين لتحسين مستواك 💪', 'Good! Keep practising and it will sharpen up 💪')
+                          : ts('لا بأس! راجع الأسئلة وحاول مرة أخرى 📚', 'No problem! Go back over the questions and try again 📚')}
                     </p>
 
                     {/* Score bar */}
@@ -1271,7 +1335,7 @@ export default function QASection() {
                     <div className="flex gap-2 justify-center">
                       <Button onClick={startQuiz} className="gap-2">
                         <RotateCcw className="w-4 h-4" />
-                        إعادة الاختبار
+                        {ts('إعادة الاختبار', 'Take it again')}
                       </Button>
                       <Button
                         variant="outline"
@@ -1280,7 +1344,7 @@ export default function QASection() {
                           setQuizFinished(false)
                         }}
                       >
-                        رجوع
+                        {ts('رجوع', 'Back')}
                       </Button>
                     </div>
                   </CardContent>
@@ -1301,7 +1365,10 @@ export default function QASection() {
                   <CardContent className="p-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">
-                        السؤال {quizCurrent + 1} / {quizQuestions.length}
+                        {ts(
+                          `السؤال ${quizCurrent + 1} / ${quizQuestions.length}`,
+                          `Question ${quizCurrent + 1} of ${quizQuestions.length}`,
+                        )}
                       </span>
                       <div className="flex items-center gap-3">
                         <Badge variant="outline" className="gap-1">
@@ -1335,7 +1402,7 @@ export default function QASection() {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <HelpCircle className="w-4 h-4 text-[var(--clr-info)]" />
-                        ما التصنيف المناسب لهذا السؤال؟
+                        {ts('ما التصنيف المناسب لهذا السؤال؟', 'Which situation does this question belong to?')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -1347,7 +1414,7 @@ export default function QASection() {
                           {quizQuestions[quizCurrent].questionPinyin}
                         </p>
                         <p className="text-sm font-bold text-[var(--clr-info)]">
-                          {quizQuestions[quizCurrent].questionAr}
+                          {tsPick(quizQuestions[quizCurrent].questionAr, quizQuestions[quizCurrent].questionEn)}
                         </p>
                       </div>
 
@@ -1377,7 +1444,7 @@ export default function QASection() {
                                 )
                               }
                             >
-                              {opt}
+                              {catLabel(opt)}
                               {showResult && isCorrect && (
                                 <motion.div
                                   initial={{ scale: 0 }}
@@ -1416,8 +1483,9 @@ export default function QASection() {
                             }
                           >
                             {quizAnswer === quizQuestions[quizCurrent].correctIndex
-                              ? '✅ إجابة صحيحة! أحسنت!'
-                              : '❌ إجابة خاطئة. التصنيف الصحيح هو: ' + quizQuestions[quizCurrent].correctCategory}
+                              ? ts('✅ إجابة صحيحة! أحسنت!', '✅ Correct — well done!')
+                              : ts('❌ إجابة خاطئة. التصنيف الصحيح هو: ', '❌ Not right. The correct one is: ') +
+                                catLabel(quizQuestions[quizCurrent].correctCategory)}
                           </motion.div>
                         )}
                       </AnimatePresence>

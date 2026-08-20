@@ -1,0 +1,128 @@
+{
+ "1": [
+  { "zh": "我们去机场接你们。", "pinyin": "Wǒmen qù jīchǎng jiē nǐmen.", "arabic": "سنذهب إلى المطار لاستقبالكم." },
+  { "zh": "我以为你的行李丢了。", "pinyin": "Wǒ yǐwéi nǐ de xíngli diū le.", "arabic": "ظننتُ أنّ أمتعتك قد ضاعت." },
+  { "zh": "他的身高是一米八，头发很短。", "pinyin": "Tā de shēngāo shì yī mǐ bā, tóufa hěn duǎn.", "arabic": "طوله متر وثمانون، وشعره قصير جداً." },
+  { "zh": "我的护照好像不见了！", "pinyin": "Wǒ de hùzhào hǎoxiàng bújiàn le!", "arabic": "يبدو أنّ جواز سفري مفقود!" },
+  { "zh": "你可以帮助我拿箱子吗？", "pinyin": "Nǐ kěyǐ bāngzhù wǒ ná xiāngzi ma?", "arabic": "هل يمكنك مساعدتي في حمل الحقيبة؟" }
+ ],
+ "2": [
+  { "zh": "服务员，请给我一张菜单。", "pinyin": "Fúwùyuán, qǐng gěi wǒ yì zhāng càidān.", "arabic": "أيها النادل، من فضلك أعطني قائمة الطعام." },
+  { "zh": "我又饿又渴，想喝点儿饮料。", "pinyin": "Wǒ yòu è yòu kě, xiǎng hē diǎnr yǐnliào.", "arabic": "أنا جائع وعطشان، وأريد أن أشرب شيئاً." },
+  { "zh": "你们想吃什么就点什么。", "pinyin": "Nǐmen xiǎng chī shénme jiù diǎn shénme.", "arabic": "اطلبوا ما تشتهون من الطعام." },
+  { "zh": "请再给我一双筷子和一个碗。", "pinyin": "Qǐng zài gěi wǒ yì shuāng kuàizi hé yí ge wǎn.", "arabic": "من فضلك أعطني زوجاً آخر من عيدان الطعام وصحناً." },
+  { "zh": "你不用客气，尝尝这个蛋糕吧！", "pinyin": "Nǐ búyòng kèqi, chángchang zhège dàngāo ba!", "arabic": "لا داعي للتكلّف، تذوّق هذه الكعكة!" }
+ ],
+ "3": [
+  { "zh": "这个小区的环境挺好的。", "pinyin": "Zhège xiǎoqū de huánjìng tǐng hǎo de.", "arabic": "بيئة هذا الحيّ السكني جيدة جداً." },
+  { "zh": "咱们下个月就搬家吧。", "pinyin": "Zánmen xià ge yuè jiù bānjiā ba.", "arabic": "لننتقل إلى المنزل الجديد الشهر القادم." },
+  { "zh": "房子里有空调、冰箱和洗衣机。", "pinyin": "Fángzi lǐ yǒu kōngtiáo, bīngxiāng hé xǐyījī.", "arabic": "في البيت مكيّف وثلاجة وغسّالة ملابس." },
+  { "zh": "出门以前请关灯。", "pinyin": "Chūmén yǐqián qǐng guān dēng.", "arabic": "من فضلك أطفئ المصباح قبل الخروج." },
+  { "zh": "我需要去银行办一张信用卡。", "pinyin": "Wǒ xūyào qù yínháng bàn yì zhāng xìnyòngkǎ.", "arabic": "أحتاج أن أذهب إلى البنك لأستخرج بطاقة ائتمان." }
+ ],
+ "4": [
+  { "zh": "这家宾馆跟别的都不一样。", "pinyin": "Zhè jiā bīnguǎn gēn biéde dōu bù yíyàng.", "arabic": "هذا الفندق مختلف تماماً عن غيره." },
+  { "zh": "假期我想去草原上骑马。", "pinyin": "Jiàqī wǒ xiǎng qù cǎoyuán shang qí mǎ.", "arabic": "في العطلة أريد الذهاب إلى السهل العشبي لركوب الحصان." },
+  { "zh": "飞机晚点了，三点一刻才起飞。", "pinyin": "Fēijī wǎndiǎn le, sān diǎn yí kè cái qǐfēi.", "arabic": "تأخّرت الطائرة، ولم تُقلع إلا في الثالثة والربع." },
+  { "zh": "草原上有很多牛和羊。", "pinyin": "Cǎoyuán shang yǒu hěn duō niú hé yáng.", "arabic": "في السهل العشبي أبقار وأغنام كثيرة." },
+  { "zh": "房间很干净，我们都很满意。", "pinyin": "Fángjiān hěn gānjìng, wǒmen dōu hěn mǎnyì.", "arabic": "الغرفة نظيفة جداً، وكلّنا راضون." }
+ ],
+ "5": [
+  { "zh": "这样的照片才好看。", "pinyin": "Zhèyàng de zhàopiàn cái hǎokàn.", "arabic": "مثل هذه الصور هي الجميلة حقاً." },
+  { "zh": "我们终于爬到山上了！", "pinyin": "Wǒmen zhōngyú pá dào shān shang le!", "arabic": "أخيراً وصلنا إلى أعلى الجبل!" },
+  { "zh": "他对拍照很感兴趣。", "pinyin": "Tā duì pāizhào hěn gǎn xìngqù.", "arabic": "إنه مهتمّ جداً بالتصوير." },
+  { "zh": "我今天收到了一封邮件。", "pinyin": "Wǒ jīntiān shōudào le yì fēng yóujiàn.", "arabic": "استلمتُ اليوم رسالة بريدية." },
+  { "zh": "我每天早上都锻炼身体。", "pinyin": "Wǒ měitiān zǎoshang dōu duànliàn shēntǐ.", "arabic": "أمارس الرياضة كل صباح." }
+ ],
+ "6": [
+  { "zh": "高铁上还可以点外卖。", "pinyin": "Gāotiě shang hái kěyǐ diǎn wàimài.", "arabic": "في القطار السريع يمكنك أيضاً طلب توصيل الطعام." },
+  { "zh": "我打算坐高铁去北京。", "pinyin": "Wǒ dǎsuàn zuò gāotiě qù Běijīng.", "arabic": "أنوي الذهاب إلى بكين بالقطار فائق السرعة." },
+  { "zh": "前面的路口有红绿灯，过马路要小心。", "pinyin": "Qiánmiàn de lùkǒu yǒu hónglǜdēng, guò mǎlù yào xiǎoxīn.", "arabic": "عند التقاطع أمامنا إشارة مرور، فانتبه عند عبور الطريق." },
+  { "zh": "如果你迟到了，我们就先走。", "pinyin": "Rúguǒ nǐ chídào le, wǒmen jiù xiān zǒu.", "arabic": "إذا تأخّرت، فسنمضي نحن أولاً." },
+  { "zh": "上车以前必须检票。", "pinyin": "Shàng chē yǐqián bìxū jiǎnpiào.", "arabic": "يجب التحقّق من التذاكر قبل ركوب القطار." }
+ ],
+ "7": [
+  { "zh": "那条裙子比短裤更好看。", "pinyin": "Nà tiáo qúnzi bǐ duǎnkù gèng hǎokàn.", "arabic": "تلك التنّورة أجمل من الشورت." },
+  { "zh": "这件大衣的大小很合适。", "pinyin": "Zhè jiàn dàyī de dàxiǎo hěn héshì.", "arabic": "مقاس هذا المعطف مناسب تماماً." },
+  { "zh": "我决定买那辆自行车。", "pinyin": "Wǒ juédìng mǎi nà liàng zìxíngchē.", "arabic": "قرّرتُ شراء تلك الدراجة الهوائية." },
+  { "zh": "这个西瓜又新鲜又甜。", "pinyin": "Zhège xīguā yòu xīnxiān yòu tián.", "arabic": "هذا البطيخ طازج وحلو المذاق." },
+  { "zh": "这些香蕉一共多少钱？", "pinyin": "Zhèxiē xiāngjiāo yígòng duōshao qián?", "arabic": "كم ثمن هذا الموز كلّه؟" }
+ ],
+ "8": [
+  { "zh": "今天我出院了。", "pinyin": "Jīntiān wǒ chūyuàn le.", "arabic": "اليوم غادرتُ المستشفى." },
+  { "zh": "他感冒了，还有点儿发烧。", "pinyin": "Tā gǎnmào le, hái yǒudiǎnr fāshāo.", "arabic": "أصيب بالزكام، ولديه ارتفاع بسيط في الحرارة." },
+  { "zh": "我最近常去体育馆打羽毛球。", "pinyin": "Wǒ zuìjìn cháng qù tǐyùguǎn dǎ yǔmáoqiú.", "arabic": "أذهب مؤخراً كثيراً إلى الصالة الرياضية للعب كرة الريشة." },
+  { "zh": "你别担心，医生说他的身体很健康。", "pinyin": "Nǐ bié dānxīn, yīshēng shuō tā de shēntǐ hěn jiànkāng.", "arabic": "لا تقلق، قال الطبيب إنّ صحته جيدة." },
+  { "zh": "早睡早起是很好的习惯。", "pinyin": "Zǎo shuì zǎo qǐ shì hěn hǎo de xíguàn.", "arabic": "النوم مبكراً والاستيقاظ مبكراً عادة جيدة جداً." }
+ ],
+ "9": [
+  { "zh": "打不好没关系。", "pinyin": "Dǎ bù hǎo méi guānxì.", "arabic": "لا بأس إن لم تُحسن اللعب." },
+  { "zh": "我想参加学校的运动会。", "pinyin": "Wǒ xiǎng cānjiā xuéxiào de yùndònghuì.", "arabic": "أريد المشاركة في المهرجان الرياضي للمدرسة." },
+  { "zh": "他每天在球场练习网球。", "pinyin": "Tā měitiān zài qiúchǎng liànxí wǎngqiú.", "arabic": "يتدرّب على كرة المضرب في الملعب كل يوم." },
+  { "zh": "比赛以前我有点儿紧张。", "pinyin": "Bǐsài yǐqián wǒ yǒudiǎnr jǐnzhāng.", "arabic": "كنتُ متوتراً قليلاً قبل المباراة." },
+  { "zh": "他是一位有名的运动员。", "pinyin": "Tā shì yí wèi yǒumíng de yùndòngyuán.", "arabic": "إنه لاعب رياضي مشهور." }
+ ],
+ "10": [
+  { "zh": "你明天再把书还给我。", "pinyin": "Nǐ míngtiān zài bǎ shū huán gěi wǒ.", "arabic": "أعِد لي الكتاب غداً." },
+  { "zh": "老师讲的每一句话我都听明白了。", "pinyin": "Lǎoshī jiǎng de měi yí jù huà wǒ dōu tīng míngbai le.", "arabic": "فهمتُ كل جملة شرحها المعلّم." },
+  { "zh": "这次数学考试有点儿难。", "pinyin": "Zhè cì shùxué kǎoshì yǒudiǎnr nán.", "arabic": "امتحان الرياضيات هذه المرة صعب بعض الشيء." },
+  { "zh": "请你把黑板上的句子读一遍。", "pinyin": "Qǐng nǐ bǎ hēibǎn shang de jùzi dú yí biàn.", "arabic": "من فضلك اقرأ الجمل المكتوبة على السبّورة مرة كاملة." },
+  { "zh": "我要努力提高我的外语水平。", "pinyin": "Wǒ yào nǔlì tígāo wǒ de wàiyǔ shuǐpíng.", "arabic": "سأجتهد لأرفع مستواي في اللغة الأجنبية." }
+ ],
+ "11": [
+  { "zh": "看来我没办法解决这个问题。", "pinyin": "Kànlái wǒ méi bànfǎ jiějué zhège wèntí.", "arabic": "يبدو أنه ليس لديّ حلّ لهذه المشكلة." },
+  { "zh": "后天上午我们要开会。", "pinyin": "Hòutiān shàngwǔ wǒmen yào kāihuì.", "arabic": "سنعقد اجتماعاً بعد غد صباحاً." },
+  { "zh": "请把这个地点发到我的邮箱。", "pinyin": "Qǐng bǎ zhège dìdiǎn fā dào wǒ de yóuxiāng.", "arabic": "من فضلك أرسل هذا المكان إلى بريدي الإلكتروني." },
+  { "zh": "我今天想跟经理请假。", "pinyin": "Wǒ jīntiān xiǎng gēn jīnglǐ qǐngjià.", "arabic": "أريد أن أطلب إجازة من المدير اليوم." },
+  { "zh": "在这个城市生活是一个很好的机会。", "pinyin": "Zài zhège chéngshì shēnghuó shì yí ge hěn hǎo de jīhuì.", "arabic": "العيش في هذه المدينة فرصة جيدة جداً." }
+ ],
+ "12": [
+  { "zh": "这个季节天气变化很快。", "pinyin": "Zhège jìjié tiānqì biànhuà hěn kuài.", "arabic": "يتغيّر الطقس بسرعة في هذا الفصل." },
+  { "zh": "外面刮风了，你带伞了吗？", "pinyin": "Wàimiàn guā fēng le, nǐ dài sǎn le ma?", "arabic": "الرياح تهبّ في الخارج، هل أحضرتَ مظلّة؟" },
+  { "zh": "春天到了，公园里的花都开了。", "pinyin": "Chūntiān dào le, gōngyuán lǐ de huā dōu kāi le.", "arabic": "حلّ الربيع، وتفتّحت كل الزهور في الحديقة." },
+  { "zh": "秋天的叶子变成了黄色。", "pinyin": "Qiūtiān de yèzi biànchéng le huángsè.", "arabic": "أوراق الشجر في الخريف صارت صفراء." },
+  { "zh": "我最喜欢凉快的秋天。", "pinyin": "Wǒ zuì xǐhuan liángkuai de qiūtiān.", "arabic": "أحبّ الخريف المنعش أكثر من غيره." }
+ ],
+ "13": [
+  { "zh": "我的新邻居来自南方。", "pinyin": "Wǒ de xīn línjū láizì nánfāng.", "arabic": "جاري الجديد قادم من الجنوب." },
+  { "zh": "今天我请客，你们不要客气。", "pinyin": "Jīntiān wǒ qǐngkè, nǐmen búyào kèqi.", "arabic": "اليوم أنا أدعوكم، فلا تتكلّفوا." },
+  { "zh": "我们一边吃饭，一边聊天儿。", "pinyin": "Wǒmen yìbiān chīfàn, yìbiān liáotiānr.", "arabic": "نتناول الطعام ونتحدّث في الوقت نفسه." },
+  { "zh": "去做客的话，最好带一个礼物。", "pinyin": "Qù zuòkè dehuà, zuìhǎo dài yí ge lǐwù.", "arabic": "إن ذهبتَ زائراً، فالأفضل أن تحمل هدية." },
+  { "zh": "南方和北方的做法很不同。", "pinyin": "Nánfāng hé běifāng de zuòfǎ hěn bùtóng.", "arabic": "طريقة الطهي في الجنوب تختلف كثيراً عن الشمال." }
+ ],
+ "14": [
+  { "zh": "这本书被别人借走了。", "pinyin": "Zhè běn shū bèi biéren jiè zǒu le.", "arabic": "استعار شخص آخر هذا الكتاب." },
+  { "zh": "我常常去图书馆看报纸。", "pinyin": "Wǒ chángcháng qù túshūguǎn kàn bàozhǐ.", "arabic": "أذهب كثيراً إلى المكتبة لقراءة الجرائد." },
+  { "zh": "我忘记带词典了，怎么办？", "pinyin": "Wǒ wàngjì dài cídiǎn le, zěnme bàn?", "arabic": "نسيتُ إحضار القاموس، ماذا أفعل؟" },
+  { "zh": "新年晚会上，留学生表演了一个节目。", "pinyin": "Xīnnián wǎnhuì shang, liúxuéshēng biǎoyǎn le yí ge jiémù.", "arabic": "في حفل رأس السنة قدّم الطلاب الوافدون فقرة." },
+  { "zh": "最后我们一块儿看了一个视频。", "pinyin": "Zuìhòu wǒmen yíkuàir kàn le yí ge shìpín.", "arabic": "في النهاية شاهدنا مقطعاً مرئياً معاً." }
+ ],
+ "15": [
+  { "zh": "我是半个南京人。", "pinyin": "Wǒ shì bàn ge Nánjīng rén.", "arabic": "أنا نصف نانجينغيّ." },
+  { "zh": "学校附近有一条很长的河。", "pinyin": "Xuéxiào fùjìn yǒu yì tiáo hěn cháng de hé.", "arabic": "قرب المدرسة نهر طويل جداً." },
+  { "zh": "这个景点每天有很多游客。", "pinyin": "Zhège jǐngdiǎn měitiān yǒu hěn duō yóukè.", "arabic": "يزور هذا المعلَم سيّاح كثيرون كل يوم." },
+  { "zh": "平时放学以后我喜欢去河边走走。", "pinyin": "Píngshí fàngxué yǐhòu wǒ xǐhuan qù hé biān zǒuzou.", "arabic": "عادةً بعد انتهاء الدوام أحبّ أن أتمشّى على ضفة النهر." },
+  { "zh": "我在马路上遇见了一位老人。", "pinyin": "Wǒ zài mǎlù shang yùjiàn le yí wèi lǎorén.", "arabic": "التقيتُ صدفةً بمسنّ في الطريق." }
+ ],
+ "16": [
+  { "zh": "我听说有的熊猫出国了。", "pinyin": "Wǒ tīngshuō yǒude xióngmāo chūguó le.", "arabic": "سمعتُ أنّ بعض الباندا سافرت إلى الخارج." },
+  { "zh": "周末我们去动物园看大熊猫吧。", "pinyin": "Zhōumò wǒmen qù dòngwùyuán kàn dàxióngmāo ba.", "arabic": "لنذهب في عطلة نهاية الأسبوع إلى حديقة الحيوان لرؤية الباندا العملاقة." },
+  { "zh": "大熊猫最喜爱吃竹子。", "pinyin": "Dàxióngmāo zuì xǐ'ài chī zhúzi.", "arabic": "أحبّ ما تأكله الباندا العملاقة هو الخيزران." },
+  { "zh": "它的脸很大，样子很可爱。", "pinyin": "Tā de liǎn hěn dà, yàngzi hěn kě'ài.", "arabic": "وجهها كبير وشكلها لطيف جداً." },
+  { "zh": "全世界的人都喜欢这种动物。", "pinyin": "Quán shìjiè de rén dōu xǐhuan zhè zhǒng dòngwù.", "arabic": "الناس في العالم كلّه يحبّون هذا النوع من الحيوانات." }
+ ],
+ "17": [
+  { "zh": "我要多向认真的人学习。", "pinyin": "Wǒ yào duō xiàng rènzhēn de rén xuéxí.", "arabic": "أريد أن أتعلّم كثيراً من الأشخاص الجادّين." },
+  { "zh": "我认为这个方法很有用。", "pinyin": "Wǒ rènwéi zhège fāngfǎ hěn yǒuyòng.", "arabic": "أرى أنّ هذه الطريقة مفيدة جداً." },
+  { "zh": "你走错方向了。", "pinyin": "Nǐ zǒu cuò fāngxiàng le.", "arabic": "لقد سرتَ في الاتجاه الخاطئ." },
+  { "zh": "这个问题不太容易回答。", "pinyin": "Zhège wèntí bú tài róngyì huídá.", "arabic": "هذا السؤال ليس سهل الإجابة." },
+  { "zh": "上课的时候必须关机。", "pinyin": "Shàngkè de shíhou bìxū guānjī.", "arabic": "يجب إطفاء الجهاز أثناء الحصة." }
+ ],
+ "18": [
+  { "zh": "我学会了包饺子。", "pinyin": "Wǒ xuéhuì le bāo jiǎozi.", "arabic": "تعلّمتُ صنع الزلابية." },
+  { "zh": "春节是中国最重要的节日。", "pinyin": "Chūnjié shì Zhōngguó zuì zhòngyào de jiérì.", "arabic": "عيد الربيع هو أهمّ عيد في الصين." },
+  { "zh": "我们刚刚出发，大概六点到。", "pinyin": "Wǒmen gānggāng chūfā, dàgài liù diǎn dào.", "arabic": "انطلقنا للتوّ، وسنصل تقريباً في السادسة." },
+  { "zh": "只要坚持，你一定能完成目标。", "pinyin": "Zhǐyào jiānchí, nǐ yídìng néng wánchéng mùbiāo.", "arabic": "ما دمتَ مواظباً فستحقّق هدفك بالتأكيد." },
+  { "zh": "我下个学期就要毕业了。", "pinyin": "Wǒ xià ge xuéqī jiù yào bìyè le.", "arabic": "سأتخرّج في الفصل الدراسي القادم." }
+ ]
+}

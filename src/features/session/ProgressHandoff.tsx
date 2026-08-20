@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Check, Loader2, X } from 'lucide-react'
 import { hasLocalProgress, importLocalProgress } from '@/lib/supabase/progress-import'
 import { useMounted } from '@/hooks/use-mounted'
+import { ts } from '@/lib/i18n'
 
 type Phase = 'idle' | 'running' | 'done' | 'skipped' | 'failed'
 
@@ -63,23 +64,33 @@ export function ProgressHandoff({ signedIn }: { signedIn: boolean }) {
       {phase === 'running' && (
         <>
           <Loader2 size={16} className="j-handoff-spin" aria-hidden />
-          <span>ننقل تقدّمك إلى حسابك…</span>
+          <span>{ts('ننقل تقدّمك إلى حسابك…', 'Moving your progress into your account…')}</span>
         </>
       )}
       {phase === 'done' && summary && (
         <>
           <Check size={16} aria-hidden />
           <span>
-            نُقل تقدّمك: {summary.words} كلمة و{summary.units} وحدة. صار متاحاً على كل أجهزتك.
+            {ts(
+              `نُقل تقدّمك: ${summary.words} كلمة و${summary.units} وحدة. صار متاحاً على كل أجهزتك.`,
+              `Your progress moved over: ${summary.words} words and ${summary.units} units. It is on all your devices now.`,
+            )}
           </span>
-          <button type="button" onClick={() => setPhase('skipped')} aria-label="إغلاق"><X size={15} /></button>
+          <button type="button" onClick={() => setPhase('skipped')} aria-label={ts('إغلاق', 'Close')}>
+            <X size={15} />
+          </button>
         </>
       )}
       {phase === 'failed' && (
         <>
           <X size={16} aria-hidden />
-          <span>تعذّر نقل تقدّمك. تقدّمك على هذا الجهاز سليم — سنحاول لاحقاً.</span>
-          <button type="button" onClick={() => void run()}>أعد المحاولة</button>
+          <span>
+            {ts(
+              'تعذّر نقل تقدّمك. تقدّمك على هذا الجهاز سليم — سنحاول لاحقاً.',
+              'We could not move your progress. What is on this device is safe — we will try again later.',
+            )}
+          </span>
+          <button type="button" onClick={() => void run()}>{ts('أعد المحاولة', 'Try again')}</button>
         </>
       )}
     </div>

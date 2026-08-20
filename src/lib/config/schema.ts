@@ -198,8 +198,7 @@ export function applyConfigRows(rows: readonly RawRow[]): {
     const groupSchema = configSchema.shape[group]
     const candidate = groupSchema.safeParse(draft[group])
     if (candidate.success) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(repaired as any)[group] = candidate.data
+      ;(repaired as Record<string, unknown>)[group] = candidate.data
     } else {
       problems.push(`group ${group} fell back to defaults: ${candidate.error.message}`)
     }

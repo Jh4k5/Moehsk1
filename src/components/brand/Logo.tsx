@@ -23,7 +23,6 @@ export function Logo({
   className?: string
 }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={SRC[variant]}
       alt="جسر إلى الصين"

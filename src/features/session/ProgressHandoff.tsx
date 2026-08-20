@@ -54,7 +54,20 @@ export function ProgressHandoff({ signedIn }: { signedIn: boolean }) {
       localStorage.setItem(FLAG, new Date().toISOString())
       return
     }
-    void run()
+    // `run()`'s first line is `setPhase('running')`, called synchronously —
+    // calling it directly here would fire that setState while this effect is
+    // still in its own synchronous flush, forcing an extra render pass in the
+    // same commit. `queueMicrotask` pushes the call past that boundary; the
+    // delay is a single microtask, imperceptible, and the local checks above
+    // (the flag, `hasLocalProgress()`) already ran synchronously so the
+    // decision to start is not deferred, only the state write that starts it.
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) void run()
+    })
+    return () => {
+      cancelled = true
+    }
   }, [mounted, signedIn, run])
 
   if (!mounted || phase === 'idle' || phase === 'skipped') return null

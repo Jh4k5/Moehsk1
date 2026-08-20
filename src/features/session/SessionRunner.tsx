@@ -199,6 +199,7 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
           answered={answered}
           onAnswer={handleAnswer}
           onReady={advance}
+          locale={locale}
         />
       </div>
 

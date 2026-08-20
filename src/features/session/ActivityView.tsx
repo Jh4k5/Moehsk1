@@ -527,7 +527,7 @@ function PinyinMatch({
 
   return (
     <>
-      <Prompt title={ts('طابِق كل حرف بنطقه', 'Match each character to how it sounds')} />
+      <Prompt title={t('طابِق كل حرف بنطقه', 'Match each character to how it sounds')} />
       <div className="j-match">
         <ul className="j-match-col">
           {activity.pairs.map((pair, i) => (
@@ -577,11 +577,14 @@ function SentenceOrder({
   activity,
   answered,
   onAnswer,
+  locale,
 }: {
   activity: Extract<Activity, { kind: 'sentence-order' }>
   answered: boolean
   onAnswer: (correct: boolean) => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   const [built, setBuilt] = useState<number[]>([])
   const remaining = activity.tokens.map((_, i) => i).filter((i) => !built.includes(i))
 
@@ -596,10 +599,10 @@ function SentenceOrder({
 
   return (
     <>
-      <Prompt title={ts('رتّب الكلمات لتكوّن الجملة', 'Put the words in order to make the sentence')} sub={activity.sentence.ar} />
+      <Prompt title={t('رتّب الكلمات لتكوّن الجملة', 'Put the words in order to make the sentence')} sub={activity.sentence.ar} />
       <div className="j-build-line">
         {built.length === 0 && (
-          <span className="j-build-empty">{ts('اضغط الكلمات بالترتيب', 'Tap the words in order')}</span>
+          <span className="j-build-empty">{t('اضغط الكلمات بالترتيب', 'Tap the words in order')}</span>
         )}
         {built.map((i) => (
           <button
@@ -650,12 +653,15 @@ function PronounceRecorder({
   passScore,
   disabled,
   onResult,
+  locale,
 }: {
   target: string
   passScore: number
   disabled: boolean
   onResult: (passed: boolean) => void
+  locale: Locale
 }) {
+  const t = makeT(locale)
   const [state, setState] = useState<'idle' | 'listening' | 'done'>('idle')
   const [score, setScore] = useState<number | null>(null)
 
@@ -698,10 +704,10 @@ function PronounceRecorder({
       </button>
       <span className="j-record-hint">
         {state === 'listening'
-          ? ts('أستمع…', 'Listening…')
+          ? t('أستمع…', 'Listening…')
           : score !== null
             ? `${score}%`
-            : ts('اضغط وتحدّث', 'Tap, then speak')}
+            : t('اضغط وتحدّث', 'Tap, then speak')}
       </span>
     </div>
   )

@@ -1,6 +1,11 @@
 'use client'
-// ─── The tutor — rules engine first, so the common question costs nothing ───
-import { useEffect, useRef, useState } from 'react'
+// ─── المعلّم بمستويين ───────────────────────────────────────────────────────
+//
+// محرك القواعد يعمل هنا في المتصفح: يقرأ تقدّم الطالب الحقيقي من المتجر ويجيب
+// فوراً بلا شبكة ولا تكلفة. لا يخرج طلب واحد إلى /api/tutor إلا حين يعلن
+// المحرك عجزه (`resolved === false`) — والخادم يعيد الحكم بنفسه على كل حال،
+// فلا يستطيع هذا الملف أن يفتعل استدعاءً مدفوعاً.
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,6 +17,29 @@ import { ts } from '@/lib/i18n'
 import { useLearningStore } from '@/lib/store'
 import { type VocabWord } from '@/data/vocabulary'
 
+/** حالة الطبقة الثانية كما يرويها الخادم — لا يُقرَّر منها شيء هنا، إنما تُعرض. */
+interface TutorStatus {
+  tutorEnabled: boolean
+  signedIn: boolean
+  isSubscriber: boolean
+  modelConfigured: boolean
+  limit: number
+  used: number | null
+  remaining: number | null
+  notice: string | null
+}
+
+interface TutorApiResponse {
+  ok: boolean
+  tier?: 'rules' | 'model'
+  text?: string
+  followUps?: string[]
+  notice?: string
+  code?: string
+  usage?: { used: number; limit: number; remaining: number } | null
+  error?: string
+}
+
 export default function ChatSection() {
   const store = useLearningStore()
   const activeLevelBundle = useActiveLevel()
@@ -21,20 +49,70 @@ export default function ChatSection() {
   const [isTyping, setIsTyping] = useState(false)
   const [followUps, setFollowUps] = useState<string[]>([])
   const pendingQuizRef = useRef<TutorQuiz | null>(null)
+  const [status, setStatus] = useState<TutorStatus | null>(null)
+  // أي طبقة أجابت آخر مرة، وما التنبيه المرافق. يُعرضان على آخر رد فقط: التاريخ
+  // محفوظ في المتجر بلا هذه البيانات، وادّعاء طبقةٍ لرسالة قديمة سيكون كذباً.
+  const [lastTier, setLastTier] = useState<'rules' | 'model' | null>(null)
+  const [lastNotice, setLastNotice] = useState<string | null>(null)
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [store.chatMessages])
 
+  const refreshStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/tutor', { method: 'GET' })
+      if (!res.ok) return
+      setStatus((await res.json()) as TutorStatus)
+    } catch {
+      // الحالة زينة معلوماتية: تعذّر جلبها لا يمنع محرك القواعد من العمل.
+    }
+  }, [])
+
+  // بعد أول رسم لا في أثنائه: حالة الاشتراك والرصيد معلومة خادمية، وجلبها
+  // متزامناً داخل التأثير يُسلسل رسمات لا لزوم لها.
+  useEffect(() => {
+    const t = setTimeout(() => void refreshStatus(), 0)
+    return () => clearTimeout(t)
+  }, [refreshStatus])
+
+  /** الطبقة الثانية: تُستدعى فقط بعد أن يعلن المحرك عجزه. */
+  const askServer = async (userMsg: string, fallbackText: string) => {
+    try {
+      const res = await fetch('/api/tutor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg, level, lang: store.lang }),
+      })
+      const data = (await res.json()) as TutorApiResponse
+      store.addChatMessage({ role: 'assistant', content: data.text || fallbackText })
+      setLastTier(data.tier ?? 'rules')
+      setLastNotice(data.notice ?? null)
+      setFollowUps(data.followUps || [])
+      if (data.usage) {
+        setStatus((prev) =>
+          prev ? { ...prev, used: data.usage!.used, remaining: data.usage!.remaining, limit: data.usage!.limit } : prev,
+        )
+      } else {
+        void refreshStatus()
+      }
+    } catch {
+      store.addChatMessage({ role: 'assistant', content: fallbackText })
+      setLastTier('rules')
+      setLastNotice(ts('تعذّر الاتصال بالمعلّم الذكي. هذه إجابة محرك الشرح المجاني.', 'Could not reach the AI tutor. This is the free rule engine answer.'))
+    }
+  }
+
   const handleSend = (text?: string) => {
     const userMsg = (text ?? input).trim()
-    if (!userMsg) return
+    if (!userMsg || isTyping) return
     setInput('')
     setFollowUps([])
+    setLastNotice(null)
     store.addChatMessage({ role: 'user', content: userMsg })
     setIsTyping(true)
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const weakWords = store
         .getWeakWordIds(10)
         .map((id) => vocabulary.find((w) => w.id === id))
@@ -55,11 +133,32 @@ export default function ChatSection() {
         grammarPractice: activeLevelBundle.grammarPractice,
       })
       if (reply.quiz !== undefined) pendingQuizRef.current = reply.quiz
-      store.addChatMessage({ role: 'assistant', content: reply.text })
-      setFollowUps(reply.followUps || [])
+
+      if (reply.resolved === false) {
+        // عجز المحرك: هنا وحده يجوز أن يكلّف السؤال شيئاً.
+        await askServer(userMsg, reply.text)
+      } else {
+        store.addChatMessage({ role: 'assistant', content: reply.text })
+        setLastTier('rules')
+        setFollowUps(reply.followUps || [])
+      }
       setIsTyping(false)
-    }, 500 + Math.random() * 700)
+    }, 400 + Math.random() * 400)
   }
+
+  /** سطر الحالة: ما الذي يعمل الآن، وكم بقي للطالب اليوم. */
+  const statusLine = (() => {
+    if (!status) return null
+    if (!status.tutorEnabled) return ts('المعلّم الذكي موقوف — محرك الشرح المجاني يعمل.', 'AI tutor is off — the free rule engine is running.')
+    if (!status.modelConfigured) return ts('المعلّم الذكي غير مهيّأ على الخادم — محرك الشرح المجاني يعمل.', 'AI tutor is not configured — the free rule engine is running.')
+    if (!status.signedIn) return ts('سجّل الدخول لتسأل المعلّم الذكي عمّا يعجز عنه الشرح الآلي.', 'Sign in to ask the AI tutor what the rule engine cannot answer.')
+    if (!status.isSubscriber) return ts('المعلّم الذكي للمشتركين — شرح الكلمات والقواعد مجاني للجميع.', 'The AI tutor is for subscribers — word and grammar explanations are free for everyone.')
+    if (status.remaining === null) return null
+    return ts(
+      `بقي لك ${status.remaining} من ${status.limit} سؤالاً للمعلّم الذكي اليوم.`,
+      `${status.remaining} of ${status.limit} AI tutor questions left today.`,
+    )
+  })()
 
   const quickQuestions = [
     ts('ما معنى 你好؟', 'What does 你好 mean?'),
@@ -80,6 +179,9 @@ export default function ChatSection() {
         </Button>
       </div>
       <p className="text-[var(--text-muted)] text-sm">{ts('اسألني عن أي كلمة صينية أو احصل على نصائح للتعلم!','Ask me about any Chinese word or get study tips!')}</p>
+      {statusLine && (
+        <p className="text-xs text-[var(--text-muted)] border-s-2 border-primary/40 ps-2">{statusLine}</p>
+      )}
 
       {/* Chat Messages */}
       <Card className="j-card border-0 shadow-sm">
@@ -125,9 +227,21 @@ export default function ChatSection() {
                     <div className="flex items-center gap-1 mb-1">
                       <Bot className="w-3 h-3 text-primary" />
                       <span className="text-xs font-medium text-primary">{ts('المعلم','Tutor')}</span>
+                      {i === store.chatMessages.length - 1 && lastTier && (
+                        <span className="text-[10px] rounded-full px-2 py-0.5 bg-primary/10 text-primary">
+                          {lastTier === 'model'
+                            ? ts('المعلّم الذكي', 'AI tutor')
+                            : ts('شرح مجاني', 'free rule engine')}
+                        </span>
+                      )}
                     </div>
                   )}
                   <div className="text-sm whitespace-pre-line leading-relaxed">{msg.content}</div>
+                  {msg.role === 'assistant' && i === store.chatMessages.length - 1 && lastNotice && (
+                    <div className="mt-2 text-xs text-[var(--text-muted)] border-t border-[var(--text-muted)]/20 pt-2">
+                      {lastNotice}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}

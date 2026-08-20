@@ -23,20 +23,31 @@ import { publicLevel } from '@/data/public-index.generated'
 import { useActiveLevel } from '@/lib/levels'
 import { hrefFor } from '@/components/nav/nav-model'
 import { isDueForReview } from '@/lib/srs'
+import { makeT, type Locale } from '@/lib/locale'
 import type { HskLevelNo } from '@/lib/curriculum/types'
 
-const AR = new Intl.NumberFormat('ar-EG')
-const LEVEL_LABEL: Record<HskLevelNo, string> = {
-  1: 'HSK 1 · المستوى الأول',
-  2: 'HSK 2 · المستوى الثاني',
-  3: 'HSK 3 · المستوى الثالث',
+// `ar-EG` renders Arabic-Indic digits (٧). An English reader needs Latin ones,
+// so the formatter follows the route's locale like everything else here.
+const NUM = { ar: new Intl.NumberFormat('ar-EG'), en: new Intl.NumberFormat('en-US') } as const
+const LEVEL_LABEL: Record<Locale, Record<HskLevelNo, string>> = {
+  ar: {
+    1: 'HSK 1 · المستوى الأول',
+    2: 'HSK 2 · المستوى الثاني',
+    3: 'HSK 3 · المستوى الثالث',
+  },
+  en: {
+    1: 'HSK 1 · Level one',
+    2: 'HSK 2 · Level two',
+    3: 'HSK 3 · Level three',
+  },
 }
 
 /** Rough minutes for a unit: ~15s per activity, and a unit runs 34–42. */
 const MINUTES_PER_UNIT = 9
 
-function greeting(): string {
+function greeting(locale: Locale): string {
   const h = new Date().getHours()
+  if (locale === 'en') return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
   if (h < 12) return 'صباح الخير'
   if (h < 17) return 'طاب يومك'
   return 'مساء الخير'
@@ -44,6 +55,8 @@ function greeting(): string {
 
 export default function HomeSection() {
   const locale = useLocale()
+  const t = makeT(locale)
+  const AR = NUM[locale]
   const store = useLearningStore()
   const level = store.currentLevel as HskLevelNo
 
@@ -107,8 +120,8 @@ export default function HomeSection() {
         <div className="j-home-brandrow">
           <span className="j-home-mark"><Logo variant="icon" size={22} /></span>
           <span className="j-home-brand">
-            <span className="j-home-brand-ar">جسر إلى الصين</span>
-            <span className="j-home-brand-level">{LEVEL_LABEL[level]}</span>
+            <span className="j-home-brand-ar">{t('جسر إلى الصين', 'Bridge to China')}</span>
+            <span className="j-home-brand-level">{LEVEL_LABEL[locale][level]}</span>
           </span>
           <span className="j-home-streak">
             <Flame size={15} aria-hidden />
@@ -117,11 +130,20 @@ export default function HomeSection() {
         </div>
 
         <div className="j-home-greeting">
-          <h1>{greeting()}{store.profile?.name ? ` يا ${store.profile.name}` : ''}</h1>
+          <h1>
+            {greeting(locale)}
+            {store.profile?.name ? t(` يا ${store.profile.name}`, `, ${store.profile.name}`) : ''}
+          </h1>
           <p>
             {next
-              ? `وحدة واحدة${dueWords.length > 0 ? ` و${AR.format(dueWords.length)} مراجعة` : ''} — نحو ${AR.format(minutes)} دقيقة.`
-              : 'أنهيت هذا المستوى — اختر مستوى آخر من صفحة مسارك.'}
+              ? t(
+                  `وحدة واحدة${dueWords.length > 0 ? ` و${AR.format(dueWords.length)} مراجعة` : ''} — نحو ${AR.format(minutes)} دقيقة.`,
+                  `One unit${dueWords.length > 0 ? ` and ${AR.format(dueWords.length)} to review` : ''} — about ${AR.format(minutes)} minutes.`,
+                )
+              : t(
+                  'أنهيت هذا المستوى — اختر مستوى آخر من صفحة مسارك.',
+                  'You have finished this level — pick another one from your path.',
+                )}
           </p>
         </div>
       </header>
@@ -132,20 +154,22 @@ export default function HomeSection() {
           is the drop-off this whole rebuild exists to prevent. */}
       {!primerDone && stats.doneUnits === 0 ? (
         <section className="j-next-card" aria-labelledby="j-next-title">
-          <span className="j-next-eyebrow">ابدأ من هنا</span>
-          <h2 id="j-next-title">تمهيد المبتدئ</h2>
+          <span className="j-next-eyebrow">{t('ابدأ من هنا', 'Start here')}</span>
+          <h2 id="j-next-title">{t('تمهيد المبتدئ', 'Beginner primer')}</h2>
           <p className="j-next-goal">
-            ما هي الصينية ولماذا لا أبجدية لها، وكيف تُبنى الرموز من جذورها، والنبرات الأربع،
-            وقراءة البينين. عشر دقائق قبل الدرس الأول — مجانية بالكامل.
+            {t(
+              'ما هي الصينية ولماذا لا أبجدية لها، وكيف تُبنى الرموز من جذورها، والنبرات الأربع، وقراءة البينين. عشر دقائق قبل الدرس الأول — مجانية بالكامل.',
+              'What Chinese is and why it has no alphabet, how characters are built from their radicals, the four tones, and how to read pinyin. Ten minutes before lesson one — free, all of it.',
+            )}
           </p>
           <Link href={`/${locale}/primer`} className="j-next-cta">
-            <span>ابدأ التمهيد</span>
+            <span>{t('ابدأ التمهيد', 'Start the primer')}</span>
             <ChevronLeft size={17} aria-hidden />
           </Link>
         </section>
       ) : next ? (
         <section className="j-next-card" aria-labelledby="j-next-title">
-          <span className="j-next-eyebrow">التالي في مسارك</span>
+          <span className="j-next-eyebrow">{t('التالي في مسارك', 'Next on your path')}</span>
           <h2 id="j-next-title">{next.title}</h2>
           {/*
             Chips, not a "·"-separated line.
@@ -160,8 +184,8 @@ export default function HomeSection() {
             between the numbers at all.
           */}
           <ul className="j-next-facts">
-            <li>الدرس {AR.format(next.ref.lesson)}</li>
-            <li>{AR.format(next.wordIds.length)} كلمات</li>
+            <li>{t(`الدرس ${AR.format(next.ref.lesson)}`, `Lesson ${AR.format(next.ref.lesson)}`)}</li>
+            <li>{t(`${AR.format(next.wordIds.length)} كلمات`, `${AR.format(next.wordIds.length)} words`)}</li>
             {grammarName && <li className="j-next-fact-wide">{grammarName}</li>}
           </ul>
 
@@ -181,14 +205,20 @@ export default function HomeSection() {
             href={`/${locale}/path/${next.ref.level}/${next.ref.lesson}/${next.ref.unit}`}
             className="j-next-cta"
           >
-            <span>{stats.doneUnits === 0 ? 'ابدأ الوحدة الأولى' : 'تابع الوحدة'}</span>
+            <span>
+              {stats.doneUnits === 0
+                ? t('ابدأ الوحدة الأولى', 'Start the first unit')
+                : t('تابع الوحدة', 'Continue the unit')}
+            </span>
             <ChevronLeft size={17} aria-hidden />
           </Link>
         </section>
       ) : (
         <section className="j-next-card j-next-done">
-          <h2>أتممت المستوى</h2>
-          <Link href={hrefFor(locale, 'lessons')} className="j-next-cta"><span>اختر مستوى آخر</span></Link>
+          <h2>{t('أتممت المستوى', 'Level complete')}</h2>
+          <Link href={hrefFor(locale, 'lessons')} className="j-next-cta">
+            <span>{t('اختر مستوى آخر', 'Pick another level')}</span>
+          </Link>
         </section>
       )}
 
@@ -197,13 +227,15 @@ export default function HomeSection() {
         <div className="j-goal">
           <Ring percent={goalPct} colour="var(--brand-gold)" size={46} label={AR.format(todayWords)} />
           <div className="j-goal-text">
-            <span className="j-goal-title">هدف اليوم</span>
-            <span className="j-goal-sub"><bdi>{AR.format(todayWords)}</bdi> من <bdi>{AR.format(goal)} كلمات</bdi></span>
+            <span className="j-goal-title">{t('هدف اليوم', "Today's goal")}</span>
+            <span className="j-goal-sub">
+              <bdi>{AR.format(todayWords)}</bdi> {t('من', 'of')} <bdi>{t(`${AR.format(goal)} كلمات`, `${AR.format(goal)} words`)}</bdi>
+            </span>
           </div>
         </div>
         <div className="j-level-meter">
           <span className="j-level-num" dir="ltr">{AR.format(learned)}<span>/{AR.format(levelWordCount)}</span></span>
-          <span className="j-level-label">كلمة محفوظة</span>
+          <span className="j-level-label">{t('كلمة محفوظة', 'words learned')}</span>
           <div className="j-level-track"><div className="j-level-fill" style={{ width: `${stats.percent}%` }} /></div>
         </div>
       </section>
@@ -212,8 +244,10 @@ export default function HomeSection() {
       {dueWords.length > 0 && (
         <section className="j-due">
           <div className="j-due-head">
-            <h3>مراجعة مستحقة <span className="j-due-count">{AR.format(dueWords.length)}</span></h3>
-            <Link href={hrefFor(locale, 'vocabulary')} className="j-due-all">راجع الكل</Link>
+            <h3>
+              {t('مراجعة مستحقة', 'Due for review')} <span className="j-due-count">{AR.format(dueWords.length)}</span>
+            </h3>
+            <Link href={hrefFor(locale, 'vocabulary')} className="j-due-all">{t('راجع الكل', 'Review all')}</Link>
           </div>
           <ul className="j-due-list">
             {dueWords.map((w) => (
@@ -229,9 +263,19 @@ export default function HomeSection() {
 
       {/* ═══ Streak ═══ */}
       <section className="j-streak-card">
-        <h3>سلسلتك — {AR.format(store.dailyStreak)} {store.dailyStreak === 1 ? 'يوم' : 'أيام'}</h3>
-        <WeekDots activity={store.dailyActivity} />
-        <p>أنهِ وحدة اليوم قبل منتصف الليل لتصل إلى {AR.format(store.dailyStreak + 1)}.</p>
+        <h3>
+          {t(
+            `سلسلتك — ${AR.format(store.dailyStreak)} ${store.dailyStreak === 1 ? 'يوم' : 'أيام'}`,
+            `Your streak — ${AR.format(store.dailyStreak)} ${store.dailyStreak === 1 ? 'day' : 'days'}`,
+          )}
+        </h3>
+        <WeekDots activity={store.dailyActivity} locale={locale} />
+        <p>
+          {t(
+            `أنهِ وحدة اليوم قبل منتصف الليل لتصل إلى ${AR.format(store.dailyStreak + 1)}.`,
+            `Finish today's unit before midnight to reach ${AR.format(store.dailyStreak + 1)}.`,
+          )}
+        </p>
       </section>
     </div>
   )
@@ -257,10 +301,19 @@ function Ring({ percent, colour, size, label }: { percent: number; colour: strin
   )
 }
 
-const DAY_LETTERS = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س']
+const DAY_LETTERS: Record<Locale, string[]> = {
+  ar: ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'],
+  en: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+}
 
 /** The last seven days, filled where something was actually studied. */
-function WeekDots({ activity }: { activity: Record<string, { wordsLearned: number; questionsAnswered: number }> }) {
+function WeekDots({
+  activity,
+  locale,
+}: {
+  activity: Record<string, { wordsLearned: number; questionsAnswered: number }>
+  locale: Locale
+}) {
   const today = new Date()
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today)
@@ -268,7 +321,7 @@ function WeekDots({ activity }: { activity: Record<string, { wordsLearned: numbe
     const entry = activity[d.toDateString()]
     return {
       key: d.toDateString(),
-      letter: DAY_LETTERS[d.getDay()],
+      letter: DAY_LETTERS[locale][d.getDay()],
       active: Boolean(entry && (entry.questionsAnswered > 0 || entry.wordsLearned > 0)),
     }
   })

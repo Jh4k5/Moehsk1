@@ -3,12 +3,14 @@
  * apply-mnemonics3.js — fill the empty `mnemonic` field of the HSK3 words
  * from scripts/translations/hsk3-mnemonic-*.json (batches merged in order).
  * Only an EMPTY mnemonic is written to, so re-running is safe and an already
- * authored hook is never overwritten.
+ * authored hook is never overwritten. Pass --force to also rewrite the ones
+ * already filled from these same batch files (used when a hook is revised).
  */
 const fs = require('fs');
 const path = require('path');
 const { ROOT } = require('./ts-load');
 
+const FORCE = process.argv.includes('--force');
 const DIR = path.join(ROOT, 'scripts/translations');
 const batches = fs.readdirSync(DIR).filter((f) => /^hsk3-mnemonic-\d+\.json$/.test(f)).sort();
 
@@ -30,9 +32,10 @@ let applied = 0, skipped = 0;
 for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
   const m = line.match(/^\s*\{id:\s*(\d+),/);
   if (!m || !tr[m[1]]) { out.push(line); continue; }
-  const rep = line.replace(/mnemonic:\s*(['"])\1/, () => { applied++; return `mnemonic:${JSON.stringify(tr[m[1]])}`; });
-  if (rep === line) skipped++;
+  const pat = FORCE ? /mnemonic:\s*(['"])(?:[^'"\\]|\\.)*?\1/ : /mnemonic:\s*(['"])\1/;
+  const rep = line.replace(pat, () => { applied++; return `mnemonic:${JSON.stringify(tr[m[1]])}`; });
+  if (rep === line) skipped++;   // pattern did not match (e.g. already filled, not --force)
   out.push(rep);
 }
 fs.writeFileSync(file, out.join('\n'));
-console.log(`${rel}: ${applied} mnemonic(s) applied${skipped ? `, ${skipped} already had one` : ''}`);
+console.log(`${rel}: ${applied} line(s) matched, ${applied - skipped} changed, ${skipped} already identical`);

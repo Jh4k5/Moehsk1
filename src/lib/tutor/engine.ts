@@ -401,11 +401,28 @@ function runRules(raw: string, ctx: TutorContext): TutorReply {
       const w = words[0]
       return { text: wordCard(w, ctx), followUps: [`أمثلة على ${w.zh}`, `كيف أنطق ${w.zh}؟`, 'اختبرني'], quiz: null }
     }
-    if (extractHanzi(message).join('').length >= 2 && words.length >= 2) {
+    const hanziRun = extractHanzi(message).join('')
+    if (hanziRun.length >= 2 && words.length >= 2) {
       // جملة/عبارة صينية: فكّكها كلمة كلمة
       const lines = ['🔍 تحليل العبارة كلمة كلمة:', '']
       for (const w of words.slice(0, 6)) {
         lines.push(`• **${w.zh}** (${w.pinyin}) — ${w.meaning}`)
+      }
+      // كم من حروف الجملة غطّاه المعجم فعلاً؟ تفكيكٌ ناقص ليس ترجمة، ومن يطلب
+      // ترجمة جملة كاملة لا يكفيه أن نعرف نصفها.
+      const covered = Math.min(
+        words.reduce((n, w) => n + (message.includes(w.zh) ? w.zh.length : 0), 0),
+        hanziRun.length,
+      )
+      const coverage = covered / hanziRun.length
+      const wantsFullMeaning = /(ترجم|بالعربي|معني الجمله|translate)/.test(normalized)
+      if (coverage < 0.7 || (wantsFullMeaning && coverage < 1)) {
+        lines.push('', `⚠️ لم يغطِّ معجم هذا المستوى إلا ${Math.round(coverage * 100)}٪ من حروف الجملة، فلا أضمن ترجمتها كاملة.`)
+        return gap('out-of-corpus', {
+          text: lines.join('\n'),
+          followUps: words.slice(0, 2).map((w) => `اشرح ${w.zh}`),
+          quiz: null,
+        })
       }
       lines.push('', 'اسألني عن أي كلمة منها لشرح أوسع!')
       return { text: lines.join('\n'), followUps: words.slice(0, 2).map((w) => `اشرح ${w.zh}`), quiz: null }

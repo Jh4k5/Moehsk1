@@ -19,8 +19,12 @@ import { useLearningStore } from '@/lib/store'
 import { useLocale } from '@/components/nav/use-locale'
 import { hrefFor } from '@/components/nav/nav-model'
 import { speak } from '@/lib/tts'
+import { ts } from '@/lib/i18n'
+import { makeT, type Locale } from '@/lib/locale'
 
-const AR = new Intl.NumberFormat('ar-EG')
+// Follows the route's locale: `ar-EG` prints Arabic-Indic digits, which is not
+// a count an English reader can parse.
+const NUM = { ar: new Intl.NumberFormat('ar-EG'), en: new Intl.NumberFormat('en-US') } as const
 
 type Step = { chapter: number; index: number; kind: 'card' | 'check' }
 
@@ -37,7 +41,9 @@ function buildSteps(): Step[] {
 const STEPS = buildSteps()
 
 export default function PrimerSection() {
-  const locale = useLocale()
+  const locale: Locale = useLocale()
+  const t = makeT(locale)
+  const AR = NUM[locale]
   const completePrimer = useLearningStore((s) => s.completePrimer)
   const [at, setAt] = useState(0)
   const [picked, setPicked] = useState<number | null>(null)
@@ -61,12 +67,16 @@ export default function PrimerSection() {
     return (
       <div className="j-primer-done">
         <span className="j-medal"><Check size={40} aria-hidden /></span>
-        <h1>أنت جاهز للدرس الأول</h1>
+        <h1>{t('أنت جاهز للدرس الأول', 'You are ready for lesson one')}</h1>
         <p>
-          تعرف الآن لماذا لا توجد أبجدية صينية، وكيف تُبنى الرموز من جذورها، وما تفعله النبرات
-          الأربع، وكيف يُقرأ البينين. الباقي تمرين.
+          {t(
+            'تعرف الآن لماذا لا توجد أبجدية صينية، وكيف تُبنى الرموز من جذورها، وما تفعله النبرات الأربع، وكيف يُقرأ البينين. الباقي تمرين.',
+            'You now know why Chinese has no alphabet, how characters are built from their radicals, what the four tones do, and how pinyin is read. The rest is practice.',
+          )}
         </p>
-        <Link href={hrefFor(locale, 'lessons')} className="j-next-cta">ابدأ الدرس الأول</Link>
+        <Link href={hrefFor(locale, 'lessons')} className="j-next-cta">
+          {t('ابدأ الدرس الأول', 'Start lesson one')}
+        </Link>
       </div>
     )
   }
@@ -74,7 +84,11 @@ export default function PrimerSection() {
   return (
     <div className="j-primer">
       <header className="j-session-bar">
-        <Link href={hrefFor(locale, 'lessons')} className="j-session-close" aria-label="أغلق التمهيد">
+        <Link
+          href={hrefFor(locale, 'lessons')}
+          className="j-session-close"
+          aria-label={t('أغلق التمهيد', 'Close the primer')}
+        >
           <X size={20} aria-hidden />
         </Link>
         <div className="j-session-track" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
@@ -111,13 +125,13 @@ function Card({ card, onNext }: { card: PrimerChapter['cards'][number]; onNext: 
           {card.pinyin && <span className="j-primer-pinyin" dir="ltr">{card.pinyin}</span>}
           {card.gloss && <span className="j-primer-gloss">{card.gloss}</span>}
           <button type="button" className="j-listen" onClick={() => speak(card.hanzi!)}>
-            <Volume2 size={14} aria-hidden /> <span>استمع</span>
+            <Volume2 size={14} aria-hidden /> <span>{ts('استمع', 'Listen')}</span>
           </button>
         </div>
       )}
       <p className="j-primer-text">{card.body}</p>
       <button type="button" className="j-ready" onClick={onNext}>
-        متابعة <ArrowLeft size={16} aria-hidden />
+        {ts('متابعة', 'Continue')} <ArrowLeft size={16} aria-hidden />
       </button>
     </>
   )
@@ -163,12 +177,16 @@ function CheckCard({
           <div className="j-verdict-head">
             <span className="j-verdict-icon" aria-hidden>{right ? <Check size={15} /> : <X size={15} />}</span>
             <div>
-              <span className="j-verdict-title">{right ? 'صحيح' : 'ليست الإجابة الصحيحة'}</span>
+              <span className="j-verdict-title">
+                {right ? ts('صحيح', 'Correct') : ts('ليست الإجابة الصحيحة', 'Not the right answer')}
+              </span>
               <p className="j-verdict-why">{check.because}</p>
             </div>
           </div>
           <div className="j-verdict-actions">
-            <button type="button" className="j-verdict-next" onClick={onNext}>تابع</button>
+            <button type="button" className="j-verdict-next" onClick={onNext}>
+              {ts('تابع', 'Continue')}
+            </button>
           </div>
         </div>
       )}

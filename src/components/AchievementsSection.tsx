@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLearningStore } from '@/lib/store'
 import { Analytics } from '@/lib/analytics'
+import { ts, tsPick } from '@/lib/i18n'
 
 // ─── localStorage helpers ─────────────────────────────────────────────
 const STORAGE_KEY = 'achievements'
@@ -35,6 +36,23 @@ function getUnlockedIds(): string[] {
 function saveUnlockedIds(ids: string[]) {
   if (typeof window === 'undefined') return
   localStorage.setItem(STORAGE_KEY, JSON.stringify(ids))
+}
+
+// ─── English gloss per achievement ──────────────────────────────────
+// `src/data/achievements.ts` is not this file's to edit (it belongs to a
+// parallel agent), so the English text lives here, keyed by the same id the
+// data file already exports — the same pattern as `achievementIcons` below.
+const achievementEn: Record<string, { title: string; desc: string }> = {
+  first_word: { title: 'A real start', desc: 'Learn at least one word' },
+  fifty_words: { title: 'Fifty words!', desc: 'Learn 50 Chinese words' },
+  hundred_words: { title: 'The first hundred', desc: 'Learn 100 Chinese words' },
+  all_words: { title: 'HSK 1 mastered', desc: 'Learn every word in level one (405 words)' },
+  streak_7: { title: 'A full week', desc: 'Keep a 7-day study streak' },
+  streak_30: { title: 'A month of showing up', desc: 'Keep a 30-day study streak' },
+  perfect_pron: { title: 'Pronunciation pro', desc: 'Finish 20 units — pronunciation drills and all' },
+  first_exam_pass: { title: 'You passed!', desc: 'Finish a full lesson, exam questions included' },
+  hanzi_writer: { title: 'Character calligrapher', desc: 'Write 20 characters on the tracing board' },
+  conv_master: { title: 'Sharp conversationalist', desc: 'Finish 30 units, role-plays included' },
 }
 
 // ─── Icon map for achievements ────────────────────────────────────────
@@ -149,10 +167,10 @@ export default function AchievementsSection() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-foreground sm:text-2xl">
-              🏅 الإنجازات
+              {ts('🏅 الإنجازات', '🏅 Achievements')}
             </h2>
             <p className="text-sm text-muted-foreground">
-              تتبع تقدمك وحقق المزيد
+              {ts('تتبع تقدمك وحقق المزيد', 'Track your progress and unlock more')}
             </p>
           </div>
         </div>
@@ -161,7 +179,7 @@ export default function AchievementsSection() {
           <span className="text-2xl font-bold text-[var(--clr-warning)] sm:text-3xl">
             {totalPoints}
           </span>
-          <span className="text-sm text-[var(--clr-warning)]/70">نقطة</span>
+          <span className="text-sm text-[var(--clr-warning)]/70">{ts('نقطة', 'points')}</span>
         </div>
       </div>
 
@@ -169,7 +187,10 @@ export default function AchievementsSection() {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-sm">
           <span className="text-muted-foreground">
-            {unlockedCount} من {totalAchievements} إنجاز مفتوح
+            {ts(
+              `${unlockedCount} من ${totalAchievements} إنجاز مفتوح`,
+              `${unlockedCount} of ${totalAchievements} achievements unlocked`,
+            )}
           </span>
           <Badge
             variant="outline"
@@ -229,13 +250,13 @@ export default function AchievementsSection() {
                     isUnlocked ? 'text-[var(--clr-warning)]' : 'text-[var(--text-muted)]'
                   }`}
                 >
-                  {isUnlocked ? achievement.titleAr : '???'}
+                  {isUnlocked ? tsPick(achievement.titleAr, achievementEn[achievement.id]?.title) : '???'}
                 </h3>
 
                 {/* Description (only for unlocked) */}
                 {isUnlocked && (
                   <p className="mb-2 text-xs text-[var(--text-muted)] leading-relaxed line-clamp-2">
-                    {achievement.descAr}
+                    {tsPick(achievement.descAr, achievementEn[achievement.id]?.desc)}
                   </p>
                 )}
 
@@ -246,13 +267,13 @@ export default function AchievementsSection() {
                     className="mt-2 bg-[var(--clr-warning)]/10 border border-[var(--clr-warning)]/20"
                   >
                     <span className="text-[var(--clr-warning)] font-bold text-sm">
-                      +{achievement.points} نقطة
+                      {ts(`+${achievement.points} نقطة`, `+${achievement.points} points`)}
                     </span>
                   </Badge>
                 ) : (
                   <div className="mt-2 text-xs text-[var(--text-tertiary)]">
-                    <Star className="inline h-3 w-3 ml-1" />
-                    {achievement.points} نقطة
+                    <Star className="inline h-3 w-3 me-1" />
+                    {ts(`${achievement.points} نقطة`, `${achievement.points} points`)}
                   </div>
                 )}
 
@@ -287,21 +308,21 @@ export default function AchievementsSection() {
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--clr-warning)]/30 to-[var(--gold-700)]/20 border border-[var(--clr-warning)]/30">
                 <span className="text-2xl">{achievement.emoji}</span>
               </div>
-              <div className="flex-1 text-right min-w-0">
+              <div className="flex-1 text-start min-w-0">
                 <p className="text-xs font-medium text-[var(--clr-warning)]/70 mb-0.5">
-                  🎉 إنجاز جديد!
+                  {ts('🎉 إنجاز جديد!', '🎉 New achievement!')}
                 </p>
                 <p className="text-sm font-bold text-[var(--clr-warning)] truncate">
-                  {achievement.titleAr}
+                  {tsPick(achievement.titleAr, achievementEn[achievement.id]?.title)}
                 </p>
                 <p className="text-[var(--clr-warning)] font-bold text-sm mt-0.5">
-                  +{achievement.points} نقطة
+                  {ts(`+${achievement.points} نقطة`, `+${achievement.points} points`)}
                 </p>
               </div>
               <button
                 onClick={() => dismissToast(achievement.id)}
                 className="flex-shrink-0 rounded-full p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-card)] hover:text-[var(--text-primary)]"
-                aria-label="إغلاق"
+                aria-label={ts('إغلاق', 'Close')}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

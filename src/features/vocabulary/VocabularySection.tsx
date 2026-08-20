@@ -164,7 +164,7 @@ export default function VocabularySection() {
         score: bestSim,
         spoken: bestSpoken,
         color: bestSim >= 70 ? 'var(--clr-success)' : 'var(--clr-danger)',
-        msg: bestSim >= 70 ? 'نطق ممتاز! 🎉' : 'حاول مرة أخرى 🎧',
+        msg: bestSim >= 70 ? ts('نطق ممتاز! 🎉', 'Excellent pronunciation! 🎉') : ts('حاول مرة أخرى 🎧', 'Try again 🎧'),
       })
       setIsRecording(false)
     }
@@ -412,7 +412,7 @@ export default function VocabularySection() {
           <Badge variant={hideMastered ? 'default' : 'outline'} className="cursor-pointer text-xs" onClick={() => setHideMastered(v => !v)}>
             {hideMastered ? ts('✓ إخفاء المحفوظ','✓ Hide mastered') : ts('إخفاء المحفوظ','Hide mastered')}
           </Badge>
-          <Badge variant="secondary">{filteredVocab.length} كلمة</Badge>
+          <Badge variant="secondary">{filteredVocab.length} {ts('كلمة', 'words')}</Badge>
         </div>
       </div>
 
@@ -496,7 +496,7 @@ export default function VocabularySection() {
                   <Progress value={progressPercent} className="h-2" />
                   <div className="flex justify-between text-xs text-[var(--text-muted)]">
                     <span>{store.flashcardIndex + 1} {ts('من','of')} {deck.length}</span>
-                    <span>{sessionSeen.size > 0 ? 'شوهد ' + sessionSeen.size : ''}</span>
+                    <span>{sessionSeen.size > 0 ? ts('شوهد ', 'Seen ') + sessionSeen.size : ''}</span>
                   </div>
                 </div>
 
@@ -639,7 +639,7 @@ export default function VocabularySection() {
                             >
                               <Mic size={20} />
                               <span className="text-sm font-bold">
-                                {isRecording ? '🔴 جارٍ التسجيل...' : '🎤 انطق الكلمة'}
+                                {isRecording ? ts('🔴 جارٍ التسجيل...', '🔴 Recording...') : ts('🎤 انطق الكلمة', '🎤 Say the word')}
                               </span>
                             </button>
 

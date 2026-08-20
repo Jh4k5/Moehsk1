@@ -33,9 +33,9 @@ for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
   const m = line.match(/^\s*\{id:\s*(\d+),/);
   if (!m || !tr[m[1]]) { out.push(line); continue; }
   const pat = FORCE ? /mnemonic:\s*(['"])(?:[^'"\\]|\\.)*?\1/ : /mnemonic:\s*(['"])\1/;
-  const rep = line.replace(pat, () => { applied++; return `mnemonic:${JSON.stringify(tr[m[1]])}`; });
-  if (rep === line) skipped++;   // pattern did not match (e.g. already filled, not --force)
+  const rep = line.replace(pat, () => { return `mnemonic:${JSON.stringify(tr[m[1]])}`; });
+  if (rep !== line) applied++; else skipped++;   // skipped: already filled and not --force
   out.push(rep);
 }
 fs.writeFileSync(file, out.join('\n'));
-console.log(`${rel}: ${applied} line(s) matched, ${applied - skipped} changed, ${skipped} already identical`);
+console.log(`${rel}: ${applied} mnemonic(s) written, ${skipped} left untouched (already filled)`);

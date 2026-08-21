@@ -1,8 +1,9 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { AdminNav } from './AdminNav'
+import { BootstrapPanel } from './BootstrapPanel'
 import { getCurrentProfile } from '@/lib/supabase/auth'
-import { isSupabaseConfigured } from '@/lib/supabase/env'
+import { adminBootstrapEmails, isSupabaseConfigured } from '@/lib/supabase/env'
 import { isLocale, type Locale } from '@/lib/locale'
 
 // ─── The owner's panel ──────────────────────────────────────────────────────
@@ -46,8 +47,20 @@ export default async function AdminLayout({
 
   const profile = await getCurrentProfile()
   if (!profile) redirect(`/${locale}/sign-in?next=/${locale}/admin`)
-  // 404, not 403: a non-admin learns nothing about whether this path exists.
-  if (profile.role !== 'admin') notFound()
+
+  if (profile.role !== 'admin') {
+    // The one exception to the 404 below: a signed-in owner whose email is
+    // already in `ADMIN_BOOTSTRAP_EMAILS` gets the activation button instead
+    // of a dead end. This reveals nothing — the address had to be on the
+    // server's list before we got here, and the route it calls re-checks that
+    // list against the verified session email rather than trusting this page.
+    const email = (profile.email ?? '').toLowerCase()
+    if (email && adminBootstrapEmails().includes(email)) {
+      return <BootstrapPanel email={profile.email ?? email} />
+    }
+    // 404, not 403: a non-admin learns nothing about whether this path exists.
+    notFound()
+  }
 
   return (
     <div className="j-admin">

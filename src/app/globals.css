@@ -2327,6 +2327,21 @@
 .j-admin-unconfigured { padding: 3rem 1rem; display: flex; flex-direction: column; gap: 1rem; }
 .j-admin-unconfigured code { padding: 0.125rem 0.375rem; border-radius: 0.25rem; background: var(--surface-card); font-size: 0.8125rem; }
 
+/* First-admin activation — the one screen a not-yet-admin owner can reach. */
+.j-admin-bootstrap { padding: 3rem 1rem; display: flex; flex-direction: column; gap: 1rem; align-items: flex-start; }
+.j-admin-bootstrap h1 { font-family: 'Cairo', sans-serif; font-size: 1.5rem; font-weight: 900; color: var(--text-primary); }
+.j-admin-bootstrap p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.7; max-width: 44ch; }
+.j-admin-bootstrap code { padding: 0.125rem 0.375rem; border-radius: 0.25rem; background: var(--surface-card); font-size: 0.8125rem; }
+.j-admin-activate {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.25rem; border-radius: 0.75rem;
+  background: var(--action); color: var(--action-fg);
+  font-size: 0.9375rem; font-weight: 700; cursor: pointer;
+}
+.j-admin-activate:disabled { opacity: 0.6; cursor: default; }
+.j-admin-activate .j-spin { animation: j-spin 0.9s linear infinite; }
+.j-admin-hint { font-size: 0.8125rem; color: var(--text-muted); }
+
 .j-admin-head {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
   padding: 1.5rem 0 1rem;

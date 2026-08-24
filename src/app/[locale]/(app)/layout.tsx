@@ -13,7 +13,8 @@ import { isLocale, type Locale } from '@/lib/locale'
 // bottom bar plus the header's drawer; at and above it the rail, with the
 // drawer trigger hidden because the rail already lists every section. The
 // 768–1023px band that had neither is gone — both sides now switch on the same
-// number, declared once in `use-mobile.ts` and once as `--bp-desktop` in CSS.
+// number, declared once as `DESKTOP_BREAKPOINT` here and once as
+// `--bp-desktop` in CSS.
 //
 // This layout is a server component. It renders no gate: no `mounted` splash,
 // no `if (!profile) return <OnboardingScreen/>`. Onboarding is a prompt inside

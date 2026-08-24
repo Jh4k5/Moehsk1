@@ -14,7 +14,8 @@
     "check:activities": "node scripts/check-activities.js",
     "check:progress": "node scripts/check-progress.js",
     "check:payments": "node scripts/check-payments.js",
-    "check:admin": "node scripts/check-admin.js"
+    "check:admin": "node scripts/check-admin.js",
+    "verify": "npm run check && npm run build && npm run check:paywall"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

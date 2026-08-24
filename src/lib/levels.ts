@@ -171,16 +171,69 @@ function request(level: HskLevel): void {
     })
 }
 
+/**
+ * The pending bundle for a level, built ONCE and reused.
+ *
+ * This map is load-bearing, and its absence was a platform-wide crash.
+ * `useSyncExternalStore` calls `getSnapshot` on every render and compares the
+ * result with `Object.is`; anything unequal means "the store changed, render
+ * again". `pendingBundle()` builds a fresh object literal, so returning it
+ * directly made every render report a change — an infinite loop, React error
+ * #185, on any level whose content had not arrived yet.
+ *
+ * HSK1 hid the bug completely: it is seeded into `CACHE` above, so it always
+ * returned the same reference and never looped. Only HSK2 and HSK3 took the
+ * pending path — so the very act of choosing a level, the thing the platform
+ * exists to let a learner do, was what broke it. And because the chosen level
+ * is persisted to localStorage, the loop came back on every later page load
+ * until the user cleared their site data.
+ *
+ * Memoising per level keeps the reference stable, so an unresolved level is
+ * simply "the same empty bundle" until the fetch lands and `CACHE` takes over.
+ */
+const PENDING = new Map<HskLevel, LevelBundle>()
+
+function pendingFor(level: HskLevel): LevelBundle {
+  const existing = PENDING.get(level)
+  if (existing) return existing
+  const created = pendingBundle(level, true)
+  PENDING.set(level, created)
+  return created
+}
+
 function snapshot(level: HskLevel): LevelBundle {
   const cached = CACHE.get(level)
   if (cached) return cached
   request(level)
-  return pendingBundle(level, true)
+  return pendingFor(level)
 }
 
 /** Non-hook accessor (tutor engine and other non-React code). */
 export function getLevelBundle(level: HskLevel): LevelBundle {
-  return CACHE.get(level) ?? (level === 1 ? HSK1_BUNDLE : pendingBundle(level, true))
+  return CACHE.get(level) ?? (level === 1 ? HSK1_BUNDLE : pendingFor(level))
+}
+
+/**
+ * One NAMED level's content, whoever is asking.
+ *
+ * Use this wherever the level is known from the route rather than from the
+ * learner's current selection — a unit session is the case that matters. It
+ * used to read `store.currentLevel`, so opening a link to an HSK2 unit while
+ * the store still said HSK1 handed the activity engine HSK1's word list. None
+ * of the unit's ids matched, the stream came out empty, and the learner was
+ * told «لا يوجد محتوى لهذه الوحدة بعد» — "there is no content for this unit
+ * yet" — over 195 authored words. Not a paywall, not an upsell: a flat lie
+ * about the product being empty.
+ */
+export function useLevel(level: HskLevel): LevelBundle {
+  return useSyncExternalStore(
+    subscribe,
+    () => snapshot(level),
+    // The server has no cache and must not start a fetch: it renders the
+    // pending shape, and the browser fills it in on the next render. Same
+    // memoised reference as the client path, or hydration would see a change.
+    () => (level === 1 ? HSK1_BUNDLE : pendingFor(level)),
+  )
 }
 
 /**
@@ -191,12 +244,5 @@ export function getLevelBundle(level: HskLevel): LevelBundle {
  */
 export function useActiveLevel(): LevelBundle {
   const level = useLearningStore((s) => s.currentLevel) as HskLevel
-  const bundle = useSyncExternalStore(
-    subscribe,
-    () => snapshot(level),
-    // The server has no cache and must not start a fetch: it renders the
-    // pending shape, and the browser fills it in on the next render.
-    () => (level === 1 ? HSK1_BUNDLE : pendingBundle(level, true)),
-  )
-  return bundle
+  return useLevel(level)
 }

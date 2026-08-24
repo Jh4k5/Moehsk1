@@ -16,7 +16,7 @@ import { Check, Flame, HelpCircle, X } from 'lucide-react'
 import { ActivityView } from './ActivityView'
 import { UnitComplete } from './UnitComplete'
 import { buildActivityStream } from '@/lib/curriculum/activity-engine'
-import { useActiveLevel } from '@/lib/levels'
+import { useLevel } from '@/lib/levels'
 import { toStoryRecords, type LevelContent, type QaItem } from '@/lib/curriculum/content-types'
 import { unitPassed } from '@/lib/curriculum/progress'
 import { useLearningStore } from '@/lib/store'
@@ -35,10 +35,16 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
   const toggleLearned = useLearningStore((s) => s.toggleLearned)
   const dailyStreak = useLearningStore((s) => s.dailyStreak)
 
-  // The level's content, fetched and already filtered by entitlement. The
-  // engine used to import the data modules itself, which put all three levels
-  // into this component's bundle — and this component mounts on a public route.
-  const active = useActiveLevel()
+  // The content of the level THIS UNIT belongs to — read from the route, not
+  // from the learner's currently-selected level. Those two disagree whenever
+  // someone opens a link to a unit outside their current selection, and this
+  // used to call `useActiveLevel()`: the engine then received HSK1's words for
+  // an HSK2 unit, matched none of its ids, produced an empty stream, and the
+  // screen claimed the unit had no content at all.
+  //
+  // Entitlement is unaffected — `/api/content/[level]` still decides what this
+  // viewer may actually receive. This only stops us asking for the wrong level.
+  const active = useLevel(unit.ref.level)
 
   const content = useMemo<LevelContent>(
     () => ({

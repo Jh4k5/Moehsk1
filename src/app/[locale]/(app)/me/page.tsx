@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import SettingsSection from '@/components/SettingsSection'
 import { AppHeader } from '@/components/nav/AppHeader'
+import { AccountPanel } from '@/features/account/AccountPanel'
 import { SectionErrorBoundary } from '@/features/shared/SectionErrorBoundary'
 import { isLocale, makeT, type Locale } from '@/lib/locale'
 
@@ -25,6 +26,7 @@ export default async function MePage({
   return (
     <>
       <AppHeader locale={locale} />
+      <AccountPanel locale={locale} />
       <SectionErrorBoundary sectionName="حسابي">
       <SettingsSection />
       </SectionErrorBoundary>

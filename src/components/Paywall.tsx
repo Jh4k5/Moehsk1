@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { usePaywall } from '@/lib/paywall-context'
-import { usePricing } from '@/lib/config/client'
+import { startCheckout, usePricing } from '@/lib/config/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -37,7 +37,7 @@ function TrialBanner() {
 
       <Button
         size="sm"
-        onClick={() => { if (checkoutHref) window.location.assign(checkoutHref) }}
+        onClick={() => { void startCheckout('lifetime', ts('ar', 'en')) }}
         disabled={!checkoutHref}
         className="h-8 gap-1.5 rounded-lg border-0 bg-[var(--green-500)] px-4 text-xs font-bold text-white hover:bg-[var(--green-600)] disabled:opacity-60"
       >
@@ -126,7 +126,7 @@ function PaywallOverlay() {
                     </div>
                     <h3 className="mb-1 text-2xl font-bold text-white">{ts('انتهت فترة التجربة','Your free trial has ended')}</h3>
                     <p className="text-sm text-[var(--navy-200)]">
-                      احصل على وصول كامل لـ <strong className="text-[var(--gold-300)]">{ts('600+ كلمة','600+ words')}</strong> و <strong className="text-[var(--gold-300)]">{ts('دروس تفاعلية','Interactive lessons')}</strong>
+                      احصل على وصول كامل لـ <strong className="text-[var(--gold-300)]">{ts('١٬٠٧٩ كلمة','1,079 words')}</strong> و <strong className="text-[var(--gold-300)]">{ts('دروس تفاعلية','Interactive lessons')}</strong>
                     </p>
                   </div>
                 </div>
@@ -148,7 +148,7 @@ function PaywallOverlay() {
                   {/* Gumroad purchase button */}
                   <Button
                     size="lg"
-                    onClick={() => { if (checkoutHref) window.location.assign(checkoutHref) }}
+                    onClick={() => { void startCheckout('lifetime', ts('ar', 'en')) }}
                     disabled={!checkoutHref}
                     className="w-full gap-2 rounded-xl border-0 bg-gradient-to-l from-[var(--navy-600)] to-[var(--navy-700)] py-6 text-base font-bold text-white shadow-lg shadow-[var(--navy-500)]/25 hover:from-[var(--navy-700)] hover:to-[var(--navy-800)] disabled:opacity-60"
                   >

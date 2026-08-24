@@ -2578,3 +2578,27 @@
 .j-primer-entry-body { display: flex; flex-direction: column; gap: 0.1875rem; min-width: 0; }
 .j-primer-entry-title { font-size: 0.9375rem; font-weight: 800; font-family: 'Cairo', sans-serif; }
 .j-primer-entry-sub { font-size: 0.75rem; line-height: 1.6; color: var(--text-muted); }
+
+/* ── The account strip on /me ─────────────────────────────────────────────
+   Sign-in and sign-out had no control anywhere in the platform; this is it. */
+.j-account {
+  display: flex; align-items: center; gap: 0.875rem; flex-wrap: wrap;
+  max-width: 30rem; margin: 0.75rem auto 0; padding: 0.875rem 1rem;
+  border: 1px solid var(--line-default); border-radius: 0.875rem;
+  background: var(--surface-card);
+}
+.j-account > svg { flex: none; color: var(--text-muted); }
+.j-account > div { flex: 1; min-width: 8rem; }
+.j-account h2 { font-size: 0.875rem; font-weight: 700; color: var(--text-primary); }
+.j-account p { font-size: 0.75rem; line-height: 1.6; color: var(--text-muted); }
+.j-account-email { font-family: ui-monospace, monospace; }
+.j-account-btn {
+  display: inline-flex; align-items: center; gap: 0.4375rem; flex: none;
+  padding: 0.5rem 0.875rem; border-radius: 0.625rem;
+  background: var(--action); color: var(--action-fg);
+  font-size: 0.8125rem; font-weight: 700; cursor: pointer;
+}
+.j-account-btn-quiet {
+  background: transparent; color: var(--text-muted);
+  border: 1px solid var(--line-default);
+}

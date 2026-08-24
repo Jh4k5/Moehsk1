@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/theme-provider'
 import { PaywallProvider } from '@/lib/paywall-context'
 import { AppConfigProvider } from '@/lib/config/client'
+import { getPublicConfig } from '@/lib/config/server'
 import { LocaleSync } from '@/components/nav/LocaleSync'
 import { HanziScale } from '@/components/nav/HanziScale'
 import { LOCALES, dirOf, isLocale, makeT, type Locale } from '@/lib/locale'
@@ -111,11 +112,18 @@ export default async function LocaleLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
           {/* The owner's settings — price, free-tier size, feature flags —
-              reach every screen from here. No `value` yet means the built-in
-              defaults, whose amounts are all null, so nothing renders a price
-              the owner has not set. Wiring Supabase means passing `value` here
-              and nowhere else. */}
-          <AppConfigProvider>
+              reach every screen from here.
+
+              This `value` is load-bearing and its absence was a silent, total
+              payment failure. Mounted bare, the provider fell back to
+              `DEFAULT_CONFIG`, whose amounts are all null and whose
+              `checkoutEnabled` is false — so the admin panel could write a
+              price to `app_config`, report a successful save, and that price
+              would never appear on any screen and never enable a buy button.
+              The whole config layer was write-only as far as the browser was
+              concerned. `getPublicConfig()` strips `gateway` (secrets) before
+              anything crosses. */}
+          <AppConfigProvider value={await getPublicConfig()}>
             <PaywallProvider>
               <LocaleSync locale={locale} />
               <HanziScale />

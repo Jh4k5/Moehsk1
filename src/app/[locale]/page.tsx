@@ -87,7 +87,13 @@ export default async function LandingPage({
             >
               {t('English', 'العربية')}
             </Link>
-            <Link href={`/${locale}/home`} className="j-landing-ghost-btn">
+            {/* This said "Sign in" and went to /home. Sign-in was fully built
+                — Google OAuth and a magic link — and NOTHING in the platform
+                linked to it, so the only way to reach an account was to type
+                the URL. No account meant no code redemption, no purchase and
+                no sync: the whole paid product hung off a link that pointed
+                at the wrong page. */}
+            <Link href={`/${locale}/sign-in`} className="j-landing-ghost-btn">
               {t('دخول', 'Sign in')}
             </Link>
           </div>

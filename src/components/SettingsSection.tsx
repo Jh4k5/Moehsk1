@@ -6,7 +6,7 @@ import { useMounted } from '@/hooks/use-mounted'
 import { useLearningStore } from '@/lib/store'
 import { useI18n, ts } from '@/lib/i18n'
 import { usePaywall } from '@/lib/paywall-context'
-import { usePricing } from '@/lib/config/client'
+import { startCheckout, usePricing } from '@/lib/config/client'
 import { speak, getChineseVoices } from '@/lib/tts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -304,11 +304,17 @@ export default function SettingsSection() {
                     : t('انتهت التجربة', 'Trial ended')}
                 </Badge>
                 {checkoutHref && (
-                  <a href={checkoutHref} className="text-xs text-primary hover:underline">
+                  // A button, not an <a>: /api/checkout is POST-only and
+                  // answers a GET navigation with 405.
+                  <button
+                    type="button"
+                    onClick={() => { void startCheckout('lifetime', lang) }}
+                    className="text-xs text-primary hover:underline"
+                  >
                     {/* No amount until the owner sets one from the admin panel. */}
                     {t('شراء النسخة الكاملة', 'Buy the full version')}
                     {lifetime ? ` — ${lifetime}` : ''}
-                  </a>
+                  </button>
                 )}
               </div>
               <div className="flex gap-2">

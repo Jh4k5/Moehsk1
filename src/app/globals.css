@@ -791,6 +791,7 @@
      768–1023px band reserved 5rem for a bar that was not there. */
   .j-main-content { padding-bottom: 5rem; }
   .j-header { padding: 0.625rem 1rem; }
+
 }
 
 @media (min-width: 1024px) {
@@ -1466,6 +1467,37 @@
   margin-inline: auto;
   background: var(--surface-page);
 }
+
+/* The one way forward must clear the navigation bar.
+   MEASURED on 390×844, the commonest phone, at the first card of the first
+   lesson: the session's content ran 905px in an 844px viewport, so the
+   «فهمت» / Continue button began at y=807 while the fixed bottom bar begins
+   at y=783 — the button was entirely behind it at first paint.
+   `elementFromPoint` on the button's own centre returned
+   `SPAN.j-bottom-nav-label`, so a tap navigated to «مساري» instead of
+   advancing. THAT is what «الأزرار ما تشتغل» was: not a dead handler, a
+   button underneath the navigation.
+
+   Two fixes were tried and MEASURED AS FAILING before this one, so neither is
+   worth trying again:
+     * `min-height: calc(100dvh - 5rem)` — moot. min-height does nothing when
+       the content is taller than it, which is the normal case here.
+     * `position: sticky; bottom: …` — never engages. An ancestor carries
+       `overflow-x: hidden`, which makes IT the scroll container, so the button
+       stuck to a box as tall as its own content and never moved: measured at
+       `top: 739` in a 667px viewport and a 844px one alike.
+
+   What works is giving the session enough tail that the button can always be
+   scrolled clear of the bar, and never sits under it once the learner reaches
+   the page bottom. Verified: scrolled to the end, the button lands at y=618
+   with the bar at y=783. */
+.j-session { padding-bottom: 2rem; }
+@media (max-width: 1023px) {
+  /* The bar's own 5rem, plus a thumb's breathing room beneath the button. */
+  .j-session { padding-bottom: 7rem; }
+}
+
+
 .j-session-empty { align-items: center; justify-content: center; gap: 1rem; padding: 2rem; text-align: center; }
 
 .j-session-bar {

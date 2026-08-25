@@ -6,6 +6,9 @@ import { LessonStructuredData } from '@/features/marketing/structured-data'
 import { LEVEL_CONTENT, levelSummary, type HskLevel } from '@/features/marketing/level-summary'
 import { LOCALES, isLocale, makeT, type Locale } from '@/lib/locale'
 import { unitsOfLesson } from '@/lib/curriculum'
+import { isLessonFree } from '@/lib/entitlement/policy'
+import { getFreeAccessPolicy } from '@/lib/entitlement/check'
+import type { FreeAccessPolicy } from '@/lib/entitlement/types'
 import type { Lesson } from '@/data/lessons'
 import type { VocabWord } from '@/data/vocabulary'
 
@@ -25,9 +28,6 @@ import type { VocabWord } from '@/data/vocabulary'
 // The words themselves are never serialised into the HTML, so "view source"
 // is not a way around the subscription.
 
-const FREE_LESSON_COUNT = 2
-const FREE_LEVEL: HskLevel = 1
-
 interface Parsed {
   level: HskLevel
   lesson: Lesson
@@ -46,8 +46,22 @@ function parseSlug(slug: string): Parsed | null {
   return { level, lesson: list[index], index }
 }
 
-function isFree(level: HskLevel, index: number): boolean {
-  return level === FREE_LEVEL && index < FREE_LESSON_COUNT
+/**
+ * Is this lesson inside the free tier?
+ *
+ * The rule lives in ONE place — `lib/entitlement/policy` — reading the owner's
+ * `app_config`. It was written out a third time here, as two constants, and
+ * they had already drifted: this page said "level 1 only" while the shipped
+ * config now opens the first two lessons of EVERY level. So an HSK2 learner
+ * was told their free lessons were paid.
+ *
+ * These pages are statically generated marketing pages with no session, so
+ * they show the FREE-TIER view to everyone. A subscriber sees the whole lesson
+ * inside the app, where the session knows who they are.
+ */
+function isFree(level: HskLevel, index: number, policy: FreeAccessPolicy): boolean {
+  // `index` is zero-based; `isLessonFree` counts lessons from 1.
+  return isLessonFree(level, index + 1, policy)
 }
 
 export const dynamicParams = false
@@ -104,7 +118,7 @@ export default async function LessonPage({
 
   const content = LEVEL_CONTENT[level]
   const summary = levelSummary(level)
-  const free = isFree(level, index)
+  const free = isFree(level, index, await getFreeAccessPolicy())
   const units = unitsOfLesson(level, lesson.id)
 
   // Read the words only on the free path. On a paid lesson this array is never

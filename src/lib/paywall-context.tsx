@@ -14,12 +14,6 @@ import { useMounted } from '@/hooks/use-mounted'
 // `usePricing()` below reads the configured amount and returns `null` until one
 // is set — so an unpriced platform shows a call to action with no number,
 // loudly, instead of a plausible wrong number, silently.
-const CONFIG = {
-  TRIAL_MS: 24 * 60 * 60 * 1000, // 1 day trial
-  STORAGE_KEY_OK: 'pw_ok',
-  STORAGE_KEY_TRIAL_START: 'pw_t',
-}
-
 /** What the server renders, and what the client renders on its FIRST pass.
  *  The real state depends on `localStorage` and `Date.now()`, neither of which
  *  exists during prerender — reading them in the initial render is what threw
@@ -56,33 +50,73 @@ function formatTime(ms: number): string {
   return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-// ─── Initial state from localStorage (client-side only) ────
-function readState(): PaywallState {
-  if (typeof window === 'undefined') return SERVER_STATE
+// ─── Where the answer comes from now ────────────────────────
+//
+// THIS FILE USED TO DECIDE WHETHER SOMEONE HAD PAID, IN THE BROWSER.
+//
+//     if (localStorage.getItem('pw_ok') === '1') return { isPaid: true }
+//
+// One line in devtools unlocked the entire paid product. And any anonymous
+// visitor was started on a 24-hour trial that no account and no row backed,
+// so "the trial ended" meant "this browser's clock says so" — a reinstall,
+// another browser, or a cleared cache reset it forever.
+//
+// The verdict now comes from `GET /api/entitlement`, which reads
+// `subscriptions` in Postgres behind RLS and fails closed. `localStorage`
+// keeps nothing but a cached copy for the first paint, and a cached copy can
+// only ever make the UI *slower* to unlock, never wrongly unlocked: the
+// content itself still comes from `/api/content/[level]`, which re-decides
+// server-side and hands a non-subscriber nothing.
 
-  if (localStorage.getItem(CONFIG.STORAGE_KEY_OK) === '1') {
-    return { status: 'active', trialRemaining: 0, isPaid: true }
-  }
+const CACHE_KEY = 'pw_cache'
 
-  // Starting the clock is a write, so it belongs in an effect, not in render.
-  // A missing start time means "the trial has not begun" — it is begun by
-  // `beginTrial()` once, after mount.
-  const startTime = localStorage.getItem(CONFIG.STORAGE_KEY_TRIAL_START)
-  if (!startTime) return SERVER_STATE
+interface ServerVerdict {
+  signedIn: boolean
+  isEntitled: boolean
+  isLifetime: boolean
+  activeUntil: string | null
+}
 
-  const remaining = CONFIG.TRIAL_MS - (Date.now() - Number(startTime))
-  return {
-    status: remaining <= 0 ? 'expired' : 'trial',
-    trialRemaining: Math.max(0, remaining),
-    isPaid: false,
+/** Last known verdict, for the first paint only. Never trusted to unlock. */
+function readCachedVerdict(): ServerVerdict | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as ServerVerdict
+    return typeof parsed?.isEntitled === 'boolean' ? parsed : null
+  } catch {
+    return null
   }
 }
 
-function beginTrial(): void {
-  if (localStorage.getItem(CONFIG.STORAGE_KEY_OK) === '1') return
-  if (!localStorage.getItem(CONFIG.STORAGE_KEY_TRIAL_START)) {
-    localStorage.setItem(CONFIG.STORAGE_KEY_TRIAL_START, Date.now().toString())
+function cacheVerdict(v: ServerVerdict): void {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(v))
+  } catch {
+    // A private window with storage disabled is not an error worth surfacing.
   }
+}
+
+/** Turn the server's verdict into what the screens ask for. */
+function toState(v: ServerVerdict | null): PaywallState {
+  if (!v) return SERVER_STATE
+  if (v.isEntitled) {
+    const remaining = v.isLifetime || !v.activeUntil
+      ? 0
+      : Math.max(0, new Date(v.activeUntil).getTime() - Date.now())
+    return { status: 'active', trialRemaining: remaining, isPaid: true }
+  }
+  // NOT entitled is not the same as "expired". A first-time visitor has two
+  // free lessons waiting at their level; telling them their trial has ended,
+  // over a full-screen wall, before they have read one character, is both
+  // false and the worst possible first impression.
+  //
+  // Locking is per-unit now (`UnitGate` asks the server about THIS unit), so
+  // the blanket overlay has nothing left to protect and plenty to break. It
+  // stays reachable for a real expiry — see `trial.days` in app_config — but
+  // simply not having paid is no longer an expiry.
+  return { status: 'active', trialRemaining: 0, isPaid: false }
 }
 
 // ─── Provider ───────────────────────────────────────────────
@@ -94,29 +128,38 @@ export function PaywallProvider({ children }: { children: ReactNode }) {
   // render later, which is what keeps hydration silent.
   const mounted = useMounted()
 
-  // A clock, not a copy of the state. The trial's remaining time is DERIVED
-  // from `localStorage` on every render rather than mirrored into state and
-  // kept in sync — mirroring is what forced a `setState` inside an effect, and
-  // it meant two sources of truth for one number. This bumps once a second and
-  // once on activation, and the derivation below does the rest.
+  // The server's verdict. `undefined` = not asked yet.
+  const [verdict, setVerdict] = useState<ServerVerdict | undefined>(undefined)
+
+  // A clock, so a subscription that expires mid-session stops being honoured
+  // without a reload.
   const [clock, setClock] = useState(0)
   const advance = useCallback(() => setClock((n) => n + 1), [])
 
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch('/api/entitlement', { credentials: 'same-origin' })
+      if (!res.ok) return
+      const body = (await res.json()) as ServerVerdict
+      setVerdict(body)
+      cacheVerdict(body)
+    } catch {
+      // Offline: keep whatever we have. The cached copy cannot over-grant,
+      // and the content endpoint refuses independently.
+    }
+  }, [])
+
   useEffect(() => {
-    // Writing the trial's start time is a side effect, so it happens here and
-    // never during render.
-    beginTrial()
-    // No `advance()` here: `useMounted` already causes the re-render that
-    // re-derives the state. The interval only keeps the countdown counting.
+    void refresh()
     const interval = setInterval(advance, 1000)
     return () => clearInterval(interval)
-  }, [advance])
+  }, [refresh, advance])
 
-  // Reading `localStorage` here is a pure read: `beginTrial` above owns the one
-  // write. `clock` is in the dependency list so the countdown actually counts.
+  // Until the server answers, show the cached verdict — never a granted one
+  // by default. `SERVER_STATE` is not-paid, so the honest failure is a lock.
   const state: PaywallState = useMemo(
-    () => (mounted ? readState() : SERVER_STATE),
-    [mounted, clock],
+    () => (mounted ? toState(verdict ?? readCachedVerdict()) : SERVER_STATE),
+    [mounted, verdict, clock],
   )
 
   // Activate license key
@@ -152,10 +195,10 @@ export function PaywallProvider({ children }: { children: ReactNode }) {
 
       const data = (await res.json()) as { ok?: boolean; error?: string }
       if (data.ok === true) {
-        // The grant lives in the database now, not in this flag. The flag stays
-        // so the current session stops showing the paywall without a reload.
-        localStorage.setItem(CONFIG.STORAGE_KEY_OK, '1')
-        advance()
+        // The grant is a row in `subscriptions` now. Re-ask the server rather
+        // than setting a local flag: the flag WAS the vulnerability, and the
+        // server already knows the truth a millisecond after the redemption.
+        await refresh()
         setIsActivated(true)
         return { success: true }
       }
@@ -163,7 +206,7 @@ export function PaywallProvider({ children }: { children: ReactNode }) {
     } catch {
       return { success: false, error: 'خطأ بالاتصال، حاول مجدداً' }
     }
-  }, [advance])
+  }, [refresh])
 
   return (
     <PaywallContext.Provider
@@ -188,5 +231,3 @@ export function usePaywall() {
   if (!ctx) throw new Error('usePaywall must be used within PaywallProvider')
   return ctx
 }
-
-export { CONFIG }

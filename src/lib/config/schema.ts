@@ -72,11 +72,17 @@ export const DEFAULT_CONFIG: AppConfig = {
   access: {
     freePrimer: true,
     freeLessonCount: 2,
-    freeLevels: [1],
+    // Every level, not just HSK1. The owner's rule is "two free lessons at the
+    // level the learner chose" — a second-level student does not start at the
+    // first. Keeping this `[1]` made `/api/content/2` return zero words, so an
+    // HSK2 learner met an empty product instead of a trial.
+    freeLevels: [1, 2, 3],
   },
   trial: {
-    enabled: false,
-    days: 0,
+    // The free lessons above are permanent. This is the separate 48-hour window
+    // in which the REST of the library opens after signing up, then closes.
+    enabled: true,
+    days: 2,
   },
   features: {
     checkoutEnabled: false,

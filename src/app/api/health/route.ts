@@ -45,6 +45,13 @@ export async function GET() {
 
   return NextResponse.json(
     {
+      // WHICH BUILD IS THIS? The question that ended a long round of guessing.
+      // Vercel's "Redeploy" re-runs the SAME commit it is pressed on, so a
+      // redeploy done to pick up a new environment variable can quietly ship
+      // old code with the new value. Naming the commit here makes that visible
+      // in one glance instead of another hour of theories.
+      commit: (process.env.VERCEL_GIT_COMMIT_SHA ?? 'local').slice(0, 7),
+      builtAt: process.env.VERCEL_DEPLOYMENT_ID ? 'vercel' : 'local',
       server,
       // Enough to tell a truncated paste from a missing one, without leaking.
       supabaseUrlHost: inlinedUrl ? new URL(inlinedUrl).host : null,

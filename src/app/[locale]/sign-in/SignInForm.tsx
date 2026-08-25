@@ -12,6 +12,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { SUPABASE_ANON_KEY } from '@/lib/supabase/env'
 import { makeT, type Locale } from '@/lib/locale'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
@@ -30,6 +31,19 @@ const MESSAGES: Record<string, { ar: string; en: string }> = {
 function humanise(raw: string, locale: Locale): string {
   const key = Object.keys(MESSAGES).find((k) => raw.includes(k))
   if (key) return locale === 'en' ? MESSAGES[key].en : MESSAGES[key].ar
+
+  // A CONFIGURATION fault is not a user's fault, and hiding it behind «حدث
+  // خطأ» cost an afternoon: both Google and the magic link failed with that
+  // one sentence while the real cause — a missing key in the browser bundle —
+  // named itself in the exception and never reached the screen. Anything that
+  // says a variable is not set is shown verbatim, because the person reading
+  // it is the person who can fix it.
+  if (/is not set|Invalid API key|No API key/i.test(raw)) {
+    return locale === 'en'
+      ? `Configuration problem: ${raw}. Check /api/health, then redeploy.`
+      : `مشكلة إعداد: ${raw}. افحص /api/health ثم أعد النشر.`
+  }
+
   return locale === 'en' ? 'Something went wrong. Try again.' : 'حدث خطأ. حاول مرة أخرى.'
 }
 
@@ -62,10 +76,31 @@ export function SignInForm({
       provider: 'google',
       options: {
         redirectTo: callbackUrl(),
-        // `consent` + offline is what actually returns a refresh token on a
-        // repeat sign-in; without it a returning reader silently gets a session
-        // that cannot be refreshed and is signed out an hour later.
-        queryParams: { access_type: 'offline', prompt: 'consent' },
+        queryParams: {
+          // `consent` + offline is what actually returns a refresh token on a
+          // repeat sign-in; without it a returning reader silently gets a
+          // session that cannot be refreshed and is signed out an hour later.
+          access_type: 'offline',
+          prompt: 'consent',
+
+          // The publishable key, by hand, because supabase-js does not put it
+          // there. `signInWithOAuth` NAVIGATES the browser to
+          // `/auth/v1/authorize` — it is not a fetch, so the `apikey` header
+          // the client sets on every other call cannot ride along, and the
+          // library does not add it to the query either. Verified by building
+          // the URL locally with both a publishable and a legacy key: neither
+          // produced `apikey=`.
+          //
+          // Projects whose gateway tolerates an unauthenticated `/authorize`
+          // never notice. This one does not, and answered every Google click
+          // with a raw JSON page: {"message":"No API key found in request"} —
+          // the reader's first impression of signing in.
+          //
+          // Safe to put in a URL: this key is publishable by definition, it is
+          // already in the JavaScript bundle, and RLS is what actually guards
+          // the data.
+          apikey: SUPABASE_ANON_KEY,
+        },
       },
     })
     if (error) {

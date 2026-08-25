@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Sparkles, Target } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft, ArrowRight, GraduationCap, LogIn, Sparkles, Target } from 'lucide-react'
 import { useLearningStore, type UserProfile } from '@/lib/store'
 import { useI18n } from '@/lib/i18n'
 import { Logo } from '@/components/brand/Logo'
@@ -14,6 +15,23 @@ const GOALS = [
   { value: 15, emoji: '🌳', label: '١٥ كلمة', labelEn: '15 words', desc: 'جاد — 30 دقيقة يومياً', descEn: 'Serious — 30 min/day' },
   { value: 20, emoji: '🔥', label: '٢٠ كلمة', labelEn: '20 words', desc: 'مكثف — 45 دقيقة يومياً', descEn: 'Intense — 45 min/day' },
 ]
+// The owner's first requirement, and the one the platform shipped without:
+// «يستطيع أي أحد أن يختار مستوى عندما يقوم بتسجيل الدخول ليبدأ به مباشرة».
+// Onboarding used to be name → daily goal, and set `currentLevel: 1` for
+// everyone. A learner already at HSK2 was marched back to «你好», and the two
+// free lessons they were promised were lessons of a level they had finished.
+//
+// Level is now the FIRST question, because it decides which path they land on
+// and which lessons open — everything after it is preference.
+const LEVELS = [
+  { value: 1 as const, zh: '一', label: 'HSK 1', ar: 'مبتدئ — أبدأ من الصفر', en: 'Beginner — starting from zero',
+    hintAr: 'التحيات، التعارف، العائلة، الأرقام', hintEn: 'Greetings, introductions, family, numbers' },
+  { value: 2 as const, zh: '二', label: 'HSK 2', ar: 'ابتدائي — أعرف الأساسيات', en: 'Elementary — I know the basics',
+    hintAr: 'التسوق، المواصلات، الطعام، المواعيد', hintEn: 'Shopping, transport, food, appointments' },
+  { value: 3 as const, zh: '三', label: 'HSK 3', ar: 'متوسط — أكوّن جملاً كاملة', en: 'Intermediate — I form full sentences',
+    hintAr: 'الرأي والسبب والمقارنة، الدراسة والعمل', hintEn: 'Opinion, reason, comparison, study and work' },
+]
+
 const FLOATING_HANZI = [
   { ch: '桥', top: '8%', left: '6%', size: 90, delay: 0 },
   { ch: '学', top: '70%', left: '10%', size: 64, delay: 1.2 },
@@ -23,8 +41,10 @@ const FLOATING_HANZI = [
 
 export default function OnboardingScreen() {
   const setProfile = useLearningStore((s) => s.setProfile)
+  const setLevel = useLearningStore((s) => s.setLevel)
   const { t, dir, lang, setLang } = useI18n()
   const [step, setStep] = useState(0)
+  const [level, setChosenLevel] = useState<1 | 2 | 3 | null>(null)
   const [name, setName] = useState('')
   const [avatar, setAvatar] = useState('🐼')
   const [error, setError] = useState('')
@@ -36,6 +56,10 @@ export default function OnboardingScreen() {
       dailyGoal,
       createdAt: new Date().toISOString(),
     }
+    // The level goes in before the profile: `HomeSection` reads it on its very
+    // first render, and writing it second showed HSK1 for one frame to someone
+    // who had just chosen HSK3.
+    if (level) setLevel(level)
     setProfile(profile)
     try {
       localStorage.removeItem('jisr_currentUser')
@@ -127,7 +151,7 @@ export default function OnboardingScreen() {
 
         {/* مؤشر الخطوات */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          {[0, 1].map((i) => (
+          {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
               className="h-1.5 rounded-full"
@@ -139,6 +163,72 @@ export default function OnboardingScreen() {
 
         <AnimatePresence mode="wait">
           {step === 0 ? (
+            <motion.div
+              key="step-level"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="flex items-center gap-1.5 text-sm font-bold text-white/80 mb-1">
+                  <GraduationCap className="w-4 h-4 text-[var(--brand-gold)]" />
+                  {t('ما مستواك في الصينية؟', 'What is your level in Chinese?')}
+                </label>
+                <p className="text-xs text-white/45 leading-relaxed">
+                  {t(
+                    'ستبدأ من هذا المستوى مباشرةً، وأول درسين فيه مفتوحان لك مجاناً. تستطيع تغييره متى شئت.',
+                    'You will start at this level directly, and its first two lessons are free. You can change it any time.',
+                  )}
+                </p>
+              </div>
+
+              <div className="space-y-2.5">
+                {LEVELS.map((lv) => {
+                  const active = level === lv.value
+                  return (
+                    <button
+                      key={lv.value}
+                      type="button"
+                      onClick={() => { setChosenLevel(lv.value); setError(''); setStep(1) }}
+                      className={
+                        'w-full flex items-center gap-3 rounded-2xl border p-3.5 text-start transition-all ' +
+                        (active
+                          ? 'border-[var(--brand-gold)] bg-[var(--brand-gold)]/10'
+                          : 'border-white/12 bg-white/[0.04] hover:border-white/25 hover:bg-white/[0.07]')
+                      }
+                    >
+                      <span
+                        className="grid h-11 w-11 flex-none place-items-center rounded-xl text-xl font-bold text-[var(--brand-gold)]"
+                        style={{ background: 'rgba(212,175,55,0.12)' }}
+                        aria-hidden
+                      >
+                        {lv.zh}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-extrabold text-white">{lv.label}</span>
+                        <span className="block text-xs text-white/70">{t(lv.ar, lv.en)}</span>
+                        <span className="mt-0.5 block truncate text-[11px] text-white/40">{t(lv.hintAr, lv.hintEn)}</span>
+                      </span>
+                      <Forward className="w-4 h-4 flex-none text-white/30" />
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Sign-in was fully built and linked from nowhere a learner
+                  would look. Offering it HERE, at the moment someone is
+                  deciding to begin, is the difference between a browser that
+                  forgets them and an account that carries their progress. */}
+              <Link
+                href={`/${lang === 'en' ? 'en' : 'ar'}/sign-in`}
+                className="mt-1 flex items-center justify-center gap-1.5 rounded-xl border border-white/10 py-2.5 text-xs text-white/55 transition-colors hover:border-white/25 hover:text-white/80"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                {t('لديّ حساب بالفعل — تسجيل الدخول', 'I already have an account — sign in')}
+              </Link>
+            </motion.div>
+          ) : step === 1 ? (
             <motion.div
               key="step-name"
               initial={{ opacity: 0, x: -20 }}
@@ -154,7 +244,7 @@ export default function OnboardingScreen() {
                 <input
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError('') }}
-                  onKeyDown={(e) => e.key === 'Enter' && (name.trim() ? setStep(1) : setError(t('يرجى إدخال اسمك', 'Please enter your name')))}
+                  onKeyDown={(e) => e.key === 'Enter' && (name.trim() ? setStep(2) : setError(t('يرجى إدخال اسمك', 'Please enter your name')))}
                   placeholder={t('اكتب اسمك هنا...', 'Type your name here...')}
                   className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--gold-500)] focus:ring-2 focus:ring-[var(--gold-500)]/35 transition-all"
                   autoFocus
@@ -185,7 +275,7 @@ export default function OnboardingScreen() {
               </div>
 
               <motion.button
-                onClick={() => (name.trim() ? setStep(1) : setError(t('يرجى إدخال اسمك', 'Please enter your name')))}
+                onClick={() => (name.trim() ? setStep(2) : setError(t('يرجى إدخال اسمك', 'Please enter your name')))}
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.985 }}
                 className="w-full rounded-xl bg-gradient-to-r from-[var(--navy-600)] to-[var(--navy-500)] py-3.5 font-bold text-white shadow-lg shadow-[var(--navy-900)]/45 hover:brightness-110 transition-all flex items-center justify-center gap-2"
@@ -237,7 +327,7 @@ export default function OnboardingScreen() {
                 ))}
               </div>
 
-              <button onClick={() => setStep(0)} className="w-full text-center text-xs text-white/40 hover:text-white/70 transition-colors">
+              <button onClick={() => setStep(1)} className="w-full text-center text-xs text-white/40 hover:text-white/70 transition-colors">
                 {dir === 'rtl' ? '→ ' : '← '}{t('رجوع', 'Back')}
               </button>
             </motion.div>

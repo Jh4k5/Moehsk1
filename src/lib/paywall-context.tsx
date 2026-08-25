@@ -150,9 +150,15 @@ export function PaywallProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    void refresh()
+    // Deferred by a microtask, not called straight from the effect body. The
+    // lint rule is right: `refresh()` reaches a `setState` on its first
+    // synchronous leg, and doing that inside an effect cascades a render.
+    // Queueing it changes nothing the user sees — the fetch was always async —
+    // and keeps the first paint to a single pass.
+    let cancelled = false
+    queueMicrotask(() => { if (!cancelled) void refresh() })
     const interval = setInterval(advance, 1000)
-    return () => clearInterval(interval)
+    return () => { cancelled = true; clearInterval(interval) }
   }, [refresh, advance])
 
   // Until the server answers, show the cached verdict — never a granted one

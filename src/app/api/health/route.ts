@@ -1,3 +1,4 @@
+import 'server-only'
 import { NextResponse } from 'next/server'
 
 // ─── GET /api/health ────────────────────────────────────────────────────────
@@ -19,6 +20,12 @@ import { NextResponse } from 'next/server'
 //
 // Values are never returned, only presence and length, so this is safe to
 // leave in production and safe to send to anyone helping debug.
+//
+// `server-only` is on line 1 because `check:payments` demands it of any file
+// that so much as NAMES `SUPABASE_SERVICE_ROLE_KEY`, and it was right to: a
+// route reading the secret's presence is one careless refactor away from a
+// component reading its value. The marker turns that refactor into a build
+// error instead of a leak.
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'

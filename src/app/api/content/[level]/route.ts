@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { getVocabularyForViewer } from '@/lib/entitlement'
+import { getVocabularyForViewer, getLevelExtrasForViewer } from '@/lib/entitlement'
 import { levelContent } from '@/lib/curriculum/content-source'
 
 // ─── GET /api/content/[level] ───────────────────────────────────────────────
@@ -36,23 +36,49 @@ export async function GET(
   const result = await getVocabularyForViewer(level)
 
   // The rest of the level's material — the daily questions, the stories, the
-  // picture dictionary — is part of the same paid product as the words, so it
-  // rides the same decision. A viewer who gets no words gets none of it either.
+  // picture dictionary, the grammar — is part of the same paid product as the
+  // words, so it rides the same decision.
+  //
+  // But "the same decision" is NOT "all or nothing", and treating it that way
+  // was a real defect. The words beside it were already sliced: the free
+  // lessons' vocabulary comes through for everyone. These four were not, so a
+  // visitor on the free tier got 30 genuine HSK2 words and then four blank
+  // screens — a product that looks deleted rather than sampled. Whatever the
+  // free tier contains, it must contain a real example of EVERY kind of
+  // material, or it teaches the visitor that the platform is empty.
+  //
+  // `getLevelExtrasForViewer` returns the viewer's share as a limit function;
+  // applying it here keeps the collections themselves on the server until the
+  // moment they are cut.
   //
   // Assembled here rather than imported by the screens: `QASection` importing
   // `@/data/hsk3/qa3` directly is what kept a handful of HSK3 pairs in the
   // public bundle after the vocabulary itself was gated.
-  const extras = result.entitled
-    ? (() => {
-        const content = levelContent(level as 1 | 2 | 3)
-        return {
-          qa: content.qa,
-          stories: content.stories,
-          pictures: content.pictures,
-          grammar: content.grammar,
-        }
-      })()
-    : { qa: [], stories: [], pictures: [], grammar: [] }
+  const content = levelContent(level as 1 | 2 | 3)
+  const access = await getLevelExtrasForViewer(level)
+
+  const cut = <T,>(items: T[], limit: ((total: number) => number) | null): T[] =>
+    limit === null ? items : items.slice(0, limit(items.length))
+
+  const qa = cut(content.qa, access.qaLimit)
+  const stories = cut(content.stories, access.storyLimit)
+  const pictures = cut(content.pictures, access.pictureLimit)
+
+  const extras = {
+    qa,
+    stories,
+    pictures,
+    grammar: access.grammar,
+    // Counts, never the items. A screen showing "٥ من ٣٣ — والبقية بالاشتراك"
+    // is honest about being a sample; one showing five with no total reads as
+    // all there is, which is the impression that cost us this bug report.
+    lockedExtras: {
+      qa: content.qa.length - qa.length,
+      stories: content.stories.length - stories.length,
+      pictures: content.pictures.length - pictures.length,
+      grammar: 0,
+    },
+  }
 
   return NextResponse.json({ ...result, ...extras }, {
     headers: {

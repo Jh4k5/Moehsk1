@@ -287,6 +287,82 @@ export async function getVocabularyForViewer(level: number): Promise<{
 }
 
 /**
+ * The level's SUPPORTING material — stories, picture dictionary, daily
+ * questions, grammar — filtered to what the viewer may see.
+ *
+ * ── The bug this replaces ───────────────────────────────────────────────────
+ *
+ * `GET /api/content/[level]` used to compute these four as all-or-nothing on
+ * `entitled`: a subscriber got everything, everyone else got four empty arrays.
+ * The vocabulary beside them was NOT all-or-nothing — the free lessons' words
+ * came through — so the free tier ended up in a state nobody designed: 30 real
+ * HSK2 words, and then a stories screen, a picture dictionary and a daily-
+ * questions screen that were simply blank. The owner reported it exactly as it
+ * looks from outside — «المحتوى اختفى ... وان وجد يكون ناقص» — and they were
+ * right. A trial that opens six sections and fills one is not a trial; it reads
+ * as a broken product, which is the most expensive thing a shop window can do.
+ *
+ * ── Why a proportional slice, and not "everything whose characters are taught"
+ *
+ * The obvious rule — an item is free when every character in it has been taught
+ * — was measured first, and it returns ZERO stories at every level and zero
+ * daily questions. Not because the rule is wrong, but because the authored
+ * stories and questions lean heavily on untaught characters. That is a real
+ * content defect and it is tracked separately as the prerequisite linter; it
+ * must not also be allowed to decide what the free tier contains, or a content
+ * bug silently becomes a pricing policy.
+ *
+ * So the slice is positional: the free lessons are `freeLessonCount` of the
+ * level's lessons, and the viewer gets that same fraction of each supporting
+ * collection, taken from the front — these files are authored in lesson order —
+ * with a floor of one item so no section is ever empty when the collection is
+ * not. Grammar is the exception and is exact rather than proportional, because
+ * the free units name their own `grammarIds` and there is no need to guess.
+ *
+ * What is withheld is reported as a COUNT, never as the items.
+ */
+export async function getLevelExtrasForViewer(level: number): Promise<{
+  entitled: boolean
+  grammar: GrammarRule[]
+  /** Applied to a collection's length. `null` = no limit (subscriber). */
+  storyLimit: ((total: number) => number) | null
+  pictureLimit: ((total: number) => number) | null
+  qaLimit: ((total: number) => number) | null
+}> {
+  const { entitlement, policy } = await getAccessContext()
+  if (!isLevelNo(level)) {
+    const none = () => 0
+    return { entitled: false, grammar: [], storyLimit: none, pictureLimit: none, qaLimit: none }
+  }
+
+  const grammar = await loadGrammar(level)
+  if (entitlement.isEntitled) {
+    // `null` means "no limit" — distinct from 0, which means "nothing".
+    return { entitled: true, grammar, storyLimit: null, pictureLimit: null, qaLimit: null }
+  }
+
+  const units = (await loadUnits()).filter((u) => u.ref.level === level)
+  const lessonCount = new Set(units.map((u) => u.ref.lesson)).size || 1
+  const freeLessons = Math.min(policy.freeLessonCount, lessonCount)
+
+  const grammarIds = new Set<number>()
+  for (const u of units) {
+    if (isUnitFree(u.ref, policy)) for (const id of u.grammarIds) grammarIds.add(id)
+  }
+
+  const fraction = freeLessons / lessonCount
+  const limit = (total: number) => (total === 0 ? 0 : Math.max(1, Math.ceil(total * fraction)))
+
+  return {
+    entitled: false,
+    grammar: grammar.filter((g) => grammarIds.has(g.id)),
+    storyLimit: limit,
+    pictureLimit: limit,
+    qaLimit: limit,
+  }
+}
+
+/**
  * A single lesson's shell — used by a lesson index page. Locked lessons come
  * back with their title only, so the path still renders.
  */

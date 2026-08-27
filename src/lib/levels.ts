@@ -61,6 +61,16 @@ export interface LevelBundle {
   loading: boolean
   /** How many words this viewer may not see. A number, never the words. */
   lockedCount: number
+  /**
+   * The same count for the SUPPORTING material.
+   *
+   * A screen that shows five pictures out of thirty-three and says nothing is
+   * indistinguishable from a screen showing all five pictures that exist. The
+   * owner read exactly that and reported the content as deleted. Every section
+   * that renders a sliced collection must be able to say so, and this is what
+   * it reads to know.
+   */
+  lockedExtras: { qa: number; stories: number; pictures: number; grammar: number }
   /** Daily questions. Paid content above HSK1, so it arrives with the rest. */
   dailyQA: unknown[]
 }
@@ -82,6 +92,7 @@ const HSK1_BUNDLE: LevelBundle = {
   vocabIdRange: [1, 1000],
   loading: false,
   lockedCount: 0,
+  lockedExtras: { qa: 0, stories: 0, pictures: 0, grammar: 0 },
   dailyQA: [],
 }
 
@@ -103,6 +114,7 @@ function pendingBundle(level: HskLevel, loading: boolean): LevelBundle {
     vocabIdRange: level === 2 ? [2000, 3000] : [3000, 4000],
     loading,
     lockedCount: 0,
+    lockedExtras: { qa: 0, stories: 0, pictures: 0, grammar: 0 },
     dailyQA: [],
   }
 }
@@ -133,6 +145,8 @@ interface ContentResponse {
   stories: unknown[]
   pictures: { zh: string; pinyin: string; ar: string; emoji: string; category: string }[]
   grammar: GrammarRule[]
+  /** How many items of each kind the free tier withheld. Counts, not items. */
+  lockedExtras?: { qa: number; stories: number; pictures: number; grammar: number }
 }
 
 function request(level: HskLevel): void {
@@ -146,6 +160,7 @@ function request(level: HskLevel): void {
         bundle.vocabulary = data.words ?? []
         bundle.hanziChars = uniqueChars(bundle.vocabulary)
         bundle.lockedCount = data.lockedCount ?? 0
+        bundle.lockedExtras = data.lockedExtras ?? { qa: 0, stories: 0, pictures: 0, grammar: 0 }
         bundle.grammarRules = data.grammar ?? []
         bundle.stories = data.stories ?? []
         bundle.dailyQA = data.qa ?? []

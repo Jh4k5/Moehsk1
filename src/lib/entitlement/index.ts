@@ -19,6 +19,7 @@ export {
   getUnitForViewer,
   getLevelPathForViewer,
   getVocabularyForViewer,
+  getLevelExtrasForViewer,
   getLessonForViewer,
   canViewUnit,
   type UnitAccessResult,

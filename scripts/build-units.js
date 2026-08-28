@@ -27,6 +27,7 @@ const fs = require('fs')
 const path = require('path')
 const { load, ROOT } = require('./ts-load')
 const { rankedLabels, rankedTopics, posLabelFor, posLabelEnFor } = require('./topics')
+const { byTeachingOrder } = require('./lib/teaching-order')
 
 const MIN_WORDS = 5
 const MAX_WORDS = 8
@@ -468,6 +469,10 @@ function makeGoal(unitWords, headline, carriesExam, title) {
     : `${count} جديدة ${topic}، تستعملها في جمل الدرس ومحادثاته.`
 }
 
+// [2.12] [2.13] The teaching order lives in `scripts/lib/teaching-order.js`,
+// shared with the auditor so the rule the generator applies and the rule the
+// check asserts cannot drift apart. See that file for why.
+
 // ── build ───────────────────────────────────────────────────────────────────
 
 function buildLevel(L, topicsOfWord) {
@@ -494,7 +499,7 @@ function buildLevel(L, topicsOfWord) {
     const grammarIds = lesson.grammarIds || []
 
     segments.forEach((seg, u) => {
-      const unitWords = seg.map((i) => words[i])
+      const unitWords = seg.map((i) => words[i]).sort(byTeachingOrder)
       const wordIds = unitWords.map((w) => w.id)
       const carriesExam = u === segments.length - 1
 

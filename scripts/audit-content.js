@@ -15,6 +15,7 @@ const path = require('path')
 const fs = require('fs')
 const { load, ROOT } = require('./ts-load.js')
 const P = require('./lib/pinyin-core.js')
+const { isFunctionWord, byTeachingOrder } = require('./lib/teaching-order.js')
 
 const JSON_OUT = process.argv.includes('--json')
 
@@ -182,21 +183,13 @@ function auditPrerequisites() {
 // «吗» before «你好» is the case the owner named. A particle has no meaning to
 // show and no situation to use it in until there is a sentence to attach it to.
 
-const FUNCTION_WORDS = new Set([
-  '吗', '呢', '吧', '了', '的', '地', '得', '着', '过', '啊', '呀', '嘛', '哦', '嗯',
-  '和', '与', '或', '但', '而', '就', '才', '也', '还', '再', '又', '很', '太', '最',
-  '不', '没', '别', '被', '把', '给', '让', '对', '从', '向', '往', '在', '于', '为',
-])
-
 function auditOpeners() {
   const offenders = []
   for (const u of units) {
     const vocab = LEVELS[u.ref.level].vocab
     const first = vocab.find((v) => v.id === u.wordIds[0])
     if (!first) continue
-    const isFunction = FUNCTION_WORDS.has(first.zh) ||
-      /part|particle|conj|prep|adv/i.test(String(first.pos || ''))
-    if (isFunction) offenders.push({ unit: u.key, word: first.zh, pos: first.pos, title: u.title })
+    if (isFunctionWord(first)) offenders.push({ unit: u.key, word: first.zh, pos: first.pos, title: u.title })
   }
   return offenders
 }
@@ -208,17 +201,22 @@ function auditOpeners() {
 // measurable question, not a matter of taste.
 
 function auditWordOrder() {
+  // Checked against the SAME key the generator sorts by, re-derived here rather
+  // than imported, so a change to one has to be made deliberately in the other.
+  //
+  // The first version of this check compared raw `frequencyRank` alone and
+  // reported 185 of 191 units "unsorted". That number was never wrong about
+  // there being no order — there wasn't one — but it could not have gone to
+  // zero either, because frequency is only the second of four criteria. A check
+  // that cannot be satisfied by doing the right thing is not a check.
   const unsorted = []
   for (const u of units) {
     const vocab = LEVELS[u.ref.level].vocab
-    const ranks = u.wordIds
-      .map((id) => vocab.find((v) => v.id === id))
-      .filter(Boolean)
-      .map((w) => (typeof w.frequencyRank === 'number' ? w.frequencyRank : null))
-    if (ranks.length < 2 || ranks.some((r) => r === null)) continue
+    const words = u.wordIds.map((id) => vocab.find((v) => v.id === id)).filter(Boolean)
+    if (words.length < 2) continue
     let inversions = 0
-    for (let i = 0; i < ranks.length - 1; i += 1) if (ranks[i] > ranks[i + 1]) inversions += 1
-    if (inversions > 0) unsorted.push({ unit: u.key, inversions, of: ranks.length - 1 })
+    for (let i = 0; i < words.length - 1; i += 1) if (byTeachingOrder(words[i], words[i + 1]) > 0) inversions += 1
+    if (inversions > 0) unsorted.push({ unit: u.key, inversions, of: words.length - 1 })
   }
   return unsorted
 }
@@ -394,7 +392,7 @@ console.log(`  ${n(report.openers.length)}  of ${report.corpus.units} units`)
 for (const o of report.openers.slice(0, 3)) console.log(`         e.g. ${o.unit} opens on «${o.word}» (${o.pos})`)
 
 console.log('\n[2.13] word order inside the unit')
-console.log(`  ${n(report.wordOrder.length)}  of ${report.corpus.units} units are not in frequency order`)
+console.log(`  ${n(report.wordOrder.length)}  of ${report.corpus.units} units are not in teaching order`)
 
 console.log('\n[2.15] unit titles')
 console.log(`  ${n(report.titles.unitsAffected)}  of ${report.titles.total} units carry a duplicated title (${report.titles.distinct} distinct titles)`)

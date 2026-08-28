@@ -126,6 +126,7 @@ function toPreview(unit: Unit): LockedUnitPreview {
     ref: unit.ref,
     key: unit.key,
     title: unit.title,
+    titleEn: unit.titleEn,
     goal: unit.goal,
     wordCount: unit.wordIds.length,
     carriesExam: unit.carriesExam,

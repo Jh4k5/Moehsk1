@@ -20,7 +20,7 @@ import { isUnitUnlocked, levelProgress, nextUnitFor } from '@/lib/curriculum/pro
 import { publicLevel } from '@/data/public-index.generated'
 import { useLocale } from '@/components/nav/use-locale'
 import { makeT, type Locale } from '@/lib/locale'
-import type { HskLevelNo, Unit } from '@/lib/curriculum/types'
+import { unitTitle, type HskLevelNo, type Unit } from '@/lib/curriculum/types'
 
 // `ar-EG` gives Arabic-Indic digits — ٧, not 7. The formatter follows the
 // route's locale so an English reader gets numerals they can read.
@@ -142,7 +142,7 @@ export default function PathSection() {
                             {unitDone ? <Check size={15} /> : open ? <Play size={14} /> : <Lock size={13} />}
                           </span>
                           <span className="j-unit-body">
-                            <span className="j-unit-title">{unit.title}</span>
+                            <span className="j-unit-title">{unitTitle(unit, locale)}</span>
                             <span className="j-unit-goal">{unit.goal}</span>
                           </span>
                           <span className="j-unit-words">{AR.format(unit.wordIds.length)}</span>

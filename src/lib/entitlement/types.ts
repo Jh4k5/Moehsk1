@@ -86,6 +86,8 @@ export interface LockedUnitPreview {
   key: string
   /** Arabic title. Marketing copy for the locked card, not content. */
   title: string
+  /** The same, in English. A locked card is shown on both routes. */
+  titleEn: string
   /** Arabic one-line goal. Also marketing copy. */
   goal: string
   /** How many words are inside — a count, never the words. */

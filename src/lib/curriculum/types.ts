@@ -54,6 +54,8 @@ export interface Unit {
   key: UnitKey
   /** Arabic title, derived from the unit's own words. */
   title: string
+  /** The same title in English. Both languages, always — see [4.6]. */
+  titleEn: string
   /** One-line Arabic goal, derived from the unit's own words. */
   goal: string
   /** Vocabulary ids owned by this unit. Every lesson word lands in exactly one. */
@@ -515,6 +517,26 @@ export const ACTIVITY_KIND_LABEL_EN: Record<ActivityKind, string> = {
 /** The pill label for a kind, in the locale the route is serving. */
 export function activityKindLabel(kind: ActivityKind, locale: 'ar' | 'en'): string {
   return locale === 'en' ? ACTIVITY_KIND_LABEL_EN[kind] : ACTIVITY_KIND_LABEL_AR[kind]
+}
+
+/**
+ * A unit's title in the locale being served.
+ *
+ * Every screen used to render `unit.title` directly, which is the Arabic one,
+ * so the English path listed an entire curriculum under Arabic headings. A
+ * helper rather than a field access because there are six call sites and a
+ * seventh will be added by someone who has not read this file.
+ *
+ * Falls back to the Arabic when `titleEn` is absent — unlike a sentence gloss,
+ * a missing title cannot be dropped: a unit with no name is unnavigable, and a
+ * name in the wrong language still tells the reader which unit it is.
+ */
+export function unitTitle(
+  unit: { title: string; titleEn?: string },
+  locale: 'ar' | 'en',
+): string {
+  if (locale !== 'en') return unit.title
+  return unit.titleEn?.trim() || unit.title
 }
 
 // ── Learner state the engine reads ──────────────────────────────────────────

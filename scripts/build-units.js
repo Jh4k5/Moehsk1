@@ -26,7 +26,7 @@
 const fs = require('fs')
 const path = require('path')
 const { load, ROOT } = require('./ts-load')
-const { rankedLabels, posLabelFor } = require('./topics')
+const { rankedLabels, rankedTopics, posLabelFor, posLabelEnFor } = require('./topics')
 
 const MIN_WORDS = 5
 const MAX_WORDS = 8
@@ -367,20 +367,81 @@ const AR_ORDINAL = [
  * A learner reading the path gains nothing from two translations in a title
  * anyway; they gain from knowing which of the two units this is.
  */
-function makeTitle(unitWords, headline, used, unitIndex) {
-  const candidates = [...rankedLabels(unitWords), posLabelFor(unitWords)]
+// Titles must be unique across the WHOLE curriculum, not within a lesson, so
+// the set lives here rather than inside `buildLevel`. See the note in
+// `makeTitle` for what a per-lesson set cost.
+const usedTitles = new Set()
+
+function makeTitle(unitWords, lesson, used) {
+  const topics = rankedTopics(unitWords)
+  const candidates = topics.map((t) => ({ ar: t.label, en: t.labelEn }))
+  candidates.push({ ar: posLabelFor(unitWords), en: posLabelEnFor(unitWords) })
+
   for (const c of candidates) {
-    if (c && !used.has(c)) {
-      used.add(c)
+    if (c.ar && !used.has(c.ar)) {
+      used.add(c.ar)
       return c
     }
   }
-  const base = candidates[0] || posLabelFor(unitWords)
+
+  // [2.15] EVERY topic this unit could be named after is already taken.
+  //
+  // The old code appended an Arabic ordinal — «أسماء وأشياء (الثانية)» — and
+  // did it against a set that was reset FOR EVERY LESSON, so the counter never
+  // saw the other forty-seven lessons and the same plain label came back
+  // thirty-three times across the curriculum. 179 units of 191 shared a title
+  // with at least one other unit; a learner scrolling the path read the same
+  // five words over and over and could not tell one session from the next.
+  //
+  // The set is now global, and the qualifier is DERIVED FROM THE UNIT'S OWN
+  // WORDS: its second-strongest topic. «الأشياء والملابس · السفر والتنقّل»
+  // says what this unit is actually about; «أسماء وأشياء (الثانية)» says only
+  // that there was a first one.
+  //
+  // Deriving it from the topics rather than from the lesson title is what keeps
+  // BOTH languages working. The first attempt qualified with the lesson's own
+  // title — public, descriptive, and Arabic-only, because no lesson in the
+  // repository has an English title. Arabic came out 191 unique and English
+  // came out 179 duplicated: a fix that repaired one language and left the
+  // other exactly as broken. Topics carry `labelEn`, so this one cannot do
+  // that.
+  const base = candidates[0]
+  for (const alt of candidates.slice(1)) {
+    if (!alt.ar || alt.ar === base.ar) continue
+    const ar = `${base.ar} · ${alt.ar}`
+    if (used.has(ar)) continue
+    used.add(ar)
+    return { ar, en: `${base.en} · ${alt.en}` }
+  }
+
+  // Still colliding: qualify with the lesson. Arabic gets the lesson's title,
+  // which is public and descriptive; English has none to use, so it gets the
+  // lesson number — honest, and it improves by itself the day lesson titles are
+  // authored in both languages.
+  const lessonAr = String(lesson.title || '').trim()
+  if (lessonAr) {
+    const ar = `${base.ar} — ${lessonAr}`
+    const en = `${base.en} — lesson ${lesson.id}`
+    if (!used.has(ar) && !used.has(en)) {
+      used.add(ar)
+      used.add(en)
+      return { ar, en }
+    }
+  }
+
+  // Last resort, and now genuinely rare: an ordinal, against the global set.
+  // The counter advances only when BOTH spellings are free. Checking the Arabic
+  // alone let two units land on «Everyday verbs (2)» — their Arabic differed
+  // because the lesson titles differed, so the Arabic loop saw no collision and
+  // stopped, and nine English titles collided behind it.
   let n = 2
-  while (used.has(`${base} (${AR_ORDINAL[n] || n})`)) n++
-  const titled = `${base} (${AR_ORDINAL[n] || n})`
-  used.add(titled)
-  return titled
+  const stem = lessonAr ? `${base.ar} — ${lessonAr}` : base.ar
+  const arAt = (i) => `${stem} (${AR_ORDINAL[i] || i})`
+  const enAt = (i) => `${base.en} (${i})`
+  while (used.has(arAt(n)) || used.has(enAt(n))) n++
+  used.add(arAt(n))
+  used.add(enAt(n))
+  return { ar: arAt(n), en: enAt(n) }
 }
 
 /**
@@ -431,7 +492,6 @@ function buildLevel(L, topicsOfWord) {
     segments.sort((a, b) => Math.min(...a.map((i) => words[i].id)) - Math.min(...b.map((i) => words[i].id)))
 
     const grammarIds = lesson.grammarIds || []
-    const usedTitles = new Set()
 
     segments.forEach((seg, u) => {
       const unitWords = seg.map((i) => words[i])
@@ -463,13 +523,14 @@ function buildLevel(L, topicsOfWord) {
 
       const headline = centralWords(sim, words, seg, Math.min(3, unitWords.length))
 
-      const title = makeTitle(unitWords, headline, usedTitles, u + 1)
+      const title = makeTitle(unitWords, lesson, usedTitles)
 
       units.push({
         ref: { level: L.n, lesson: lesson.id, unit: u + 1 },
         key: `${L.n}:${lesson.id}:${u + 1}`,
-        title,
-        goal: makeGoal(unitWords, headline, carriesExam, title),
+        title: title.ar,
+        titleEn: title.en,
+        goal: makeGoal(unitWords, headline, carriesExam, title.ar),
         wordIds,
         grammarIds: unitGrammar,
         keySentenceIndices,
@@ -570,6 +631,7 @@ export const unitsGenerated: Unit[] = [
         `    ref: { level: ${u.ref.level}, lesson: ${u.ref.lesson}, unit: ${u.ref.unit} },\n` +
         `    key: ${j(u.key)},\n` +
         `    title: ${j(u.title)},\n` +
+        `    titleEn: ${j(u.titleEn)},\n` +
         `    goal: ${j(u.goal)},\n` +
         `    wordIds: ${j(u.wordIds)},\n` +
         `    grammarIds: ${j(u.grammarIds)},\n` +

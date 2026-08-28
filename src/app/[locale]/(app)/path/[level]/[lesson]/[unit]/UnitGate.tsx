@@ -29,7 +29,7 @@ import { isUnitUnlocked, nextUnitFor } from '@/lib/curriculum/progress'
 import { isUnitFree } from '@/lib/entitlement/policy'
 import { hrefFor } from '@/components/nav/nav-model'
 import { makeT, type Locale } from '@/lib/locale'
-import type { Unit } from '@/lib/curriculum/types'
+import { unitTitle, type Unit } from '@/lib/curriculum/types'
 
 interface Verdict {
   signedIn: boolean
@@ -74,7 +74,7 @@ export function UnitGate({ unit, locale }: { unit: Unit; locale: Locale }) {
     return (
       <div className="j-locked">
         <span className="j-locked-icon j-locked-icon-paid" aria-hidden><ShoppingCart size={26} /></span>
-        <h1>{unit.title}</h1>
+        <h1>{unitTitle(unit, locale)}</h1>
         <p>{unit.goal}</p>
         <p className="j-locked-why">
           {verdict?.signedIn
@@ -103,7 +103,7 @@ export function UnitGate({ unit, locale }: { unit: Unit; locale: Locale }) {
     return (
       <div className="j-locked">
         <span className="j-locked-icon" aria-hidden><Lock size={26} /></span>
-        <h1>{unit.title}</h1>
+        <h1>{unitTitle(unit, locale)}</h1>
         <p>{unit.goal}</p>
         <p className="j-locked-why">
           {t(
@@ -116,7 +116,7 @@ export function UnitGate({ unit, locale }: { unit: Unit; locale: Locale }) {
             href={`/${locale}/path/${next.ref.level}/${next.ref.lesson}/${next.ref.unit}`}
             className="j-ready"
           >
-            {t('ابدأ من:', 'Start with:')} {next.title}
+            {t('ابدأ من:', 'Start with:')} {unitTitle(next, locale)}
           </Link>
         )}
         <Link href={hrefFor(locale, 'lessons')} className="j-locked-back">

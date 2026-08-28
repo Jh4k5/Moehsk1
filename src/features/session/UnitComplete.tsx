@@ -12,7 +12,7 @@ import { BridgeArch, HanziWatermark } from '@/components/nav/BridgeArt'
 import { UNIT_PASS_RATIO } from '@/lib/curriculum/progress'
 import { useLocale } from '@/components/nav/use-locale'
 import { makeT } from '@/lib/locale'
-import type { Unit } from '@/lib/curriculum/types'
+import { unitTitle, type Unit } from '@/lib/curriculum/types'
 
 // `ar-EG` renders ٧, which an English reader cannot read. The formatter follows
 // the route's locale, like every other number on the English side.
@@ -56,7 +56,7 @@ export function UnitComplete({
               ? t('أتممت الوحدة', 'Unit complete')
               : t('قريب — أعِد المحاولة', 'So close — give it another go')}
           </h1>
-          <p>{unit.title}</p>
+          <p>{unitTitle(unit, locale)}</p>
         </div>
 
         <div className="j-complete-stats">

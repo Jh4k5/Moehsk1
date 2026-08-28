@@ -55,6 +55,8 @@ import {
 import { hanziOf, type LevelContent, type VocabWord } from './content-types'
 import { UNIT_STAGES, stageOfActivity, type StageId } from './lesson-stages'
 import { EXPLANATION_BY_GRAMMAR } from '@/data/explanations'
+import { chapterOf, isChapterEnd, type ChapterSpec } from './chapters'
+import type { HskLevelNo } from './types'
 import { makeRng, type Rng } from './rng'
 
 export { ACTIVITY_KIND_LABEL_AR }
@@ -967,9 +969,21 @@ export function buildActivityStream(
   // The explanation goes back on the front, past every trim and every shuffle.
   if (teach) body = [teach, ...body]
 
-  // The lesson's last unit closes with exam-format items. Added AFTER the trim
-  // so the assessment is never what gets cut to fit.
-  if (unit.carriesExam && !options.skipExam) body = [...body, ...examStyle(ctx, 3)]
+  // [2.7] NO EXAM INSIDE A UNIT.
+  //
+  // Three exam items used to be stapled to the last unit of every lesson —
+  // forty-eight little exams across the curriculum, each covering material the
+  // learner had met minutes earlier. That measures short-term recall, returns a
+  // high score every time, feels like progress and predicts nothing.
+  //
+  // Assessment now happens once per CHAPTER, over five or six lessons, which is
+  // the first point at which anything has had time to be forgotten and
+  // therefore the first point at which a score carries information. See
+  // `buildChapterExam` below and `chapters.ts` for where the boundaries are.
+  //
+  // `unit.carriesExam` is still on the generated unit record and still marks
+  // the last unit of a lesson; it drives an achievement and the path's own
+  // "end of lesson" marker. It no longer drives an exam.
 
   // Game breaks go in last, so their spacing counts real activities.
   //
@@ -992,4 +1006,79 @@ export function buildActivityStream(
   }
 
   return finalise(withBreaks, unit.key)
+}
+
+
+// ── [2.7] The chapter exam ──────────────────────────────────────────────────
+
+export interface ChapterExamOptions {
+  seed?: number
+  /** How many items. The HSK papers this imitates run 20–40. */
+  count?: number
+}
+
+export interface ChapterExam {
+  chapter: ChapterSpec
+  activities: Activity[]
+  /** Minutes on the clock. Zero means untimed — see the note below. */
+  minutes: number
+  /** Proportion of items needed to pass, 0–1. */
+  passMark: number
+}
+
+/**
+ * A cumulative, timed assessment over one chapter.
+ *
+ * Draws from the level's exam bank rather than from the units, so the items are
+ * HSK-format questions and not the drills the learner has already answered.
+ *
+ * TIMING. The clock is one minute per item, which is roughly the real HSK
+ * pacing and is generous for this level. It returns 0 when the bank is too thin
+ * to fill the paper, and a caller must render an untimed exam in that case
+ * rather than a suspiciously short one — a two-minute "chapter exam" tells the
+ * learner the chapter was worth two minutes.
+ *
+ * COVERAGE IS NOT ASSUMED. HSK2 and HSK3 have no exam bank at all today
+ * (measured: 40 items at HSK1, zero at both others), so this returns an empty
+ * activity list for them. An empty exam must be reported by the caller as
+ * "not ready", never rendered as an exam the learner passes by default.
+ */
+export function buildChapterExam(
+  chapter: ChapterSpec,
+  content: LevelContent,
+  options: ChapterExamOptions = {},
+): ChapterExam {
+  const count = options.count ?? 20
+  const rng = makeRng(options.seed ?? 1, `chapter:${chapter.level}:${chapter.number}`)
+
+  // The exam belongs to the chapter, not to any one unit, but every activity
+  // carries a `UnitRef`. The chapter's FIRST lesson, unit 0, is used as that
+  // address: unit 0 is already reserved for non-unit material (the primer uses
+  // it), so this cannot collide with a real unit's progress record.
+  const ref = { level: chapter.level, lesson: chapter.lessons[0], unit: 0 }
+  const ctx: Ctx = {
+    unit: { ref, key: `${ref.level}:${ref.lesson}:0` } as unknown as Unit,
+    ref,
+    rng,
+    words: [],
+    pool: content.vocabulary,
+    learner: { srsCards: {}, completedUnits: [], missedWordIds: [], seed: 1 },
+    content,
+  }
+
+  const drafts = examStyle(ctx, count)
+  return {
+    chapter,
+    activities: finalise(drafts, `chapter:${chapter.level}:${chapter.number}`),
+    minutes: drafts.length >= count ? count : 0,
+    // Two thirds. The HSK pass mark is 60%; this sits a little above it because
+    // a chapter exam is formative — the point is to send the learner back to
+    // what they missed, not to hand out a certificate.
+    passMark: 2 / 3,
+  }
+}
+
+/** Does a chapter exam fall due after finishing this lesson? */
+export function examDueAfter(level: HskLevelNo, lesson: number): ChapterSpec | null {
+  return isChapterEnd(level, lesson) ? chapterOf(level, lesson) : null
 }

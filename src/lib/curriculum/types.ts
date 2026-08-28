@@ -58,6 +58,8 @@ export interface Unit {
   titleEn: string
   /** One-line Arabic goal, derived from the unit's own words. */
   goal: string
+  /** The same goal in English. */
+  goalEn: string
   /** Vocabulary ids owned by this unit. Every lesson word lands in exactly one. */
   wordIds: number[]
   /** Grammar rule ids the unit may draw a `grammar-brief` from. */
@@ -584,6 +586,15 @@ export function unitTitle(
 ): string {
   if (locale !== 'en') return unit.title
   return unit.titleEn?.trim() || unit.title
+}
+
+/** A unit's one-line goal in the locale being served. Same rule as the title. */
+export function unitGoal(
+  unit: { goal: string; goalEn?: string },
+  locale: 'ar' | 'en',
+): string {
+  if (locale !== 'en') return unit.goal
+  return unit.goalEn?.trim() || unit.goal
 }
 
 // ── Learner state the engine reads ──────────────────────────────────────────

@@ -29,7 +29,7 @@ import { isUnitUnlocked, nextUnitFor } from '@/lib/curriculum/progress'
 import { isUnitFree } from '@/lib/entitlement/policy'
 import { hrefFor } from '@/components/nav/nav-model'
 import { makeT, type Locale } from '@/lib/locale'
-import { unitTitle, type Unit } from '@/lib/curriculum/types'
+import { unitTitle, unitGoal, type Unit } from '@/lib/curriculum/types'
 
 interface Verdict {
   signedIn: boolean
@@ -75,7 +75,7 @@ export function UnitGate({ unit, locale }: { unit: Unit; locale: Locale }) {
       <div className="j-locked">
         <span className="j-locked-icon j-locked-icon-paid" aria-hidden><ShoppingCart size={26} /></span>
         <h1>{unitTitle(unit, locale)}</h1>
-        <p>{unit.goal}</p>
+        <p>{unitGoal(unit, locale)}</p>
         <p className="j-locked-why">
           {verdict?.signedIn
             ? t(
@@ -104,7 +104,7 @@ export function UnitGate({ unit, locale }: { unit: Unit; locale: Locale }) {
       <div className="j-locked">
         <span className="j-locked-icon" aria-hidden><Lock size={26} /></span>
         <h1>{unitTitle(unit, locale)}</h1>
-        <p>{unit.goal}</p>
+        <p>{unitGoal(unit, locale)}</p>
         <p className="j-locked-why">
           {t(
             'هذه الوحدة تُفتح حين تُنهي التي قبلها. المسار متدرّج: كل وحدة تبني على ما قبلها.',

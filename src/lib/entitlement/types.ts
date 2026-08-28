@@ -90,6 +90,8 @@ export interface LockedUnitPreview {
   titleEn: string
   /** Arabic one-line goal. Also marketing copy. */
   goal: string
+  /** The same, in English. */
+  goalEn: string
   /** How many words are inside — a count, never the words. */
   wordCount: number
   /** True for the last unit of its lesson. Shapes the path, reveals nothing. */

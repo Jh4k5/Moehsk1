@@ -469,6 +469,23 @@ function makeGoal(unitWords, headline, carriesExam, title) {
     : `${count} جديدة ${topic}، تستعملها في جمل الدرس ومحادثاته.`
 }
 
+/**
+ * [4.5] The same line in English.
+ *
+ * The goal is rendered on the unit screen and on BOTH locked screens, and it
+ * had no English twin — so an English learner who hit a paywall or a locked
+ * unit read an English heading, an English explanation of why it was locked,
+ * and then one line of Arabic telling them what they were missing.
+ */
+function makeGoalEn(unitWords, carriesExam, titleEn) {
+  const n = unitWords.length
+  const count = `${n} new word${n === 1 ? '' : 's'}`
+  const topic = titleEn ? ` on ${titleEn.toLowerCase()}` : ' from the lesson'
+  return carriesExam
+    ? `${count}${topic}, then a review of the whole lesson in HSK format.`
+    : `${count}${topic}, used in the lesson's sentences and conversations.`
+}
+
 // [2.12] [2.13] The teaching order lives in `scripts/lib/teaching-order.js`,
 // shared with the auditor so the rule the generator applies and the rule the
 // check asserts cannot drift apart. See that file for why.
@@ -536,6 +553,7 @@ function buildLevel(L, topicsOfWord) {
         title: title.ar,
         titleEn: title.en,
         goal: makeGoal(unitWords, headline, carriesExam, title.ar),
+        goalEn: makeGoalEn(unitWords, carriesExam, title.en),
         wordIds,
         grammarIds: unitGrammar,
         keySentenceIndices,
@@ -638,6 +656,7 @@ export const unitsGenerated: Unit[] = [
         `    title: ${j(u.title)},\n` +
         `    titleEn: ${j(u.titleEn)},\n` +
         `    goal: ${j(u.goal)},\n` +
+        `    goalEn: ${j(u.goalEn)},\n` +
         `    wordIds: ${j(u.wordIds)},\n` +
         `    grammarIds: ${j(u.grammarIds)},\n` +
         `    keySentenceIndices: ${j(u.keySentenceIndices)},\n` +

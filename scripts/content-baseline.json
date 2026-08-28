@@ -1,0 +1,12 @@
+{
+  "pinyin": 0,
+  "duplicateTitles": 0,
+  "functionWordOpeners": 0,
+  "unsortedUnits": 0,
+  "hardcodedArabic": 0,
+  "staleWordCount": 1,
+  "prerequisiteViolations": 430,
+  "arabicOnEnglishRoute": 379,
+  "missingEnglishMnemonics": 1079,
+  "missingEnglishSentences": 1890
+}

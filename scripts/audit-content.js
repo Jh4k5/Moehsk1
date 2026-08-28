@@ -463,7 +463,12 @@ function auditWordCountClaim() {
       }
     }
   }
-  walk(ROOT)
+  // PRODUCT CODE ONLY. Scanning the whole repository returned eleven hits, of
+  // which every single one was documentation ABOUT this defect, the migration
+  // that fixes it, or this checker's own label — and none was the defect. A
+  // gate that fires on its own description is noise, and noise is what makes a
+  // gate get ignored.
+  walk(path.join(ROOT, 'src'))
   return hits
 }
 

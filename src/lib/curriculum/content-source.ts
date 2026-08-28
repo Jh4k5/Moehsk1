@@ -44,6 +44,7 @@ import { dailyQA2 } from '@/data/hsk2/qa2'
 import { dailyQA3 } from '@/data/hsk3/qa3'
 import { HSK1_EXAM_BANK } from '@/data/examBank'
 import { HSK2_EXAM_BANK } from '@/data/hsk2/examBank2'
+import { HSK3_EXAM_BANK } from '@/data/hsk3/examBank3'
 import type { HskLevelNo } from './types'
 
 // Shapes and the pure `hanziOf` helper live in ./content-types — a module with
@@ -242,8 +243,7 @@ const LEVELS: Record<HskLevelNo, LevelContent> = {
     stories: toStoryRecords(stories3),
     pictures: toPictures(VISUAL_DICT_CATEGORIES_3),
     qa: toQa(dailyQA3),
-    exam: [], // [2.17] HSK3 bank not authored yet — a chapter exam here is
-    // reported as 'not ready' rather than rendered as a paper with no questions.
+    exam: toExam(HSK3_EXAM_BANK),
   }),
 }
 

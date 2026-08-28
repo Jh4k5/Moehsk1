@@ -1,6 +1,7 @@
 {
   "applied": [
     "0002-hsk1-word-count",
-    "0001-pinyin-umlaut"
+    "0001-pinyin-umlaut",
+    "0003-hsk1-exam-vocab"
   ]
 }

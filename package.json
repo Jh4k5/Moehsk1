@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "validate:content": "node scripts/validate-content.js",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run validate:content && npm run check:activities && npm run check:stages && npm run check:content && npm run check:progress && npm run check:payments && npm run check:admin",
+    "check": "npm run typecheck && npm run validate:content && npm run check:activities && npm run check:stages && npm run check:content && npm run check:exam && npm run check:progress && npm run check:payments && npm run check:admin",
     "check:paywall": "node scripts/check-paywall.js",
     "check:activities": "node scripts/check-activities.js",
     "check:progress": "node scripts/check-progress.js",
@@ -18,7 +18,8 @@
     "verify": "npm run check && npm run build && npm run check:paywall",
     "check:stages": "node scripts/check-stages.js",
     "check:content": "node scripts/check-content.js",
-    "audit": "node scripts/audit-content.js"
+    "audit": "node scripts/audit-content.js",
+    "check:exam": "node scripts/check-exam-vocab.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

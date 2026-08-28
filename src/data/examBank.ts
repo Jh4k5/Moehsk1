@@ -41,6 +41,15 @@ export interface ReadingMatchQuestion {
   id: string
   hanzi: string
   options: MCQOption[]
+  /**
+   * Why the answer is what it is.
+   *
+   * Optional because the original HSK1 items were written without one — the
+   * learner picked a picture and was told only right or wrong. The brief asks
+   * for feedback that EXPLAINS rather than announces, so every newly authored
+   * item carries it and the adapter already reads it.
+   */
+  explanation_ar?: string
 }
 
 export interface ReadingTrueFalse {
@@ -221,7 +230,7 @@ export const HSK1_EXAM_BANK: HSK1ExamBank = {
       dialogue: [
         { speaker: "\u7537", text: "\u73B0\u5728\u662F\u51E0\u70B9\uFF1F" },
         { speaker: "\u5973", text: "\u73B0\u5728\u516B\u70B9\u3002" },
-        { speaker: "\u7537", text: "\u554A\uFF0C\u6211\u8BE5\u4E0A\u8BFE\u4E86\u3002" },
+        { speaker: "\u7537", text: "\u6211\u8981\u53BB\u5B66\u6821\u3002" },
       ],
       question_ar: "\u0643\u0645 \u0627\u0644\u0633\u0627\u0639\u0629 \u0627\u0644\u0622\u0646\u061F",
       options: ["\u0633\u0628\u0639\u0629", "\u062B\u0645\u0627\u0646\u064A\u0629", "\u062A\u0633\u0639\u0629", "\u0639\u0634\u0631\u0629"],
@@ -323,12 +332,12 @@ export const HSK1_EXAM_BANK: HSK1ExamBank = {
     },
     {
       id: "rp1_03",
-      hanzi: "\u732B",
+      hanzi: "\u4E66",
       options: [
-        { emoji: "\uD83D\uDC15", label: "\u0643\u0644\u0628", correct: false },
-        { emoji: "\uD83D\uDC1F", label: "\u0633\u0645\u0643\u0629", correct: false },
-        { emoji: "\uD83D\uDC31", label: "\u0642\u0637\u0629", correct: true },
-        { emoji: "\uD83D\uDC26", label: "\u0637\u0627\u0626\u0631", correct: false },
+        { emoji: "\uD83D\uDCF1", label: "\u0647\u0627\u062A\u0641", correct: false },
+        { emoji: "\uD83E\uDD64", label: "\u0643\u0648\u0628", correct: false },
+        { emoji: "\uD83D\uDCD6", label: "\u0643\u062A\u0627\u0628", correct: true },
+        { emoji: "\uD83D\uDE97", label: "\u0633\u064A\u0627\u0631\u0629", correct: false },
       ],
     },
     {
@@ -359,11 +368,11 @@ export const HSK1_EXAM_BANK: HSK1ExamBank = {
   reading_part2: [
     {
       id: "rp2_01",
-      hanzi: "\u5979\u5728\u559D\u5496\u5561\u3002",
+      hanzi: "\u5979\u5728\u559D\u8336\u3002",
       image_emoji: "\uD83C\uDF75",
       image_label: "\u0634\u0627\u064A",
-      correct: false,
-      explanation_ar: "\"\u5496\u5561\" \u062A\u0639\u0646\u064A \"\u0642\u0647\u0648\u0629\" \u0648\u0644\u064A\u0633 \"\u0634\u0627\u064A\". \u0627\u0644\u0635\u0648\u0631\u0629 \u062A\u0638\u0647\u0631 \u0627\u0644\u0634\u0627\u064A \u0648\u0644\u064A\u0633 \u0627\u0644\u0642\u0647\u0648\u0629. \u0627\u0644\u0625\u062C\u0627\u0628\u0629 \u062E\u0627\u0637\u0626\u0629.",
+      correct: true,
+      explanation_ar: "\u00AB\u8336\u00BB \u062A\u0639\u0646\u064A \u00AB\u0634\u0627\u064A\u00BB\u060C \u0648\u0627\u0644\u0635\u0648\u0631\u0629 \u062A\u064F\u0638\u0647\u0631 \u0627\u0644\u0634\u0627\u064A. \u0627\u0644\u0625\u062C\u0627\u0628\u0629 \u0635\u062D\u064A\u062D\u0629.",
     },
     {
       id: "rp2_02",
@@ -383,11 +392,11 @@ export const HSK1_EXAM_BANK: HSK1ExamBank = {
     },
     {
       id: "rp2_04",
-      hanzi: "\u4ED6\u4EEC\u5728\u6253\u7403\u3002",
+      hanzi: "\u4ED6\u4EEC\u5728\u770B\u4E66\u3002",
       image_emoji: "\uD83C\uDFCA",
       image_label: "\u0633\u0628\u0627\u062D\u0629",
       correct: false,
-      explanation_ar: "\"\u6253\u7403\" \u062A\u0639\u0646\u064A \"\u0627\u0644\u0644\u0639\u0628 \u0628\u0643\u0631\u0629\" \u0648\u0644\u064A\u0633 \"\u0627\u0644\u0633\u0628\u0627\u062D\u0629\". \u0627\u0644\u0635\u0648\u0631\u0629 \u062A\u0638\u0647\u0631 \u0634\u062E\u0635\u064B\u0627 \u064A\u0633\u0628\u062D \u0648\u0644\u064A\u0633 \u064A\u0644\u0639\u0628. \u0627\u0644\u0625\u062C\u0627\u0628\u0629 \u062E\u0627\u0637\u0626\u0629.",
+      explanation_ar: "\u00AB\u770B\u4E66\u00BB \u062A\u0639\u0646\u064A \u00AB\u064A\u0642\u0631\u0623 \u0643\u062A\u0627\u0628\u064B\u0627\u00BB \u0648\u0644\u064A\u0633 \u00AB\u0627\u0644\u0633\u0628\u0627\u062D\u0629\u00BB. \u0627\u0644\u0635\u0648\u0631\u0629 \u062A\u064F\u0638\u0647\u0631 \u0634\u062E\u0635\u064B\u0627 \u064A\u0633\u0628\u062D. \u0627\u0644\u0625\u062C\u0627\u0628\u0629 \u062E\u0627\u0637\u0626\u0629.",
     },
     {
       id: "rp2_05",
@@ -413,11 +422,11 @@ export const HSK1_EXAM_BANK: HSK1ExamBank = {
     },
     {
       id: "rp3_02",
-      sentence: "\u4ED6\u6BCF\u5929\u65E9\u4E0A\u559D___\u3002",
-      word_choices: ["\u5496\u5561", "\u725B\u5976", "\u6C34", "\u8336"],
+      sentence: "\u4ED6\u65E9\u4E0A\u559D___\u3002",
+      word_choices: ["\u83DC", "\u725B\u5976", "\u6C34", "\u8336"],
       correct_index: 3,
-      full_sentence: "\u4ED6\u6BCF\u5929\u65E9\u4E0A\u559D\u8336\u3002",
-      translation_ar: "\u0647\u0648 \u064A\u0634\u0631\u0628 \u0627\u0644\u0634\u0627\u064A \u0643\u0644 \u0635\u0628\u0627\u062D.",
+      full_sentence: "\u4ED6\u65E9\u4E0A\u559D\u8336\u3002",
+      translation_ar: "\u0647\u0648 \u064A\u0634\u0631\u0628 \u0627\u0644\u0634\u0627\u064A \u0641\u064A \u0627\u0644\u0635\u0628\u0627\u062D.",
     },
     {
       id: "rp3_03",
@@ -454,7 +463,7 @@ export const HSK1_EXAM_BANK: HSK1ExamBank = {
     {
       id: "rp3_07",
       sentence: "\u8FD9\u4E2A___\u5F88\u597D\u5403\u3002",
-      word_choices: ["\u82F9\u679C", "\u4E66", "\u7535\u5F71", "\u97F3\u4E50"],
+      word_choices: ["\u82F9\u679C", "\u4E66", "\u7535\u5F71", "\u8F66"],
       correct_index: 0,
       full_sentence: "\u8FD9\u4E2A\u82F9\u679C\u5F88\u597D\u5403\u3002",
       translation_ar: "\u0647\u0630\u0647 \u0627\u0644\u062A\u0641\u0627\u062D\u0629 \u0644\u0630\u064A\u0630\u0629 \u062C\u062F\u064B\u0627.",
@@ -470,10 +479,10 @@ export const HSK1_EXAM_BANK: HSK1ExamBank = {
     {
       id: "rp3_09",
       sentence: "\u8BF7\u4F60___\u4E00\u4E0B\u3002",
-      word_choices: ["\u5750", "\u7B49", "\u770B", "\u8BF4"],
-      correct_index: 1,
-      full_sentence: "\u8BF7\u4F60\u7B49\u4E00\u4E0B\u3002",
-      translation_ar: "\u0645\u0646 \u0641\u0636\u0644\u0643 \u0627\u0646\u062A\u0638\u0631 \u0642\u0644\u064A\u0644\u064B\u0627.",
+      word_choices: ["\u5750", "\u5403", "\u770B", "\u8BF4"],
+      correct_index: 0,
+      full_sentence: "\u8BF7\u4F60\u5750\u4E00\u4E0B\u3002",
+      translation_ar: "\u0645\u0646 \u0641\u0636\u0644\u0643 \u0627\u062C\u0644\u0633 \u0642\u0644\u064A\u0644\u064B\u0627.",
     },
     {
       id: "rp3_10",

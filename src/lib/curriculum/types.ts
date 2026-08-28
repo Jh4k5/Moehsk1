@@ -77,6 +77,7 @@ export interface Unit {
  * See the plan's «كل قسم من الـ١٧ يصير نوع نشاط داخل الوحدة» table.
  */
 export type ActivityKind =
+  | 'explanation'        // الشرح: the teaching card that opens a group
   | 'word-intro'         // المفردات — تعرّف: the six-stage new-word card
   | 'word-recall'        // المفردات — استدعاء: recognition/production recall
   | 'hanzi-write'        // الحروف: trace the character in stroke order
@@ -97,6 +98,32 @@ export type ActivityKind =
 
 /** Where an activity sits on the recognition → production ramp. */
 export type ActivityMode = 'present' | 'recognise' | 'produce' | 'break'
+
+// ── [2.1] The explanation ───────────────────────────────────────────────────
+
+/** One worked example. Both languages, always — see [4.6]. */
+export interface ExplanationExample {
+  zh: string
+  pinyin: string
+  ar: string
+  en: string
+}
+
+/**
+ * A mistake learners actually make, and what to do instead.
+ *
+ * Not decoration. Naming the wrong form beside the right one is what stops a
+ * learner inventing «我是很好» from an English habit; a rule stated only in the
+ * positive leaves every wrong path equally plausible.
+ */
+export interface CommonMistake {
+  /** The wrong form, as a learner would write it. */
+  wrongZh: string
+  /** The corrected form. */
+  rightZh: string
+  whyAr: string
+  whyEn: string
+}
 
 /** Why the engine emitted this activity — drives copy and progress weighting. */
 export type ActivitySource =
@@ -157,6 +184,47 @@ export interface MultipleChoice {
 }
 
 // ── One interface per kind ──────────────────────────────────────────────────
+
+/**
+ * THE TEACHING CARD. [2.1]
+ *
+ * The platform had none. Every one of the seventeen kinds below asks the
+ * learner for something; not one of them told them anything first. That is the
+ * gap the owner named — «تمرين بلا تدريس» — and it is the difference between a
+ * lesson and a quiz.
+ *
+ * It carries what an explanation needs and nothing that belongs to a drill:
+ * the idea in one paragraph, worked examples in both languages, the mistakes
+ * learners actually make, and a single line to carry away. No answer, no
+ * scoring, no verdict — a learner cannot get an explanation wrong.
+ */
+export interface ExplanationActivity extends ActivityBase {
+  kind: 'explanation'
+  /** What this card teaches: a grammar rule, or the unit's new vocabulary. */
+  topic: 'grammar' | 'vocabulary' | 'pronunciation' | 'writing'
+  /** Set when `topic` is 'grammar'. */
+  grammarId?: number
+  titleAr: string
+  titleEn: string
+  /** The idea, in a paragraph a beginner can hold. */
+  ideaAr: string
+  ideaEn: string
+  /** The shape, e.g. «فاعل + 是 + اسم». */
+  patternAr: string
+  patternEn: string
+  examples: ExplanationExample[]
+  mistakes: CommonMistake[]
+  /** One line to carry away. */
+  summaryAr: string
+  summaryEn: string
+  /**
+   * Whether a human has signed off on the authored parts.
+   *
+   * The owner's rule: anything the machine wrote waits for review. This travels
+   * with the content so a screen can mark it and a report can count it.
+   */
+  status: 'authored' | 'needs_review'
+}
 
 /** WordCard.dc.html — the six stages: see it, hear it, break it down,
  *  mnemonic, write it, use it. */
@@ -354,6 +422,7 @@ export interface ExamStyleActivity extends ActivityBase {
 }
 
 export type Activity =
+  | ExplanationActivity
   | WordIntroActivity
   | WordRecallActivity
   | HanziWriteActivity
@@ -372,8 +441,9 @@ export type Activity =
   | GameBreakActivity
   | ExamStyleActivity
 
-/** All 17 kinds, in the order the plan lists them. */
+/** All 18 kinds — the original 17 plus the explanation that now opens them. */
 export const ACTIVITY_KINDS: ActivityKind[] = [
+  'explanation',
   'word-intro',
   'word-recall',
   'hanzi-write',
@@ -395,6 +465,7 @@ export const ACTIVITY_KINDS: ActivityKind[] = [
 
 /** Arabic label per kind — the pill above the activity card in the designs. */
 export const ACTIVITY_KIND_LABEL_AR: Record<ActivityKind, string> = {
+  explanation: 'شرح',
   'word-intro': 'كلمة جديدة',
   'word-recall': 'تذكّر الكلمة',
   'hanzi-write': 'اكتب الحرف',
@@ -421,6 +492,7 @@ export const ACTIVITY_KIND_LABEL_AR: Record<ActivityKind, string> = {
  * and this codebase keeps both languages at the call site on purpose.
  */
 export const ACTIVITY_KIND_LABEL_EN: Record<ActivityKind, string> = {
+  explanation: 'Explanation',
   'word-intro': 'New word',
   'word-recall': 'Recall the word',
   'hanzi-write': 'Write the character',

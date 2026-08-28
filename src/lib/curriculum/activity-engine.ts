@@ -54,6 +54,7 @@ import {
 // of the real 1,079.
 import { hanziOf, type LevelContent, type VocabWord } from './content-types'
 import { UNIT_STAGES, stageOfActivity, type StageId } from './lesson-stages'
+import { EXPLANATION_BY_GRAMMAR } from '@/data/explanations'
 import { makeRng, type Rng } from './rng'
 
 export { ACTIVITY_KIND_LABEL_AR }
@@ -357,6 +358,64 @@ function grammarBrief(ctx: Ctx, grammarId: number): Draft | null {
     description: rule.description,
     pattern: rule.pattern,
     examples: (rule.examples ?? []).slice(0, 2).map((e) => ({ zh: e.zh, pinyin: e.pinyin, ar: e.ar })),
+  } as Draft
+}
+
+/**
+ * [2.1] The teaching card that opens the unit.
+ *
+ * Built from the grammar rule — which is already bilingual, with the idea, the
+ * pattern and worked examples in both languages — plus the two things grammar
+ * data has never carried: the mistakes an Arabic speaker actually makes, and a
+ * line to carry away. Those come from `src/data/explanations`.
+ *
+ * WHY THIS IS NOT `grammar-brief`. The brief is a reminder shown mid-session:
+ * a title, a sentence, two examples, and then straight into a question about
+ * it. This card is the lesson — it is allowed to be long, it asks nothing, and
+ * it cannot be answered wrong. Collapsing the two would have meant either a
+ * reminder too heavy to reread or an explanation too thin to teach, which is
+ * the state the platform was already in.
+ *
+ * Returns null when the rule has no authored commentary yet. A unit then opens
+ * on its `grammar-brief` as before rather than on a half-empty teaching card:
+ * the explanation layer is being proven on one lesson first, by the owner's
+ * instruction, and the other 47 must not degrade while that happens.
+ */
+function explanation(ctx: Ctx, grammarId: number): Draft | null {
+  const rule = ctx.content.grammar.find((g) => g.id === grammarId)
+  if (!rule) return null
+  const authored = EXPLANATION_BY_GRAMMAR.get(`${ctx.ref.level}:${grammarId}`)
+  if (!authored) return null
+
+  const examples = (rule.examples ?? []).slice(0, 3).map((e) => ({
+    zh: e.zh,
+    pinyin: e.pinyin,
+    ar: e.ar,
+    // `en` is optional on the grammar type. Falling back to the Arabic would
+    // put Arabic on the English path, which is exactly the defect [4.1] is
+    // about; an empty string lets the screen omit the line instead of lying.
+    en: e.en ?? '',
+  }))
+
+  return {
+    kind: 'explanation',
+    mode: 'present',
+    source: 'new',
+    unit: ctx.ref,
+    wordIds: [],
+    topic: 'grammar',
+    grammarId,
+    titleAr: rule.titleAr || rule.title,
+    titleEn: rule.title,
+    ideaAr: rule.description,
+    ideaEn: rule.descriptionEn ?? '',
+    patternAr: rule.pattern,
+    patternEn: rule.patternEn ?? '',
+    examples,
+    mistakes: [...authored.mistakes],
+    summaryAr: authored.summaryAr,
+    summaryEn: authored.summaryEn,
+    status: authored.status,
   } as Draft
 }
 
@@ -779,6 +838,18 @@ export function buildActivityStream(
   // a word and needing it stays short, which is when a first repetition sticks.
   const PRESENT_BATCH = 2
   const present: (Draft | null)[] = []
+
+  // THE EXPLANATION COMES FIRST — before the first new word, not after it.
+  // «الشرح قبل التمرين»: a learner meets the rule that the unit's sentences are
+  // built on, and only then meets the words that fill it.
+  //
+  // Held OUT of `present` and prepended after assembly. Everything inside a
+  // phase goes through `breakUpRuns`, which reorders to keep three of a kind
+  // from sitting together — and it duly moved the explanation into the middle
+  // of the word cards, since as a lone item of its kind it is the cheapest
+  // thing to shuffle. A card whose whole purpose is to come first cannot be
+  // subject to a rule about variety.
+  const teach = unit.grammarIds[0] != null ? explanation(ctx, unit.grammarIds[0]) : null
   for (let start = 0; start < words.length; start += PRESENT_BATCH) {
     const batch = words.slice(start, start + PRESENT_BATCH)
     for (const [i, w] of batch.entries()) {
@@ -892,6 +963,9 @@ export function buildActivityStream(
       return breakUpRuns(trimToBudget(p, budget))
     })
   }
+
+  // The explanation goes back on the front, past every trim and every shuffle.
+  if (teach) body = [teach, ...body]
 
   // The lesson's last unit closes with exam-format items. Added AFTER the trim
   // so the assessment is never what gets cut to fit.

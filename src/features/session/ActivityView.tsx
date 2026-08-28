@@ -41,6 +41,8 @@ export function ActivityView(props: ActivityViewProps) {
 function Body({ activity, answered, onAnswer, onReady, locale }: ActivityViewProps) {
   const t = makeT(locale)
   switch (activity.kind) {
+    case 'explanation':
+      return <Explanation activity={activity} onReady={onReady} locale={locale} />
     case 'word-intro':
       return <WordIntro activity={activity} onReady={onReady} locale={locale} />
     case 'grammar-brief':
@@ -346,6 +348,77 @@ function WordIntro({
           <SentenceBlock zh={example.zh} pinyin={example.pinyin} ar={example.ar} locale={locale} />
         </section>
       )}
+
+      <ReadyButton onReady={onReady} label={t('فهمت', 'Got it')} />
+    </>
+  )
+}
+
+/**
+ * [2.1] The teaching card.
+ *
+ * Deliberately the only screen in this file with no answer, no verdict bar and
+ * no scoring — a learner cannot get an explanation wrong, and giving it a
+ * button that says «تحقّق» would turn the one part of the lesson that teaches
+ * into another part that tests.
+ *
+ * The order is the order a person reads in: the idea, then the shape, then
+ * worked examples, then what goes wrong, then one line to keep. The mistakes
+ * come AFTER the examples on purpose — a wrong form shown before the right one
+ * is what the reader remembers.
+ */
+function Explanation({
+  activity,
+  onReady,
+  locale,
+}: {
+  activity: Extract<Activity, { kind: 'explanation' }>
+  onReady: () => void
+  locale: Locale
+}) {
+  const t = makeT(locale)
+  const en = locale === 'en'
+  const title = en ? activity.titleEn : activity.titleAr
+  const idea = en ? activity.ideaEn : activity.ideaAr
+  const pattern = en ? activity.patternEn : activity.patternAr
+  const summary = en ? activity.summaryEn : activity.summaryAr
+
+  return (
+    <>
+      <Prompt title={title} />
+      {idea && <p className="j-grammar-desc">{idea}</p>}
+      {pattern && <div className="j-pattern" dir={en ? 'ltr' : 'rtl'}>{pattern}</div>}
+
+      {activity.examples.map((ex) => (
+        <SentenceBlock
+          key={ex.zh}
+          zh={ex.zh}
+          pinyin={ex.pinyin}
+          ar={ex.ar}
+          en={ex.en}
+          locale={locale}
+        />
+      ))}
+
+      {activity.mistakes.length > 0 && (
+        <div className="j-mistakes">
+          <h4 className="j-mistakes-title">{t('أخطاء شائعة', 'Common mistakes')}</h4>
+          {activity.mistakes.map((m) => (
+            <div key={m.wrongZh + m.rightZh} className="j-mistake">
+              <div className="j-mistake-pair">
+                {/* The cross and the check carry the judgement, not the colour
+                    alone — the verdict has to survive a colour-blind reader and
+                    a greyscale screenshot. */}
+                <span className="j-mistake-wrong"><span aria-hidden>✗</span> {m.wrongZh}</span>
+                <span className="j-mistake-right"><span aria-hidden>✓</span> {m.rightZh}</span>
+              </div>
+              <p className="j-mistake-why">{en ? m.whyEn : m.whyAr}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {summary && <p className="j-explanation-summary">{summary}</p>}
 
       <ReadyButton onReady={onReady} label={t('فهمت', 'Got it')} />
     </>

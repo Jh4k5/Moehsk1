@@ -97,7 +97,7 @@ export const LESSON_STAGES: readonly StageSpec[] = [
     purposeAr: 'القاعدة والكلمات الجديدة، بأمثلة مشروحة قبل أي سؤال.',
     purposeEn: 'The rule and the new words, worked through before anything is asked.',
     scope: 'unit',
-    kinds: ['word-intro', 'grammar-brief'],
+    kinds: ['explanation', 'word-intro', 'grammar-brief'],
     requires: ['intro'],
     required: true,
   },

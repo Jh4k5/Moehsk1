@@ -110,24 +110,41 @@ export function Prompt({ title, sub }: { title: string; sub?: string }) {
 }
 
 /** A Chinese sentence with its pinyin and its gloss, the shape used everywhere. */
+/**
+ * A Chinese sentence with its reading and its gloss.
+ *
+ * [4.1] The gloss is CHOSEN HERE, not by the caller. Every call site used to
+ * pass `ar={...}` unconditionally, so the English route rendered Arabic under
+ * every sentence on the platform — the data carried an English field and no
+ * screen ever read it. Making the component pick means a new call site cannot
+ * reintroduce that by forgetting.
+ *
+ * When `en` is missing on the English route the Arabic is NOT substituted: the
+ * line is dropped. A missing translation should look missing, so it gets
+ * authored; silently showing Arabic to an English reader is what let 1,890
+ * untranslated sentences sit unnoticed.
+ */
 export function SentenceBlock({
   zh,
   pinyin,
   ar,
+  en,
   listen = true,
   locale,
 }: {
   zh: string
   pinyin?: string
   ar?: string
+  en?: string
   listen?: boolean
   locale: Locale
 }) {
+  const gloss = locale === 'en' ? en : ar
   return (
     <div className="j-sentence">
       <Hanzi text={zh} size="lg" />
       {pinyin && <span className="j-sentence-pinyin" dir="ltr">{pinyin}</span>}
-      {ar && <span className="j-sentence-ar">{ar}</span>}
+      {gloss && <span className="j-sentence-ar">{gloss}</span>}
       {listen && <Listen text={zh} locale={locale} />}
     </div>
   )

@@ -53,6 +53,7 @@ import {
 // It also makes the engine testable with a handful of fabricated words instead
 // of the real 1,079.
 import { hanziOf, type LevelContent, type VocabWord } from './content-types'
+import { UNIT_STAGES, stageOfActivity, type StageId } from './lesson-stages'
 import { makeRng, type Rng } from './rng'
 
 export { ACTIVITY_KIND_LABEL_AR }
@@ -830,28 +831,66 @@ export function buildActivityStream(
   // trimmed to its share of the budget FIRST, then interleaved, and the phase
   // boundaries are preserved throughout — a produce drill must never precede
   // the presentation it depends on.
-  const phases = [
-    present.filter((d): d is Draft => d !== null),
-    recognise.filter((d): d is Draft => d !== null),
-    produce.filter((d): d is Draft => d !== null),
-  ]
+  //
+  // ── The phases are now STAGES ───────────────────────────────────────────
+  //
+  // present/recognise/produce was a recognition→production ramp, and a sound
+  // one, but it is not the lesson shape the platform promises. A learner met a
+  // pinyin drill in "recognise" and a writing drill in "produce" with nothing
+  // in between calling either of them a stage of a lesson, and the measured
+  // result was 191 units out of 191 running their activities out of teaching
+  // order — 3,093 violations of «الشرح قبل التمرين».
+  //
+  // The drafts are the same drafts. They are simply bucketed by the stage that
+  // owns them (`lesson-stages.ts`) and emitted in the stage table's order, so
+  // the sequence a learner walks is the sequence the platform documents.
+  //
+  // `stageOfActivity` — not `stageOfKind` — because the presentation's own
+  // comprehension check is a `word-recall`, and reading it by kind alone would
+  // exile it to the end of the session and undo the batching two paragraphs
+  // above. See the note on that function.
+  const staged = new Map<StageId, Draft[]>()
+  for (const draft of [...present, ...recognise, ...produce]) {
+    if (!draft) continue
+    const stage = stageOfActivity(draft.kind, draft.source) ?? 'practice'
+    const bucket = staged.get(stage)
+    if (bucket) bucket.push(draft)
+    else staged.set(stage, [draft])
+  }
+  const phases = UNIT_STAGES.map((stage) => staged.get(stage.id) ?? []).filter((p) => p.length > 0)
   const total = phases.reduce((n, p) => n + p.length, 0)
   let body: Draft[] = []
   if (total <= MAX_ACTIVITIES_PER_UNIT) {
     body = phases.flatMap(breakUpRuns)
   } else {
-    // The presentation phase is never squeezed: it is one card per new word
-    // plus its first recall, and cutting it means not teaching a word the unit
-    // claims to teach. The budget comes out of recognise and produce.
-    const presentSize = phases[0].length
-    const spare = Math.max(0, MAX_ACTIVITIES_PER_UNIT - presentSize)
-    const drillTotal = phases[1].length + phases[2].length
-    const share = (n: number) => (drillTotal === 0 ? 0 : Math.round((n / drillTotal) * spare))
-    body = [
-      ...breakUpRuns(phases[0]),
-      ...breakUpRuns(trimToBudget(phases[1], share(phases[1].length))),
-      ...breakUpRuns(trimToBudget(phases[2], spare - share(phases[1].length))),
-    ]
+    // The EXPLANATION stage is never squeezed: it is the rule, one card per new
+    // word, and each word's first check. Cutting it means not teaching a word
+    // the unit claims to teach — the one thing a budget must never buy. Every
+    // other stage gives up room in proportion to its size, so a long unit loses
+    // a few drills from each rather than losing a whole stage.
+    const isExplanation = (p: Draft[]) =>
+      p.length > 0 && stageOfActivity(p[0].kind, p[0].source) === 'explanation'
+    const taught = phases.filter(isExplanation)
+    const drills = phases.filter((p) => !isExplanation(p))
+    const taughtSize = taught.reduce((n, p) => n + p.length, 0)
+    const spare = Math.max(0, MAX_ACTIVITIES_PER_UNIT - taughtSize)
+    const drillTotal = drills.reduce((n, p) => n + p.length, 0)
+
+    let allocated = 0
+    const budgets = drills.map((p, i) => {
+      // The last drill stage takes whatever rounding left over, so the budgets
+      // always sum to `spare` exactly instead of drifting by a unit or two.
+      if (i === drills.length - 1) return Math.max(0, spare - allocated)
+      const share = drillTotal === 0 ? 0 : Math.round((p.length / drillTotal) * spare)
+      allocated += share
+      return share
+    })
+
+    body = phases.flatMap((p) => {
+      if (isExplanation(p)) return breakUpRuns(p)
+      const budget = budgets[drills.indexOf(p)] ?? p.length
+      return breakUpRuns(trimToBudget(p, budget))
+    })
   }
 
   // The lesson's last unit closes with exam-format items. Added AFTER the trim
@@ -859,12 +898,19 @@ export function buildActivityStream(
   if (unit.carriesExam && !options.skipExam) body = [...body, ...examStyle(ctx, 3)]
 
   // Game breaks go in last, so their spacing counts real activities.
+  //
+  // NEVER inside the explanation. A break is a reward for effort spent, and the
+  // presentation is the part a learner must walk through unbroken — cutting a
+  // game into the middle of "here are your new words" interrupts teaching to
+  // offer a distraction, which is the Duolingo failure this platform exists to
+  // avoid. Breaks land in the drill stages, where the effort actually is.
   let breaksUsed = 0
   const withBreaks: Draft[] = []
   for (const [i, draft] of body.entries()) {
     const spaced = i > 0 && i % GAME_BREAK_EVERY === 0
     const roomLeft = i < body.length - 2
-    if (spaced && roomLeft && breaksUsed < MAX_GAME_BREAKS) {
+    const teaching = stageOfActivity(draft.kind, draft.source) === 'explanation'
+    if (spaced && roomLeft && !teaching && breaksUsed < MAX_GAME_BREAKS) {
       withBreaks.push(gameBreak(ctx, unit.wordIds))
       breaksUsed++
     }

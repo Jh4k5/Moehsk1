@@ -26,7 +26,7 @@
 // recall of the last twenty minutes; an exam after a chapter is the only one
 // that measures whether anything was retained.
 
-import type { ActivityKind } from './types'
+import type { ActivityKind, ActivitySource } from './types'
 
 export type StageId =
   | 'intro'
@@ -152,7 +152,6 @@ export const LESSON_STAGES: readonly StageSpec[] = [
       'fill-blank',
       'translate',
       'image-match',
-      'game-break',
     ],
     requires: ['explanation'],
     required: true,
@@ -204,6 +203,41 @@ export function stageOfKind(kind: ActivityKind): StageId | null {
   return KIND_TO_STAGE.get(kind) ?? null
 }
 
+/**
+ * The stage an activity belongs to, taking its SOURCE into account.
+ *
+ * Kind alone is not enough for one case, and it is the case that matters most.
+ * The engine presents two new words and then immediately asks for those two
+ * back before moving on — a `word-recall` carrying `source: 'new'`. That recall
+ * is not a drill in the stage-6 sense; it is the comprehension check that
+ * closes a presentation, and the gap between meeting a word and needing it is
+ * exactly why it sticks. Reading it as stage 6 would force the engine to move
+ * every recall to the end of the session and throw that away in the name of
+ * obeying the order.
+ *
+ * So: a recall of a word this unit has JUST introduced belongs to the
+ * explanation stage. A recall sourced from practice, spaced review or
+ * remediation belongs to practice, where it always did.
+ */
+export function stageOfActivity(kind: ActivityKind, source: ActivitySource): StageId | null {
+  if (kind === 'word-recall' && source === 'new') return 'explanation'
+  return stageOfKind(kind)
+}
+
+/**
+ * A `game-break` belongs to NO stage, deliberately, and is listed in none of
+ * the `kinds` arrays above.
+ *
+ * It is a breather placed by activity count, not a step in the lesson. When it
+ * was filed under `practice` the validator read the first break — dropped in at
+ * position 6, in the middle of the presentation — as the lesson reaching stage
+ * 6, and then flagged every remaining new-word card as running backwards. One
+ * misfiled kind accounted for most of a 3,000-violation count.
+ *
+ * `stageOfKind` returns null for it, so `validateStages` skips it rather than
+ * letting a pause reorder the lesson around it.
+ */
+
 /** The stages that run inside a unit session, in order. */
 export const UNIT_STAGES: readonly StageSpec[] = LESSON_STAGES
   .filter((s) => s.scope === 'unit')
@@ -242,13 +276,15 @@ export interface StageViolation {
  * Returns an empty array for a well-ordered stream, so a caller can assert on
  * `.length === 0`.
  */
-export function validateStages(kinds: readonly ActivityKind[]): StageViolation[] {
+export function validateStages(
+  stream: readonly { kind: ActivityKind; source: ActivitySource }[],
+): StageViolation[] {
   const violations: StageViolation[] = []
   const seen = new Set<StageId>()
   let highestOrder = 0
 
-  kinds.forEach((kind, index) => {
-    const stageId = stageOfKind(kind)
+  stream.forEach(({ kind, source }, index) => {
+    const stageId = stageOfActivity(kind, source)
     if (!stageId) return
     const stage = STAGE_BY_ID.get(stageId)
     if (!stage) return

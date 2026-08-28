@@ -29,6 +29,7 @@ import {
   GAME_BREAK_EVERY,
   MAX_KIND_RUN,
   type Activity,
+  type Bilingual,
   type ActivityKind,
   type ActivitySource,
   type Choice,
@@ -126,7 +127,22 @@ interface Ctx {
 }
 
 /** A distractor must be plausible and must not be the answer. */
-function distractorsFor(ctx: Ctx, answer: VocabWord, project: (w: VocabWord) => string): Choice[] {
+/**
+ * Wrong answers for a multiple choice.
+ *
+ * `projectEn` is the same projection on the English side. It exists because
+ * [4.1] is not only about instructions: a `zh-to-ar` recall drill labels its
+ * four options with Arabic MEANINGS, so an English learner was asked to pick
+ * between «ذلك الشيء» and «أنتم» — measured in a browser on the /en route.
+ * Passing both projections keeps the stream locale-neutral while letting the
+ * view render whichever side the reader can read.
+ */
+function distractorsFor(
+  ctx: Ctx,
+  answer: VocabWord,
+  project: (w: VocabWord) => string,
+  projectEn?: (w: VocabWord) => string,
+): Choice[] {
   const label = project(answer)
   const seen = new Set([label])
   // Prefer words of the same part of speech: "which means 'to eat'" is a real
@@ -141,7 +157,7 @@ function distractorsFor(ctx: Ctx, answer: VocabWord, project: (w: VocabWord) => 
     const text = project(w)
     if (!text || seen.has(text)) continue
     seen.add(text)
-    out.push({ label: text, wordId: w.id })
+    out.push({ label: text, labelEn: projectEn?.(w), wordId: w.id })
     if (out.length === DISTRACTORS) break
   }
   return out
@@ -151,7 +167,7 @@ function multipleChoice(
   ctx: Ctx,
   correctChoice: Choice,
   distractors: Choice[],
-  explanation: string,
+  explanation: Bilingual,
 ): MultipleChoice | null {
   // A question with fewer than two options is not a question.
   if (distractors.length === 0) return null
@@ -214,11 +230,24 @@ function wordRecall(
 ): Draft | null {
   const toArabic = direction === 'zh-to-ar'
   const project = toArabic ? (w: VocabWord) => w.meaning : (w: VocabWord) => w.zh
+  // On the English route the same drill is zh→en. The Chinese direction needs
+  // no twin: a character reads the same to both audiences.
+  const projectEn = toArabic ? (w: VocabWord) => w.english || w.meaning : undefined
   const question = multipleChoice(
     ctx,
-    { label: project(word), sub: toArabic ? undefined : word.pinyin, wordId: word.id },
-    distractorsFor(ctx, word, project),
-    `${word.zh} (${word.pinyin}) — ${word.meaning}`,
+    {
+      label: project(word),
+      labelEn: projectEn?.(word),
+      sub: toArabic ? undefined : word.pinyin,
+      wordId: word.id,
+    },
+    distractorsFor(ctx, word, project, projectEn),
+    // [4.1] `word.english` exists on all 1,079 words and was never read by
+    // anything. This is the first place it reaches a learner.
+    {
+      ar: `${word.zh} (${word.pinyin}) — ${word.meaning}`,
+      en: `${word.zh} (${word.pinyin}) — ${word.english}`,
+    },
   )
   if (!question) return null
   return {
@@ -245,7 +274,10 @@ function hanziWrite(ctx: Ctx, word: VocabWord, char: string): Draft {
     strokeCount: word.strokeCount ?? 0,
     inWord: { zh: word.zh, pinyin: word.pinyin, meaning: word.meaning },
     parts: partsOf(word),
-    hint: 'اكتب من الأعلى إلى الأسفل، ومن اليسار إلى اليمين.',
+    hint: {
+      ar: 'اكتب من الأعلى إلى الأسفل، ومن اليسار إلى اليمين.',
+      en: 'Write top to bottom, and left to right.',
+    },
   } as Draft
 }
 
@@ -274,7 +306,9 @@ function toneDiscriminate(ctx: Ctx, word: VocabWord): Draft | null {
   if (!variants) return null
 
   const correctLabel = variants[tone - 1]
-  const choices: Choice[] = variants.map((label, i) => ({ label, sub: `النبرة ${i + 1}` }))
+  // The sub-label is a bare number plus one word, so it is written in both
+  // languages here rather than pulled from a table.
+  const choices: Choice[] = variants.map((label, i) => ({ label, sub: `${i + 1}` }))
   const shuffled = ctx.rng.shuffle(choices)
   return {
     kind: 'tone-discriminate',
@@ -288,7 +322,10 @@ function toneDiscriminate(ctx: Ctx, word: VocabWord): Draft | null {
     question: {
       choices: shuffled,
       correct: shuffled.findIndex((c) => c.label === correctLabel),
-      explanation: `${word.zh} تُنطق «${word.pinyin}» — بالنبرة ${tone}.`,
+      explanation: {
+        ar: `${word.zh} تُنطق «${word.pinyin}» — بالنبرة ${tone}.`,
+        en: `${word.zh} is read «${word.pinyin}» — tone ${tone}.`,
+      },
     },
   } as Draft
 }
@@ -331,7 +368,10 @@ function imageMatch(ctx: Ctx, word: VocabWord): Draft | null {
     ctx,
     { label: word.zh, sub: word.pinyin, wordId: word.id },
     distractorsFor(ctx, word, (w) => w.zh),
-    `${match.emoji} = ${word.zh} (${word.pinyin}) — ${word.meaning}`,
+    {
+      ar: `${match.emoji} = ${word.zh} (${word.pinyin}) — ${word.meaning}`,
+      en: `${match.emoji} = ${word.zh} (${word.pinyin}) — ${word.english}`,
+    },
   )
   if (!question) return null
   return {
@@ -437,7 +477,10 @@ function grammarApply(ctx: Ctx, grammarId: number): Draft | null {
     ctx,
     { label: example.zh, sub: example.pinyin },
     distractors,
-    `${rule.pattern} — ${example.ar}`,
+    {
+      ar: `${rule.pattern} — ${example.ar}`,
+      en: rule.patternEn && example.en ? `${rule.patternEn} — ${example.en}` : '',
+    },
   )
   if (!question) return null
   return {
@@ -447,7 +490,10 @@ function grammarApply(ctx: Ctx, grammarId: number): Draft | null {
     unit: ctx.ref,
     wordIds: [],
     grammarId,
-    prompt: `أي جملة تتبع القاعدة: ${rule.titleAr || rule.title}؟`,
+    prompt: {
+      ar: `أي جملة تتبع القاعدة: ${rule.titleAr || rule.title}؟`,
+      en: `Which sentence follows the rule: ${rule.title}?`,
+    },
     question,
   } as Draft
 }
@@ -487,7 +533,10 @@ function fillBlank(ctx: Ctx, sentence: SentenceRef, word: VocabWord): Draft | nu
     ctx,
     { label: word.zh, sub: word.pinyin, wordId: word.id },
     distractorsFor(ctx, word, (w) => w.zh),
-    `${sentence.zh} — ${sentence.ar}`,
+    // Key sentences carry no English in the corpus — 1,890 of them. Empty
+    // rather than Arabic-labelled-as-English; the view falls back and the
+    // auditor counts the gap.
+    { ar: `${sentence.zh} — ${sentence.ar}`, en: '' },
   )
   if (!question) return null
   return {
@@ -514,9 +563,13 @@ function translate(ctx: Ctx, sentence: SentenceRef, wordIds: number[], direction
     .map((s) => ({ label: toArabic ? s.ar : s.zh, sub: toArabic ? undefined : s.pinyin }))
   const question = multipleChoice(
     ctx,
+    // A `translate` option in the zh→ar direction is the sentence's Arabic, and
+    // the corpus has no English for 1,890 key sentences. No `labelEn` to give:
+    // this one stays Arabic on the English route until those are authored, and
+    // the auditor counts it.
     { label: toArabic ? sentence.ar : sentence.zh, sub: toArabic ? undefined : sentence.pinyin },
     distractors,
-    `${sentence.zh} (${sentence.pinyin}) — ${sentence.ar}`,
+    { ar: `${sentence.zh} (${sentence.pinyin}) — ${sentence.ar}`, en: '' },
   )
   if (!question) return null
   return {
@@ -551,7 +604,7 @@ function roleplay(ctx: Ctx): Draft | null {
     ctx,
     { label: answer.zh, sub: answer.pinyin },
     distractors,
-    `${answer.zh} — ${answer.arabic}`,
+    { ar: `${answer.zh} — ${answer.arabic}`, en: '' },
   )
   if (!question) return null
   return {
@@ -562,7 +615,10 @@ function roleplay(ctx: Ctx): Draft | null {
     wordIds: ctx.unit.wordIds,
     conversationId: 0,
     scene: conv.scene,
-    prompt: `بماذا يردّ ${answer.name}؟`,
+    prompt: {
+      ar: `بماذا يردّ ${answer.name}؟`,
+      en: `What does ${answer.name} reply?`,
+    },
     cue: { zh: cue.zh, pinyin: cue.pinyin, ar: cue.arabic, speaker: cue.name },
     question,
   } as Draft
@@ -600,7 +656,10 @@ function storyExcerpt(ctx: Ctx): Draft | null {
     question: {
       choices: shuffled,
       correct: shuffled.findIndex((c) => c.label === correctLabel),
-      explanation: `من القصة: ${story.titleAr}`,
+      explanation: {
+        ar: `من القصة: ${story.titleAr}`,
+        en: `From the story: ${story.titleAr}`,
+      },
     },
   } as Draft
 }
@@ -617,15 +676,18 @@ function dailyQa(ctx: Ctx): Draft | null {
     wordIds: [],
     ask: item.question,
     modelAnswer: item.answer,
-    hint: 'أجب بأسلوبك، ثم قارن بالإجابة النموذجية.',
+    hint: {
+      ar: 'أجب بأسلوبك، ثم قارن بالإجابة النموذجية.',
+      en: 'Answer in your own words, then compare with the model answer.',
+    },
   } as Draft
 }
 
-const GAMES: { id: GameId; titleAr: string }[] = [
-  { id: 'match', titleAr: 'طابِق الكلمات' },
-  { id: 'memory', titleAr: 'لعبة الذاكرة' },
-  { id: 'tone-catch', titleAr: 'التقط النبرة' },
-  { id: 'speed-recall', titleAr: 'استدعاء سريع' },
+const GAMES: { id: GameId; title: Bilingual }[] = [
+  { id: 'match', title: { ar: 'طابِق الكلمات', en: 'Match the words' } },
+  { id: 'memory', title: { ar: 'لعبة الذاكرة', en: 'Memory game' } },
+  { id: 'tone-catch', title: { ar: 'التقط النبرة', en: 'Catch the tone' } },
+  { id: 'speed-recall', title: { ar: 'استدعاء سريع', en: 'Speed recall' } },
 ]
 
 function gameBreak(ctx: Ctx, poolWordIds: number[]): Draft {
@@ -637,7 +699,7 @@ function gameBreak(ctx: Ctx, poolWordIds: number[]): Draft {
     unit: ctx.ref,
     wordIds: [],
     game: game.id,
-    titleAr: game.titleAr,
+    title: game.title,
     poolWordIds,
   } as Draft
 }
@@ -646,7 +708,10 @@ function examStyle(ctx: Ctx, count: number): Draft[] {
   const bank = ctx.content.exam
   if (bank.length === 0) return []
   return ctx.rng.sample(bank, count).map((item) => {
-    const choices: Choice[] = item.options.map((label) => ({ label }))
+    const choices: Choice[] = item.options.map((label, i) => ({
+      label,
+      labelEn: item.optionsEn?.[i],
+    }))
     const correctLabel = item.options[item.correct]
     const shuffled = ctx.rng.shuffle(choices)
     return {
@@ -656,13 +721,13 @@ function examStyle(ctx: Ctx, count: number): Draft[] {
       unit: ctx.ref,
       wordIds: [],
       format: item.section === 'listening' ? 'listening-image' : 'reading-match',
-      prompt: item.promptAr,
+      prompt: { ar: item.promptAr, en: item.promptEn },
       stimulus: item.stimulus,
       stimulusPinyin: item.stimulusPinyin,
       question: {
         choices: shuffled,
         correct: shuffled.findIndex((c) => c.label === correctLabel),
-        explanation: item.explanationAr,
+        explanation: { ar: item.explanationAr, en: item.explanationEn },
       },
     } as Draft
   })

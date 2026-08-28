@@ -128,20 +128,23 @@ type ExamBank = {
 }
 
 /** True/false against a picture → a two-option choice. */
-function fromTf(items: TfItem[] | undefined, section: string, promptAr: string): ExamItem[] {
+function fromTf(items: TfItem[] | undefined, section: string, promptAr: string, promptEn: string): ExamItem[] {
   return (items ?? []).map((q) => ({
     section,
     promptAr: `${promptAr} ${q.image_emoji} ${q.image_label_ar ?? q.image_label ?? ''}`.trim(),
+    promptEn: `${promptEn} ${q.image_emoji} ${q.image_label ?? ''}`.trim(),
     stimulus: q.audio_text ?? q.hanzi ?? '',
     stimulusPinyin: '',
     options: ['✓ صحيح', '✗ خطأ'],
+    optionsEn: ['✓ True', '✗ False'],
     correct: q.correct ? 0 : 1,
     explanationAr: q.explanation_ar,
+    explanationEn: '',
   }))
 }
 
 /** Pick the matching picture. The key lives on the option, not on the item. */
-function fromPick(items: PickItem[] | undefined, section: string, promptAr: string): ExamItem[] {
+function fromPick(items: PickItem[] | undefined, section: string, promptAr: string, promptEn: string): ExamItem[] {
   return (items ?? [])
     .map((q) => {
       const correct = q.options.findIndex((o) => o.correct)
@@ -149,11 +152,13 @@ function fromPick(items: PickItem[] | undefined, section: string, promptAr: stri
       return {
         section,
         promptAr,
+        promptEn,
         stimulus: q.audio_text ?? q.hanzi ?? '',
         stimulusPinyin: '',
         options: q.options.map((o) => `${o.emoji} ${o.label}`),
         correct,
         explanationAr: q.explanation_ar ?? '',
+        explanationEn: '',
       }
     })
     .filter((x): x is ExamItem => x !== null)
@@ -163,11 +168,15 @@ function fromDialogue(items: DialogueItem[] | undefined): ExamItem[] {
   return (items ?? []).map((q) => ({
     section: 'listening',
     promptAr: q.question_ar,
+    // The dialogue bank is Arabic-only; an empty English prompt is honest and
+    // the view falls back rather than inventing a translation here.
+    promptEn: '',
     stimulus: q.dialogue.map((t) => `${t.speaker}: ${t.text}`).join('\n'),
     stimulusPinyin: '',
     options: q.options,
     correct: q.correct_index,
     explanationAr: q.explanation_ar,
+    explanationEn: '',
   }))
 }
 
@@ -175,22 +184,24 @@ function fromGap(items: GapItem[] | undefined): ExamItem[] {
   return (items ?? []).map((q) => ({
     section: 'reading',
     promptAr: 'أكمل الجملة بالكلمة المناسبة',
+    promptEn: 'Complete the sentence with the right word',
     stimulus: q.sentence,
     stimulusPinyin: '',
     options: q.word_choices,
     correct: q.correct_index,
     explanationAr: `${q.full_sentence} — ${q.translation_ar}`,
+    explanationEn: '',
   }))
 }
 
 function toExam(raw: unknown): ExamItem[] {
   const bank = (raw ?? {}) as ExamBank
   return [
-    ...fromTf(bank.listening_part1, 'listening', 'هل تطابق الجملةُ الصورة؟'),
-    ...fromPick(bank.listening_part2, 'listening', 'اختر الصورة التي تطابق ما سمعت'),
+    ...fromTf(bank.listening_part1, 'listening', 'هل تطابق الجملةُ الصورة؟', 'Does the sentence match the picture?'),
+    ...fromPick(bank.listening_part2, 'listening', 'اختر الصورة التي تطابق ما سمعت', 'Choose the picture that matches what you heard'),
     ...fromDialogue(bank.listening_part3),
-    ...fromPick(bank.reading_part1, 'reading', 'اختر الصورة التي تطابق الكلمة'),
-    ...fromTf(bank.reading_part2, 'reading', 'هل تطابق الجملةُ الصورة؟'),
+    ...fromPick(bank.reading_part1, 'reading', 'اختر الصورة التي تطابق الكلمة', 'Choose the picture that matches the word'),
+    ...fromTf(bank.reading_part2, 'reading', 'هل تطابق الجملةُ الصورة؟', 'Does the sentence match the picture?'),
     ...fromGap(bank.reading_part3),
   ]
 }

@@ -22,6 +22,7 @@ import { unitPassed } from '@/lib/curriculum/progress'
 import { useLearningStore } from '@/lib/store'
 import { hrefFor } from '@/components/nav/nav-model'
 import { makeT, type Locale } from '@/lib/locale'
+import { say } from '@/lib/curriculum/types'
 import type { Activity, Unit } from '@/lib/curriculum/types'
 
 /** Activities that grade nothing — a card the learner reads and moves past. */
@@ -218,7 +219,13 @@ export function SessionRunner({ unit, locale }: { unit: Unit; locale: Locale }) 
                 {lastCorrect ? t('إجابة صحيحة', 'Correct') : t('ليست الإجابة الصحيحة', 'Not the right answer')}
               </span>
               {'question' in activity && activity.question && 'explanation' in activity.question && (
-                <p className="j-verdict-why">{activity.question.explanation}</p>
+                // The English side may be empty where the source data has no
+                // English — the exam bank's explanations and every key sentence.
+                // A verdict with no reason is worse than a reason in the other
+                // language, so this one falls back rather than blanking.
+                <p className="j-verdict-why">
+                  {say(activity.question.explanation, locale) || activity.question.explanation.ar}
+                </p>
               )}
             </div>
           </div>

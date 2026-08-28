@@ -52,11 +52,17 @@ export interface ExamItem {
   /** HSK section this item imitates. */
   section: string
   promptAr: string
+  /** The same instruction in English. Empty where not yet authored. */
+  promptEn: string
   stimulus: string
   stimulusPinyin: string
   options: string[]
+  /** The same options in English, where the label is prose rather than Chinese. */
+  optionsEn?: string[]
   correct: number
   explanationAr: string
+  /** The same explanation in English. Empty where not yet authored. */
+  explanationEn: string
 }
 
 export interface LevelContent {

@@ -101,6 +101,30 @@ export type ActivityKind =
 /** Where an activity sits on the recognition → production ramp. */
 export type ActivityMode = 'present' | 'recognise' | 'produce' | 'break'
 
+/**
+ * [4.2] A string the learner reads, in both languages.
+ *
+ * The activity engine used to build its user-facing copy as bare Arabic
+ * template literals — «النبرة ٣», «بماذا يردّ ليلى؟», «اكتب من الأعلى إلى
+ * الأسفل» — eleven of them, reaching seven of the seventeen activity kinds.
+ * There was no `locale` anywhere in the engine to consult, so an English
+ * learner met Arabic instructions on every tone drill, every role-play and
+ * every writing board.
+ *
+ * Both languages travel together in the payload rather than the engine taking a
+ * locale, which keeps `buildActivityStream` pure and lets ONE built stream serve
+ * both routes.
+ */
+export interface Bilingual {
+  ar: string
+  en: string
+}
+
+/** Pick the reader's side of a bilingual string. */
+export function say(text: Bilingual, locale: 'ar' | 'en'): string {
+  return locale === 'en' ? text.en : text.ar
+}
+
 // ── [2.1] The explanation ───────────────────────────────────────────────────
 
 /** One worked example. Both languages, always — see [4.6]. */
@@ -171,6 +195,20 @@ export interface RadicalPart {
 export interface Choice {
   /** Primary label — Chinese, pinyin or Arabic depending on the drill. */
   label: string
+  /**
+   * The label in English, where it differs.
+   *
+   * Most choices are Chinese or pinyin and read the same on both routes, so
+   * this is absent for them. It exists for the few whose label is prose — the
+   * exam's «✓ صحيح / ✗ خطأ» being the case that forced it.
+   *
+   * NOT YET COVERED, and it is a content gap rather than a wiring one: a
+   * `translate` drill in the zh→ar direction labels its options with the
+   * sentence's Arabic, and the corpus has no English for 1,890 of those
+   * sentences. Those options stay Arabic on the English route until the
+   * translations are authored; `audit-content.js` counts them.
+   */
+  labelEn?: string
   /** Optional secondary line under the label (design shows both). */
   sub?: string
   /** Word id behind this choice, when the choice is a vocabulary word. */
@@ -181,8 +219,17 @@ export interface MultipleChoice {
   choices: Choice[]
   /** Index into `choices`. */
   correct: number
-  /** Arabic explanation shown in the verdict bar — always present. */
-  explanation: string
+  /**
+   * Explanation shown in the verdict bar — always present.
+   *
+   * `en` may be empty where the SOURCE DATA has no English (the HSK1 exam
+   * bank's explanations are Arabic-only, and 1,079 mnemonics have no English
+   * field at all). The view falls back to the Arabic in that case rather than
+   * showing an empty verdict: a learner who has just answered deserves to be
+   * told why, and a wrong-language reason beats no reason. The gap is content,
+   * counted by `audit-content.js`, and closes as the English is authored.
+   */
+  explanation: Bilingual
 }
 
 // ── One interface per kind ──────────────────────────────────────────────────
@@ -270,8 +317,8 @@ export interface HanziWriteActivity extends ActivityBase {
   inWord: { zh: string; pinyin: string; meaning: string }
   /** Components, for the stroke-rule hint. */
   parts: RadicalPart[]
-  /** Arabic hint under the board. */
-  hint: string
+  /** Hint under the board. */
+  hint: Bilingual
 }
 
 export interface ToneDiscriminateActivity extends ActivityBase {
@@ -326,8 +373,8 @@ export interface GrammarBriefActivity extends ActivityBase {
 export interface GrammarApplyActivity extends ActivityBase {
   kind: 'grammar-apply'
   grammarId: number
-  /** Arabic instruction line. */
-  prompt: string
+  /** Instruction line. */
+  prompt: Bilingual
   question: MultipleChoice
 }
 
@@ -362,8 +409,8 @@ export interface RoleplayActivity extends ActivityBase {
   conversationId: number
   /** Arabic scene line. */
   scene: string
-  /** Arabic instruction, e.g. «بماذا تجيب ليلى؟». */
-  prompt: string
+  /** Instruction, e.g. «بماذا تجيب ليلى؟» / "What does Laila reply?". */
+  prompt: Bilingual
   /** The turn the learner is answering. */
   cue: SentenceRef & { speaker: string }
   question: MultipleChoice
@@ -391,8 +438,8 @@ export interface DailyQaActivity extends ActivityBase {
   ask: SentenceRef
   /** A model answer the learner compares against. */
   modelAnswer: SentenceRef
-  /** Arabic nudge on how to adapt it. */
-  hint: string
+  /** Nudge on how to adapt it. */
+  hint: Bilingual
 }
 
 export type GameId = 'match' | 'memory' | 'tone-catch' | 'speed-recall'
@@ -400,8 +447,8 @@ export type GameId = 'match' | 'memory' | 'tone-catch' | 'speed-recall'
 export interface GameBreakActivity extends ActivityBase {
   kind: 'game-break'
   game: GameId
-  /** Arabic label of the game. */
-  titleAr: string
+  /** Label of the game. */
+  title: Bilingual
   /** Words the game should draw its items from. */
   poolWordIds: number[]
 }
@@ -415,8 +462,8 @@ export type ExamFormat =
 export interface ExamStyleActivity extends ActivityBase {
   kind: 'exam-style'
   format: ExamFormat
-  /** Arabic instruction line, HSK-paper wording. */
-  prompt: string
+  /** Instruction line, HSK-paper wording. */
+  prompt: Bilingual
   /** Chinese stimulus — the statement, sentence or fragment. */
   stimulus: string
   stimulusPinyin: string

@@ -16,6 +16,7 @@ import { HanziBoard } from './HanziBoard'
 import { speak } from '@/lib/tts'
 import { makeT, type Locale } from '@/lib/locale'
 import { hashString, makeRng } from '@/lib/curriculum/rng'
+import { say } from '@/lib/curriculum/types'
 import type { Activity } from '@/lib/curriculum/types'
 
 export interface ActivityViewProps {
@@ -127,7 +128,7 @@ function Body({ activity, answered, onAnswer, onReady, locale }: ActivityViewPro
           activity={activity}
           answered={answered}
           onAnswer={onAnswer}
-          title={activity.prompt}
+          title={say(activity.prompt, locale)}
           chinese
           locale={locale}
         />
@@ -184,7 +185,7 @@ function Body({ activity, answered, onAnswer, onReady, locale }: ActivityViewPro
           activity={activity}
           answered={answered}
           onAnswer={onAnswer}
-          title={activity.prompt}
+          title={say(activity.prompt, locale)}
           stimulus={
             <div className="j-scene">
               <p className="j-scene-line">{activity.scene}</p>
@@ -227,7 +228,7 @@ function Body({ activity, answered, onAnswer, onReady, locale }: ActivityViewPro
           activity={activity}
           answered={answered}
           onAnswer={onAnswer}
-          title={activity.prompt}
+          title={say(activity.prompt, locale)}
           stimulus={
             activity.stimulus ? (
               <div className="j-stimulus j-stimulus-exam">
@@ -461,7 +462,7 @@ function DailyQa({
   const [revealed, setRevealed] = useState(false)
   return (
     <>
-      <Prompt title={t('أجب بأسلوبك', 'Answer it your own way')} sub={activity.hint} />
+      <Prompt title={t('أجب بأسلوبك', 'Answer it your own way')} sub={say(activity.hint, locale)} />
       <SentenceBlock zh={activity.ask.zh} pinyin={activity.ask.pinyin} ar={activity.ask.ar} locale={locale} />
       {revealed ? (
         <>
@@ -496,7 +497,7 @@ function GameBreak({
   return (
     <div className="j-break">
       <Gamepad2 size={40} aria-hidden />
-      <h1>{activity.titleAr}</h1>
+      <h1>{say(activity.title, locale)}</h1>
       <p>{t('خذ نفَساً — فاصل قصير قبل أن نكمل.', 'Take a breath — a short break before we carry on.')}</p>
       <ReadyButton onReady={onReady} label={t('أكمل', 'Carry on')} />
     </div>
@@ -519,7 +520,7 @@ function HanziWrite({
   const t = makeT(locale)
   return (
     <>
-      <Prompt title={t(`اكتب ${activity.char}`, `Write ${activity.char}`)} sub={activity.hint} />
+      <Prompt title={t(`اكتب ${activity.char}`, `Write ${activity.char}`)} sub={say(activity.hint, locale)} />
       <div className="j-write-context">
         <Hanzi text={activity.inWord.zh} size="md" />
         <span className="j-sentence-pinyin" dir="ltr">{activity.inWord.pinyin}</span>

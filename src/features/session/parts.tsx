@@ -73,6 +73,10 @@ export function ChoiceList({ choices, picked, correct, onPick, chinese, locale }
   return (
     <ul className="j-choices">
       {choices.map((choice, i) => {
+        // The English label where one exists; otherwise the label as authored.
+        // Chinese and pinyin options read the same on both routes and carry no
+        // `labelEn`, so this is a no-op for almost every drill.
+        const label = (locale === 'en' && choice.labelEn) || choice.label
         const isPick = picked === i
         const isRight = correct === i
         const state = !answered ? '' : isRight ? ' is-right' : isPick ? ' is-wrong' : ' is-dim'
@@ -89,7 +93,7 @@ export function ChoiceList({ choices, picked, correct, onPick, chinese, locale }
                 {answered && isRight ? '✓' : answered && isPick ? '✗' : digits[i] ?? i + 1}
               </span>
               <span className="j-choice-body">
-                {chinese ? <Hanzi text={choice.label} size="md" /> : <span className="j-choice-label">{choice.label}</span>}
+                {chinese ? <Hanzi text={label} size="md" /> : <span className="j-choice-label">{label}</span>}
                 {choice.sub && <span className="j-choice-sub">{choice.sub}</span>}
               </span>
             </button>

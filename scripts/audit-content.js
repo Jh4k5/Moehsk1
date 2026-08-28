@@ -287,20 +287,138 @@ function auditHardcodedArabic() {
     }
   }
   walk(path.join(ROOT, 'src/lib/curriculum'))
+
+  const ARABIC = /[\u0600-\u06FF]/
   const hits = []
+
   for (const file of files) {
-    const lines = fs.readFileSync(file, 'utf8').split('\n')
-    lines.forEach((line, i) => {
-      // Comments are prose for the reader of the code, not user-facing copy.
-      const code = line.replace(/\/\/.*$/, '').replace(/^\s*\*.*$/, '')
-      if (/[؀-ۿ]/.test(code)) {
-        hits.push({ file: path.relative(ROOT, file), line: i + 1, text: line.trim().slice(0, 90) })
+    const text = fs.readFileSync(file, 'utf8')
+    const lines = text.split('\n')
+
+    // Which `const NAME_AR` blocks have a `NAME_EN` twin in this file. An
+    // entry inside one of those is the bilingual convention, not a defect.
+    const pairedMaps = new Set()
+    for (const m of text.matchAll(/const\s+([A-Z0-9_]+)_AR\b/g)) {
+      if (new RegExp(`const\\s+${m[1]}_EN\\b`).test(text)) pairedMaps.add(`${m[1]}_AR`)
+    }
+
+    let inPairedMap = null
+    let depth = 0
+    let inBlockComment = false
+
+    lines.forEach((raw, i) => {
+      let line = raw
+
+      // Strip comments — prose for whoever reads the code, never learner copy.
+      if (inBlockComment) {
+        const close = line.indexOf('*/')
+        if (close === -1) return
+        line = line.slice(close + 2)
+        inBlockComment = false
       }
+      line = line.replace(/\/\*[^]*?\*\//g, '')
+      const open = line.indexOf('/*')
+      if (open !== -1) {
+        inBlockComment = true
+        line = line.slice(0, open)
+      }
+      line = line.replace(/\/\/.*$/, '')
+
+      // Track entry into and out of a paired *_AR map.
+      const mapStart = /const\s+([A-Z0-9_]+_AR)\b/.exec(line)
+      if (mapStart && pairedMaps.has(mapStart[1])) {
+        inPairedMap = mapStart[1]
+        depth = 0
+      }
+      if (inPairedMap) {
+        depth += (line.match(/[{[]/g) || []).length - (line.match(/[}\]]/g) || []).length
+        if (depth <= 0 && !mapStart) inPairedMap = null
+      }
+
+      if (!ARABIC.test(line)) return
+      if (inPairedMap) return
+
+      // A key ending in `Ar` whose `En` twin exists in this file.
+      const key = /^\s*([A-Za-z_$][\w$]*)\s*:/.exec(line)?.[1]
+      if (key && /Ar$/.test(key) && new RegExp(`\\b${key.slice(0, -2)}En\\b`).test(text)) return
+
+      // A line carrying BOTH an Arabic string and a Latin-script string — an
+      // inline `{ ar: '…', en: '…' }`, or a call taking both spellings. This is
+      // the pattern the whole codebase uses; flagging it reported 33 defects of
+      // which every single one was the fix already in place.
+      const strings = line.match(/(['"`])(?:\\.|(?!\1)[^\\])*\1/g) || []
+      const hasArabicString = strings.some((x) => ARABIC.test(x))
+      const hasLatinString = strings.some((x) => !ARABIC.test(x) && /[A-Za-z]{3}/.test(x))
+      if (hasArabicString && hasLatinString) return
+
+      // A multi-line `{ ar: '…', en: '…' }`: the Arabic sits on one line and
+      // its twin on the next. Looking only at the current line reported six of
+      // these as unpaired when the pairing was one line below.
+      const near = lines.slice(i + 1, i + 3).join('\n')
+      if (/^\s*ar\s*:/.test(line) && /^\s*en\s*:/m.test(near)) return
+      // The same twin rule for any key: `options:` paired with `optionsEn:` on
+      // the following line is the convention working, not a defect.
+      if (key && new RegExp(`^\\s*${key}En\\s*:`, 'm').test(near)) return
+
+      hits.push({ file: path.relative(ROOT, file), line: i + 1, text: raw.trim().slice(0, 90) })
     })
   }
+
+  // `locale` is not threaded through the engine; both languages travel in the
+  // payload instead, which keeps `buildActivityStream` pure and lets one built
+  // stream serve both routes. Counted anyway, because a future change that
+  // starts reading a locale inside the engine is worth noticing.
   const engine = path.join(ROOT, 'src/lib/curriculum/activity-engine.ts')
   const localeMentions = (fs.readFileSync(engine, 'utf8').match(/locale/g) || []).length
   return { hits, localeMentions }
+}
+
+// ── [4.1] What an English reader actually sees ──────────────────────────────
+//
+// The strongest form of the bilingual check: build every unit's stream, take
+// every string the /en route would render, and count what is still Arabic.
+//
+// It measures the OUTPUT, so it cannot be satisfied by adding an `en` field
+// that nothing reads — which is precisely how 1,890 English sentences and a
+// full set of English glosses sat in the data for months while every screen
+// rendered Arabic. A field-presence check would have called that corpus
+// bilingual.
+
+function auditEnglishRoute() {
+  const { buildActivityStream } = load('src/lib/curriculum/activity-engine.ts')
+  const { levelContent } = load('src/lib/curriculum/content-source.ts')
+  const { emptyLearnerState, say } = load('src/lib/curriculum/types.ts')
+  const ARABIC = /[\u0600-\u06FF]/
+
+  let checked = 0
+  const offenders = new Map()
+
+  for (const unit of units) {
+    let stream
+    try {
+      stream = buildActivityStream(unit, emptyLearnerState(7), levelContent(unit.ref.level))
+    } catch {
+      continue
+    }
+    for (const a of stream) {
+      const texts = []
+      if (a.question) {
+        for (const c of a.question.choices) texts.push([`${a.kind}:choice`, c.labelEn ?? c.label])
+        texts.push([`${a.kind}:explanation`, say(a.question.explanation, 'en') || ''])
+      }
+      for (const field of ['prompt', 'hint', 'title']) {
+        const v = a[field]
+        if (v && typeof v === 'object' && 'en' in v) texts.push([`${a.kind}:${field}`, say(v, 'en')])
+      }
+      for (const [where, text] of texts) {
+        checked += 1
+        if (text && ARABIC.test(text)) offenders.set(where, (offenders.get(where) ?? 0) + 1)
+      }
+    }
+  }
+
+  const total = [...offenders.values()].reduce((n, v) => n + v, 0)
+  return { checked, total, offenders: [...offenders.entries()].sort((a, b) => b[1] - a[1]) }
 }
 
 // ── [2.17] Exam banks ───────────────────────────────────────────────────────
@@ -363,6 +481,7 @@ report.titles = auditTitles()
 report.sentenceGloss = auditSentenceGloss()
 report.bilingual = auditBilingual()
 report.engine = auditHardcodedArabic()
+report.englishRoute = auditEnglishRoute()
 report.exams = auditExams()
 report.wordCountClaim = auditWordCountClaim()
 
@@ -407,6 +526,10 @@ for (const e of report.exams) console.log(`  ${n(e.items)}  HSK${e.level}`)
 console.log('\n[4.1] [4.2] the engine')
 console.log(`  ${n(report.engine.localeMentions)}  mentions of \`locale\` in activity-engine.ts`)
 console.log(`  ${n(report.engine.hits.length)}  lines of Arabic frozen into src/lib/curriculum`)
+console.log(`  ${n(report.englishRoute.total)}  of ${report.englishRoute.checked} rendered strings still Arabic on /en`)
+for (const [where, count] of report.englishRoute.offenders.slice(0, 4)) {
+  console.log(`         ${String(count).padStart(5)}  ${where}`)
+}
 
 console.log('\n[4.4] [4.5] bilingual completeness')
 const b = report.bilingual
